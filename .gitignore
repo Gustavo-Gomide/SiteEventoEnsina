@@ -16,7 +16,6 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.db
 __pycache__/
 *.so
 *.egg-info/
