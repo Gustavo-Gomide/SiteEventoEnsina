@@ -1,0 +1,33 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Inscritos - {{ evento.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Inscritos no evento: {{ evento.titulo }}</h1>
+    <p><a href="?export=csv">Exportar CSV</a></p>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Usuário</th>
+                <th>Instituição</th>
+                <th>Telefone</th>
+                <th>Data Inscrição</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ins in inscritos %}
+            <tr>
+                <td>{{ ins.aluno.nome }}</td>
+                <td>{{ ins.aluno.nome_usuario }}</td>
+                <td>{{ ins.aluno.instituicao }}</td>
+                <td>{{ ins.aluno.telefone }}</td>
+                <td>{{ ins.data_inscricao }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

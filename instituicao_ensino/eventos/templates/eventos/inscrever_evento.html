@@ -1,0 +1,113 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Lista de Eventos{% endblock %}
+
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/lista_eventos.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="eventos-container">
+    <h1>Eventos Disponíveis</h1>
+
+    {% if eventos %}
+        <div class="eventos-grid">
+            {% for evento in eventos %}
+                <div class="evento-card">
+                    <h2>{{ evento.titulo }}</h2>
+
+                    <p><strong>Modalidade:</strong> {{ evento.modalidade }}</p>
+                    <p><strong>Data:</strong> {{ evento.data_inicio }}{% if evento.data_fim %} - {{ evento.data_fim }}{% endif %}</p>
+                    <p><strong>Horário:</strong> {{ evento.horario }}</p>
+                    <p><strong>Local:</strong> {{ evento.local|default:"Online" }}</p>
+
+                    <p><strong>Participantes:</strong>
+                        {% if evento.sem_limites %}
+                            Ilimitado
+                        {% elif evento.quantidade_participantes %}
+                            {{ evento.quantidade_participantes }}
+                        {% else %}
+                            Não informado
+                        {% endif %}
+                    </p>
+
+                    <p><strong>Organizador:</strong> {{ evento.organizador|default:"Não informado" }}</p>
+
+                    {% if evento.link %}
+                        <p><a href="{{ evento.link }}" target="_blank">Link do Evento</a></p>
+                    {% endif %}
+
+                    <p><strong>Inscritos:</strong> {{ evento.inscricaoevento_set.count|stringformat:"02d" }}
+                        {% if not evento.sem_limites and evento.quantidade_participantes %}
+                            /{{ evento.quantidade_participantes|stringformat:"02d" }}
+                        {% elif not evento.sem_limites %}
+                            /--
+                        {% endif %}
+                    </p>
+
+                    <!-- AÇÕES DO USUÁRIO -->
+                    {% if usuario %}
+                        <div class="evento-actions">
+                            {% if evento.criador == usuario %}
+                                    <a href="{% url 'meus_eventos' %}?evento={{ evento.id }}" class="btn">Gerenciar Evento</a>
+                                    <!-- Galeria disponível para todos usuários logados -->
+                                    <a href="#" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                                    Enviar Fotos
+                                    <a href="{% url 'galeria_evento' evento.id %}" 
+                                    class="btn">
+                                        Ver Galeria do Evento
+                                    </a>
+                                    </a>
+                                    <!-- Modal de Envio de Fotos -->
+                                    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <form method="POST" enctype="multipart/form-data" action="{% url 'galeria_evento' evento.id %}">
+                                                    {% csrf_token %}
+                                                    <div class="modal-header">
+                                                    <h5 class="modal-title" id="uploadModalLabel">Enviar Fotos do Evento</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                    <input type="file" name="photo" accept="image/*" multiple class="form-control" required>
+                                                    <small class="text-muted">Envie uma ou mais fotos do evento (formatos: JPG, PNG, GIF)</small>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="submit" class="btn btn-primary">Enviar</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                            {% endif %}
+                            {% if usuario.tipo.tipo == 'Aluno' or usuario.tipo.tipo == 'Professor' %}
+                                {% if evento.id in usuario_inscricoes %}
+                                    <a href="{% url 'detalhe_evento' evento.id %}" class="btn cancel">Cancelar Inscrição</a>
+                                    <!-- Galeria disponível para todos usuários logados -->
+                                    <a href="{% url 'galeria_evento' evento.id %}" 
+                                    class="btn">
+                                        Ver Galeria do Evento
+                                    </a>
+                                {% else %}
+                                    {% if not evento.criador == usuario %}
+                                        <a href="{% url 'detalhe_evento' evento.id %}" class="btn inscr">Inscrever-se</a>
+                                    {% endif %}                                    
+                                {% endif %}
+                            {% endif %}
+
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn">Entrar para se inscrever</a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Nenhum evento cadastrado.</p>
+    {% endif %}
+</div>
+{% endblock %}

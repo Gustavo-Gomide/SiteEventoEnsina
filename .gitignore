@@ -1,0 +1,43 @@
+# Ambiente virtual
+venv/
+ENV/
+env/
+*.pyc
+__pycache__/
+
+# Configurações locais e sensíveis
+*.sqlite3
+*.env
+.env*
+
+# Arquivos de build, logs e cache
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+__pycache__/
+*.so
+*.egg-info/
+build/
+dist/
+
+# Arquivos do Django
+.DS_Store
+
+# IDEs e sistemas
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema operacional
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Backup e temporários
+*.bak
+*.tmp

@@ -1,0 +1,180 @@
+/* Navbar Horizontal Elegante - legacy styles kept under .legacy-navbar for non-Bootstrap fallback */
+.legacy-navbar, .navbar.custom-navbar {
+    background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(139, 0, 0, 0.3);
+    border-bottom: 3px solid #d4af37;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.legacy-navbar ul, .navbar.custom-navbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.legacy-navbar li, .navbar.custom-navbar li {
+    margin: 0;
+}
+
+.legacy-navbar .nav-left, .navbar.custom-navbar .nav-left {
+    display: flex;
+    align-items: center;
+}
+
+.legacy-navbar .nav-right, .navbar.custom-navbar .nav-right {
+    display: flex;
+    align-items: center;
+}
+
+.legacy-navbar a, .navbar.custom-navbar a {
+    color: #f8f8f8;
+    text-decoration: none;
+    padding: 1.2rem 2rem;
+    display: block;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    position: relative;
+}
+
+.navbar, .navbar a {
+    font-size: 3rem;
+    --bs-navbar-toggler-font-size: 4rem;
+    --bs-navbar-toggler-margin-y: 3rem;
+}
+
+.navbar button {
+    margin: 10px;
+
+}
+
+.navbar .user-info {
+    padding: 0 1rem;
+    color: #f8f8f8;
+    font-weight: 600;
+}
+
+.btn-cta:hover {
+    background: #d4af37;
+    color: #2d1b1b;
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+}
+
+.navbar a:hover {
+    background: rgba(212, 175, 55, 0.1);
+    color: #d4af37;
+    border-bottom-color: #d4af37;
+}
+
+.navbar a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #d4af37;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.navbar a:hover::after {
+    width: 80%;
+}
+
+/* Indicador de página ativa */
+.navbar a.active {
+    color: #d4af37;
+    border-bottom-color: #d4af37;
+    background: rgba(212, 175, 55, 0.05);
+}
+/* Responsividade */
+@media (max-width: 768px) {
+    .legacy-navbar ul, .navbar.custom-navbar ul {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .legacy-navbar a, .navbar.custom-navbar a {
+        padding: 1rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .legacy-navbar ul, .navbar.custom-navbar ul {
+        flex-direction: column;
+    }
+    
+    .legacy-navbar a, .navbar.custom-navbar a {
+        padding: 0.8rem 1rem;
+        width: 100%;
+        text-align: center;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    }
+    
+    .legacy-navbar a::after, .navbar.custom-navbar a::after {
+        display: none;
+    }
+}
+
+/* Brand image size for Bootstrap navbar */
+.navbar-brand img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin-right: 8px;
+}
+
+/* Custom styling for Bootstrap navbar to give an elegant professional look */
+.navbar.custom-navbar {
+    background: linear-gradient(90deg, rgba(40,40,40,1) 0%, rgba(25,25,25,1) 100%);
+    border-bottom: 1px solid rgba(212,175,55,0.08);
+}
+.navbar.custom-navbar .nav-link {
+    color: rgba(255,255,255,0.9);
+    margin: 0 0.3rem;
+    padding: 0.5rem 0.7rem;
+    transition: color 0.18s ease, background 0.18s ease, transform 0.12s ease;
+}
+.navbar.custom-navbar .nav-link:hover {
+    color: #d4af37;
+    transform: translateY(-2px);
+}
+.navbar.custom-navbar .navbar-text {
+    color: rgba(255,255,255,0.85);
+}
+
+/* CTA button styling inside navbar (for Criar Evento) */
+.navbar.custom-navbar .btn-cta {
+    background: linear-gradient(180deg, #d4af37 0%, #b8972f 100%);
+    color: rgba(255,255,255,0.9);
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 0.4rem 0.9rem;
+    margin-left: 0.5rem;
+    border: none;
+}
+.navbar.custom-navbar .btn-cta:hover {
+    filter: brightness(0.95);
+    transform: translateY(-1px);
+    color: rgb(165, 4, 4);
+}
+
+/* Make navbar items slightly more spaced on larger screens */
+@media (min-width: 992px) {
+    .navbar.custom-navbar .navbar-nav .nav-item { margin-left: 0.45rem; margin-right: 0.45rem; }
+    .navbar, .navbar a {
+    font-size: 1.2rem;
+    }
+}

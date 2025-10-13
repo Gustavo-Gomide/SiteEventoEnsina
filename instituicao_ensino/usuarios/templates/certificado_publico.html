@@ -1,0 +1,27 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="container">
+    <h1>Certificado: {{ cert.nome }}</h1>
+    <p><strong>Participante:</strong> {{ cert.usuario.nome }} ({{ cert.usuario.nome_usuario }})</p>
+    <p><strong>Evento:</strong> {{ cert.evento.titulo if cert.evento else 'N/A' }}</p>
+    <p><strong>Data de emissão:</strong> {{ cert.data_emitido }}</p>
+    {% if cert.horas %}
+      <p><strong>Horas:</strong> {{ cert.horas }} h</p>
+    {% endif %}
+    {% if file_url %}
+      <p><a href="{{ file_url }}" target="_blank">Abrir certificado</a></p>
+    {% endif %}
+
+    {% if cert.arquivo and not file_url %}
+      <div>
+        <!-- arquivo HTML inline -->
+        <iframe src="{{ cert.arquivo.url }}" width="100%" height="800px"></iframe>
+      </div>
+    {% endif %}
+
+    <hr />
+    <p>Validação via QR: escaneie o QR no certificado para acessar esta página.</p>
+  </div>
+{% endblock %}

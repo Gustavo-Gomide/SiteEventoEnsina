@@ -1,0 +1,45 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Perfil{% endblock %}
+
+{% block content %}
+<div class="container mt-4 perfil-container">
+    <h1 class="mb-3">Perfil de {{ usuario.nome }}</h1>
+
+    <div class="row perfil-grid">
+        <div class="col-md-4 perfil-left">
+            {% comment %} Prefer explicit perfil_obj if provided, otherwise assume usuario.perfil relation {% endcomment %}
+            {% if usuario.perfil.foto %}
+                <img src="{{ usuario.perfil.foto.url }}" alt="Foto de {{ usuario.nome }}" class="img-fluid rounded" style="max-width:200px;"/>
+            {% else %}
+                <img src="{% static 'images/unknown.svg' %}" alt="Sem foto" class="img-fluid rounded" style="max-width:200px;"/>
+            {% endif %}
+
+            <p><strong>Usuário:</strong> {{ usuario.nome_usuario }}</p>
+            <p><strong>Tipo:</strong> {{ usuario.tipo.tipo }}</p>
+            <p><strong>Instituição:</strong>
+                {% if usuario.instituicao %}
+                    <a href="{% url 'instituicao_publica' usuario.instituicao.id %}">{{ usuario.instituicao.nome }}</a>
+                {% else %}
+                    -
+                {% endif %}
+            </p>
+            <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
+            
+            <h3 class="mt-4">Certificados</h3>
+            <a href="{% url 'perfil_certificados' usuario.nome_usuario %}" class="btn btn-success mt-2">Ver todos os certificados</a>
+
+        </div>
+        <div class="col-md-8 perfil-right">
+            <h3>Editar Informações</h3>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ uform.as_p }}
+                {{ pform.as_p }}
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

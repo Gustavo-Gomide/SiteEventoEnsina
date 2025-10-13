@@ -1,0 +1,47 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Certificados de {{ usuario.nome }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Certificados de {{ usuario.nome }}</h1>
+
+    {% if certificados %}
+        <div class="row row-cols-1 row-cols-md-3 g-3 mt-3">
+            {% for cert in certificados %}
+                <div class="col">
+                    <div class="card h-100">
+                        {% if cert.png %}
+                            <img src="{{ cert.png.url }}" class="card-img-top" alt="Certificado {{ cert.evento.titulo }}">
+                        {% elif cert.arquivo %}
+                            <iframe src="{{ cert.arquivo.url }}" style="width:100%; height:200px;"></iframe>
+                        {% else %}
+                            <img src="{% static 'images/unknown.svg' %}" class="card-img-top" alt="Sem certificado">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ cert.evento.titulo }}</h5>
+                            <p class="card-text">Emitido em: {{ cert.data_emitido|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            {% if cert.pdf %}
+                                <a href="{{ cert.pdf.url }}" class="btn btn-primary btn-sm" target="_blank">Download PDF</a>
+                            {% elif cert.png %}
+                                <a href="{{ cert.png.url }}" class="btn btn-primary btn-sm" target="_blank">Download PNG</a>
+                            {% else %}
+                                <a href="{{ cert.arquivo.url }}" class="btn btn-primary btn-sm" target="_blank">Abrir HTML</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">Nenhum certificado disponível.</p>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{% url 'perfil' %}" class="btn btn-secondary">Voltar ao perfil</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+/* Reset e configurações gerais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.text-muted{
+    color: #ff7f16 !important;
+    padding: 5px;
+}
+
+body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: linear-gradient(135deg, #0f0b0b 0%, #241414 100%);
+    color: #fff7d9; /* brighter for maximum contrast */
+    min-height: 100vh;
+    line-height: 1.6;
+    font-size: 18px; /* larger base for readability */
+}
+
+main {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Typography helpers */
+h1, h2, h3, h4, h5 {
+    color: #ffeaa7; /* brighter headings */
+    margin-bottom: 0.5rem;
+}
+
+p, li, label {
+    color: #fff7d9; /* supportive body text color */
+}
+
+/* Links and buttons: use gold accent with stronger focus styles */
+a, .btn {
+    color: #fffbe6;
+}
+
+a:hover, .btn:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #a66b03 0%, #7a4a02 100%);
+    border: none;
+    color: #fff;
+}
+
+.btn-primary:focus, .btn-primary:active {
+    outline: 3px solid rgba(214,175,55,0.25);
+}
+
+/* Carousel sizing: keep a modest height so it doesn't dominate the page */
+.carousel-inner {
+    max-height: 320px;
+    overflow: hidden;
+}
+.carousel-inner .carousel-item img {
+    height: 320px;
+    object-fit: cover;
+    width: 100%;
+}
+
+/* Responsive: scale down carousel and text on small screens */
+@media (max-width: 768px) {
+    body { font-size: 16px; }
+    .carousel-inner { max-height: 220px; }
+    .carousel-inner .carousel-item img { height: 220px; }
+    main { padding: 1rem; }
+}
+
+@media (max-width: 480px) {
+    body { font-size: 15px; }
+    .carousel-inner { max-height: 160px; }
+    .carousel-inner .carousel-item img { height: 160px; }
+}
+
+/* Mobile touch targets and legibility */
+@media (max-width: 600px) {
+    .btn { padding: 0.75rem 1rem; font-size: 1rem; }
+    .list-group-item { padding: 0.9rem 1rem; font-size: 1rem; }
+    .card-body p, .card-body .card-text { font-size: 0.95rem; }
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #2d1b1b;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #a00000 0%, #6a0000 100%);
+}
+
+/* Card / panels contrast */
+.card, .list-group-item {
+    background: rgba(255,255,255,0.03);
+    color: #fff7d9;
+}
+
+/* Form inputs contrast */
+input, textarea, select {
+    background: rgba(255,255,255,0.03);
+    color: #fffbe6;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+input::placeholder, textarea::placeholder {
+    color: rgba(255,255,255,0.6);
+}

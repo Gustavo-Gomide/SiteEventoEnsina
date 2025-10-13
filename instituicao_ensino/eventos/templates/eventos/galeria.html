@@ -1,0 +1,34 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/galeria.css' %}">
+{% endblock %}
+
+{% block title %}Galeria de Eventos{% endblock %}
+
+{% block content %}
+<div class="galeria-container">
+    <h1 class="titulo-galeria">📸 Galeria de Eventos</h1>
+
+    <div class="galeria-grid">
+        {% for evento in eventos %}
+            <a href="{% url 'galeria_evento' evento.id %}" class="galeria-card">
+                {% if evento.thumb %}
+                    <img src="{{ evento.thumb.url }}" alt="{{ evento.titulo }}" class="galeria-imagem">
+                {% else %}
+                    <img src="{% static 'favicon.png' %}" alt="Sem imagem" class="galeria-imagem">
+                {% endif %}
+                <div class="galeria-info">
+                    <h5>{{ evento.titulo }}</h5>
+                    <p>{{ evento.data_inicio|date:"d/m/Y" }}</p>
+                </div>
+            </a>
+        {% empty %}
+            <p class="text-muted">Nenhum evento com imagens disponível no momento.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<link rel="stylesheet" href="{% static 'css/galeria_eventos.css' %}">
+{% endblock %}

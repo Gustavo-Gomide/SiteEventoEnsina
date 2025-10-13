@@ -1,0 +1,137 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+<!-- Título da página -->
+{% block title %}Detalhe do Evento{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- ======================================== -->
+        <!-- Coluna da imagem do evento -->
+        <!-- ======================================== -->
+        <div class="col-md-4">
+            {% if evento.thumb %}
+                <!-- Exibe a imagem enviada pelo usuário -->
+                <img src="{{ evento.thumb.url }}" class="img-fluid rounded" alt="{{ evento.titulo }}">
+            {% else %}
+                <!-- Se não houver imagem, exibe uma imagem padrão -->
+                <img src="{% static 'favicon.png' %}" class="img-fluid rounded" alt="placeholder">
+            {% endif %}
+        </div>
+
+        <!-- ======================================== -->
+        <!-- Coluna com detalhes do evento -->
+        <!-- ======================================== -->
+        <div class="col-md-8">
+            <!-- Título do evento -->
+            <h1>{{ evento.titulo }}</h1>
+
+            <!-- Tipo e modalidade do evento -->
+            <p><strong>Tipo:</strong> {{ evento.tipo.tipo|default:evento.tipo }} | 
+               <strong>Modalidade:</strong> {{ evento.modalidade }}</p>
+
+            <!-- Datas do evento -->
+            <p>
+                <strong>Data:</strong> {{ evento.data_inicio }}
+                {% if evento.data_fim %}
+                    a {{ evento.data_fim }}
+                {% endif %}
+            </p>
+
+            <!-- Horário do evento -->
+            <p><strong>Horário:</strong> {{ evento.horario }}</p>
+
+            <!-- Local e link -->
+            <p>
+                <strong>Local:</strong> {{ evento.local|default:'Online' }}
+                {% if evento.link %}
+                    - <a href="{{ evento.link }}" target="_blank">Link</a>
+                {% endif %}
+            </p>
+
+            <!-- Carga em horas -->
+            {% if evento.horas %}
+                <p><strong>Carga:</strong> {{ evento.horas }} horas</p>
+            {% endif %}
+
+            <!-- Descrição do evento -->
+            {% if evento.descricao %}
+                <p><strong>Descrição:</strong> {{ evento.descricao }}</p>
+            {% endif %}
+
+            <!-- Participantes -->
+            <p>
+                <strong>Participantes:</strong>
+                {{ evento.inscricaoevento_set.count|stringformat:"02d" }}
+                {% if not evento.sem_limites and evento.quantidade_participantes %}
+                    /{{ evento.quantidade_participantes|stringformat:"02d" }}
+                {% endif %}
+            </p>
+
+            <!-- ======================================== -->
+            <!-- Mensagens do Django -->
+            <!-- ======================================== -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert 
+                        {% if message.tags %} alert-{{ message.tags }}{% else %} alert-info{% endif %} 
+                        alert-dismissible fade show mt-3" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- ======================================== -->
+            <!-- Botão de inscrição -->
+            <!-- Só aparece se usuário estiver logado e ainda não inscrito -->
+            <!-- ======================================== -->
+            {% if usuario %}
+                {% if not inscrito %}
+                    {% if usuario.tipo.tipo == 'Aluno' or usuario.tipo.tipo == 'Professor' %}
+                        <form method="post" action="{% url 'inscrever_evento' evento.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Confirmar inscrição</button>
+                        </form>
+                    {% elif usuario.tipo.tipo == 'Organizador' %}
+                        <p class="text-muted">Organizadores não podem se inscrever em eventos.</p>
+                    {% endif %}
+                {% else %}
+                    <!-- Se já estiver inscrito, mostra mensagem -->
+                    <p class="text-success">Você já está inscrito neste evento.</p>
+
+                    <!-- Botão para cancelar inscrição -->
+                    <form method="post" action="{% url 'cancelar_inscricao' evento.id %}" class="mt-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Cancelar inscrição</button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <!-- Usuário não logado é redirecionado para login -->
+                <a href="{% url 'login' %}" class="btn btn-primary">Entrar para inscrever</a>
+            {% endif %}
+
+            <!-- ======================================== -->
+            <!-- Botões do criador do evento -->
+            <!-- ======================================== -->
+            {% if usuario and evento.criador and usuario.id == evento.criador.id %}
+                <a href="{% url 'gerenciar_evento' evento.id %}" class="btn btn-outline-secondary ms-2">Gerenciar Evento</a>
+                <a href="{% url 'galeria_evento' evento.id %}" class="btn btn-outline-secondary ms-2">Galeria</a>
+            {% endif %}
+
+            <!-- ======================================== -->
+            <!-- Status do evento -->
+            <!-- ======================================== -->
+            <p>
+                <strong>Status:</strong>
+                {% if evento.finalizado %}
+                    Finalizado
+                {% else %}
+                    Em andamento
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

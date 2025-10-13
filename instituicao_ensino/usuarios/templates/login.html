@@ -1,0 +1,53 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Login</h1>
+
+    {% if mensagem %}
+        <p class="mensagem">{{ mensagem }}</p>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <p>
+            <label for="{{ form.nome_usuario.id_for_label }}">Usuário:</label>
+            {{ form.nome_usuario }}
+            {% if form.nome_usuario.errors %}
+                <span class="erro">{{ form.nome_usuario.errors }}</span>
+            {% endif %}
+        </p>
+
+        <p class="senha-container">
+            <label for="{{ form.senha.id_for_label }}">Senha:</label>
+            {{ form.senha }}
+            <span id="toggleSenha" title="Mostrar/ocultar senha">
+                <svg id="iconShow" class="active" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5m0 11a3.5 3.5 0 1 1 0-7a3.5 3.5 0 0 1 0 7m0-5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0-3"/>
+                </svg>
+                <svg id="iconHide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M12 6a9.77 9.77 0 0 1 9 6a9.6 9.6 0 0 1-1.72 2.82l1.42 1.42A11.85 11.85 0 0 0 23 12a11.77 11.77 0 0 0-11-7a11.43 11.43 0 0 0-3.93.73l1.53 1.53A9.43 9.43 0 0 1 12 6m-9.9.68l2.23 2.23A11.66 11.66 0 0 0 1 12a11.85 11.85 0 0 0 11 7a11.43 11.43 0 0 0 3.93-.73l2.3 2.3l1.27-1.27L4.37 5.41zm9.9 11.82A9.77 9.77 0 0 1 3 12a9.6 9.6 0 0 1 1.72-2.82l1.47 1.47a7.5 7.5 0 0 0 9.12 9.12l1.47 1.47A11.43 11.43 0 0 1 12 18.5M9 12a3 3 0 0 1 3-3a3 3 0 0 1 2.82 2.1L9.9 15a3 3 0 0 1-.9-3"/>
+                </svg>
+            </span>
+            {% if form.senha.errors %}
+                <span class="erro">{{ form.senha.errors }}</span>
+            {% endif %}
+        </p>
+
+        <button type="submit">Entrar</button>
+    </form>
+
+    <p class="cadastro-link">Ainda não tem cadastro? <a href="{% url 'cadastro' %}">Cadastrar</a></p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'scripts/senha.js' %}"></script>
+{% endblock %}

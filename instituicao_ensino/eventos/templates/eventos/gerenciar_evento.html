@@ -1,0 +1,89 @@
+{% extends 'base/base.html' %}
+<!-- Extende o template base, herdando navbar, footer e layout padrão -->
+
+{% block title %}Gerenciar Evento - {{ evento.titulo }}{% endblock %}
+<!-- Define o título da página, incluindo o título do evento -->
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Container do Bootstrap com margem superior -->
+
+    <h1>{{ evento.titulo }}</h1>
+    <!-- Mostra o título do evento -->
+
+    <p class="text-muted">
+        {{ evento.data_inicio }}{% if evento.data_fim %} - {{ evento.data_fim }}{% endif %}
+    </p>
+    <!-- Exibe as datas do evento. Se houver data de fim, mostra intervalo -->
+
+    <!-- Formulário para validar inscrições -->
+    <form method="post">
+        {% csrf_token %}
+        <!-- CSRF Token protege contra ataques de falsificação de requisições 
+           garantindo que o form foi enviado pelo site legítimo -->
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Usuário</th>
+                    <th>Nome</th>
+                    <th>Instituição</th>
+                    <th>Inscrito em</th>
+                    <th>Aprovado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inscr in inscritos %}
+                <!-- Loop sobre todas as inscrições do evento -->
+                <tr>
+                    <td>{{ inscr.inscrito.nome_usuario }}</td>
+                    <td>{{ inscr.inscrito.nome }}</td>
+                    <td>
+                        {% if inscr.inscrito.instituicao %}
+                            {{ inscr.inscrito.instituicao.nome }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ inscr.data_inscricao }}</td>
+                    <td>
+                        <input type="checkbox" class="validate-checkbox" name="validate_{{ inscr.id }}" {% if inscr.is_validated %}checked{% endif %}>
+                        <!-- Checkbox para marcar se a inscrição foi validada -->
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Checkbox para selecionar/desmarcar todos -->
+        <div class="mb-3">
+            <label><input type="checkbox" id="select-all"> Selecionar todos</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salvar alterações</button>
+    </form>
+
+    <!-- Script para selecionar/desmarcar todas as checkboxes -->
+    <script>
+        (function(){
+            const sel = document.getElementById('select-all');
+            if(!sel) return;
+            sel.addEventListener('change', function(){
+                const boxes = document.querySelectorAll('.validate-checkbox');
+                boxes.forEach(b => b.checked = sel.checked);
+            });
+        })();
+    </script>
+    <!-- Formulário para finalizar o evento -->
+    <form method="post" action="{% url 'finalizar_evento' evento.id %}" class="mt-3">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger" {% if evento.finalizado %}disabled{% endif %}>
+            {% if evento.finalizado %}
+                Evento finalizado
+            {% else %}
+                Finalizar evento (publicar certificados)
+            {% endif %}
+        </button>
+    </form>
+</div>
+{% endblock %}

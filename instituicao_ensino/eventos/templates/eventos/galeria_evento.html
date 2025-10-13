@@ -1,0 +1,91 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/galeria_evento.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/galeria_evento.js' %}"></script>
+{% endblock %}
+
+{% block title %}Galeria - {{ evento.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ evento.titulo }}</h1>
+    {% if usuario and usuario.id == evento.criador.id or request.user.is_staff %}
+        <form method="post" enctype="multipart/form-data" class="mb-4">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="photo" class="form-label">Enviar foto do evento</label>
+                <input type="file" name="photo" id="photo" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+            {% if upload_ok %}
+                <div class="mt-2 text-success">Upload realizado com sucesso!</div>
+            {% endif %}
+        </form>
+    {% endif %}
+
+    {% if fotos %}
+        <h4>Galeria de Fotos</h4>
+        <div class="gallery-row">
+            {% for f in fotos %}
+                <img src="{{ MEDIA_URL }}{{ f }}" class="img-fluid img-thumbnail gallery-thumb"
+                    alt="Foto {{ forloop.counter }}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#mobileLightbox"
+                    data-bs-slide-to="{{ forloop.counter0 }}">
+            {% endfor %}
+        </div>
+
+        <!-- Modal em tela cheia para a galeria -->
+        <div class="modal fade" id="mobileLightbox" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content bg-black border-0">
+
+                    <!-- Cabeçalho: título + botão fechar -->
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title text-white">{{ evento.titulo }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+
+                    <!-- Corpo do modal com carousel -->
+                    <div class="modal-body p-0 d-flex justify-content-center align-items-center">
+                        <div id="carouselMobile" class="carousel slide w-100 h-100" data-bs-ride="false">
+
+                            <!-- Imagens -->
+                            <div class="carousel-inner h-100">
+                                {% for f in fotos %}
+                                <div class="carousel-item {% if forloop.first %}active{% endif %} h-100">
+                                    <div class="d-flex justify-content-center align-items-center h-100">
+                                        <img src="{{ MEDIA_URL }}{{ f }}" class="carousel-img" alt="Foto {{ forloop.counter }}">
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Controles do carousel -->
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselMobile" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Anterior</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselMobile" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Próximo</span>
+                            </button>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <p class="text-muted">Nenhuma foto disponível no momento.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Cadastro{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Cadastro de Usuário</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Nome -->
+        <p>
+            <label for="{{ form.nome.id_for_label }}">Nome</label>
+            {{ form.nome }}
+            {% if form.nome.errors %}
+                <span class="erro">{{ form.nome.errors }}</span>
+            {% endif %}
+        </p>
+
+        <!-- DDD e Telefone lado a lado COM ALINHAMENTO CORRETO -->
+        <div class="telefone-group">
+            <div class="ddd-container">
+                <label for="{{ form.ddd.id_for_label }}" class="ddd-label">DDD</label>
+                {{ form.ddd }}
+                {% if form.ddd.errors %}
+                    <span class="erro">{{ form.ddd.errors }}</span>
+                {% endif %}
+            </div>
+            <div class="telefone-main-container">
+                <label for="{{ form.telefone.id_for_label }}" class="telefone-label">Telefone</label>
+                {{ form.telefone }}
+                {% if form.telefone.errors %}
+                    <span class="erro">{{ form.telefone.errors }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Resto do formulário permanece igual -->
+        <!-- Tipo de usuário -->
+        <p>
+            <label for="{{ form.tipo.id_for_label }}">Tipo</label>
+            {{ form.tipo }}
+            {% if form.tipo.errors %}
+                <span class="erro">{{ form.tipo.errors }}</span>
+            {% endif %}
+        </p>
+
+        <!-- Instituição -->
+        <p>
+            <label for="{{ form.instituicao.id_for_label }}">Instituição</label>
+            {{ form.instituicao }}
+            {% if form.instituicao.errors %}
+                <span class="erro">{{ form.instituicao.errors }}</span>
+            {% endif %}
+        </p>
+
+        <!-- Nome de usuário -->
+        <p>
+            <label for="{{ form.nome_usuario.id_for_label }}">Usuário</label>
+            {{ form.nome_usuario }}
+            {% if form.nome_usuario.errors %}
+                <span class="erro">{{ form.nome_usuario.errors }}</span>
+            {% endif %}
+        </p>
+
+        <!-- E-mail (opcional) -->
+        <p>
+            <label for="{{ form.email.id_for_label }}">E-mail (opcional)</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <span class="erro">{{ form.email.errors }}</span>
+            {% endif %}
+        </p>
+
+        <!-- Senha com toggle -->
+        <p class="senha-container">
+            <label for="{{ form.senha.id_for_label }}">Senha</label>
+            {{ form.senha }}
+            <button type="button" id="toggleSenha" title="Mostrar/ocultar senha">
+                <svg id="iconShow" class="active" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5m0 11a3.5 3.5 0 1 1 0-7a3.5 3.5 0 0 1 0 7"/>
+                </svg>
+                <svg id="iconHide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M12 6a9.77 9.77 0 0 1 9 6a9.6 9.6 0 0 1-1.72 2.82l1.42 1.42A11.85 11.85 0 0 0 23 12a11.77 11.77 0 0 0-11-7a11.43 11.43 0 0 0-3.93.73l1.53 1.53A9.43 9.43 0 0 1 12 6m-9.9.68l2.23 2.23A11.66 11.66 0 0 0 1 12a11.85 11.85 0 0 0 11 7a11.43 11.43 0 0 0 3.93-.73l2.3 2.3l1.27-1.27L4.37 5.41zm9.9 11.82A9.77 9.77 0 0 1 3 12a9.6 9.6 0 0 1 1.72-2.82l1.47 1.47a7.5 7.5 0 0 0 9.12 9.12l1.47 1.47A11.43 11.43 0 0 1 12 18.5M9 12a3 3 0 0 1 3-3a3 3 0 0 1 2.82 2.1L9.9 15a3 3 0 0 1-.9-3"/>
+                </svg>
+            </button>
+            {% if form.senha.errors %}
+                <span class="erro">{{ form.senha.errors }}</span>
+            {% endif %}
+        </p>
+
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <p class="cadastro-link">
+        Já tem cadastro? <a href="{% url 'login' %}">Login</a>
+    </p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'scripts/senha.js' %}"></script>
+{% endblock %}

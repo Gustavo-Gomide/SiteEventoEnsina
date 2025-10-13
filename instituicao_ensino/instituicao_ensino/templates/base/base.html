@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Meu Site{% endblock %}</title>
+
+    <link rel="shortcut icon" href="{% static 'favicon.png' %}" type="image/x-icon">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-..." crossorigin="anonymous">
+
+    <!-- CSS base -->
+    <link rel="stylesheet" href="{% static 'styles/nav.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Navbar Bootstrap -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark custom-navbar">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{% url 'main' %}">
+                        <img src="{% static 'favicon.png' %}" alt="Logo" width="32" height="32" class="d-inline-block align-text-top">
+                        EventosAcademicos
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        {% for item in nav_left %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ item.url }}">{{ item.label }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                                    {% for item in nav_right %}
+                                    <li class="nav-item">
+                                        {% if item.label == 'Criar Evento' %}
+                                            <a class="nav-link btn btn-cta" href="{{ item.url }}">{{ item.label }}</a>
+                                        {% else %}
+                                            <a class="nav-link" href="{{ item.url }}">{{ item.label }}</a>
+                                        {% endif %}
+                                    </li>
+                                    {% endfor %}
+                        {% if current_usuario %}
+                        <li class="nav-item">
+                                <span class="navbar-text text-light">Olá, {{ current_usuario.nome }}</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+    <!-- Conteúdo da página -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Scripts base -->
+    <script src="{% static 'scripts/base.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+
+    <!-- Bootstrap JS bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
+</body>
+</html>
