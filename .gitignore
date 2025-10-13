@@ -17,7 +17,6 @@ __pycache__/
 *.pyo
 *.pyd
 *.db
-*.sqlite3
 __pycache__/
 *.so
 *.egg-info/
