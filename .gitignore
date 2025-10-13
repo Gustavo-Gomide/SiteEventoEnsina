@@ -6,7 +6,6 @@ env/
 __pycache__/
 
 # Configurações locais e sensíveis
-*.sqlite3
 *.env
 .env*
 
