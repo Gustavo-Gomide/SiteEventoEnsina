@@ -1,4 +1,4 @@
-/* Container do formulário */
+/* FORMULÁRIO ELEGANTE - CSS COMPLETO */
 .form-container {
     max-width: 500px;
     margin: 2rem auto;
@@ -65,7 +65,8 @@
 }
 
 .form-container input,
-.form-container select {
+.form-container select,
+.form-container textarea {
     width: 100%;
     padding: 0.8rem 1rem;
     background: rgba(26, 15, 15, 0.8);
@@ -78,15 +79,22 @@
     font-family: 'Georgia', 'Times New Roman', serif;
 }
 
+.form-container input::placeholder,
+.form-container textarea::placeholder {
+    color: #f8d568;
+}
+
 .form-container input:focus,
-.form-container select:focus {
+.form-container select:focus,
+.form-container textarea:focus {
     border-color: #d4af37;
+    color: #d4af37;
     background: rgba(26, 15, 15, 0.9);
     box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
     transform: translateY(-1px);
 }
 
-/* Container de telefone com DDD - AJUSTADO */
+/* Container de telefone com DDD */
 .telefone-container {
     margin-bottom: 1.2rem;
 }
@@ -121,7 +129,6 @@
     display: block;
 }
 
-/* Campos menores para DDD */
 .ddd-container input {
     padding: 0.8rem 0.5rem;
     text-align: center;
@@ -160,7 +167,6 @@
     background: rgba(139, 0, 0, 0.3);
 }
 
-/* Esconder ícone padrão quando não estiver visível */
 #iconShow,
 #iconHide {
     display: none;
@@ -281,6 +287,282 @@
     color: #f8f8f8;
 }
 
+/* Checkboxes customizados */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    padding: 0.8rem 1rem;
+    background: rgba(26, 15, 15, 0.6);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.checkbox-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.checkbox-container:hover::before {
+    left: 100%;
+}
+
+.checkbox-container:hover {
+    border-color: rgba(212, 175, 55, 0.3);
+    background: rgba(26, 15, 15, 0.8);
+    transform: translateY(-2px);
+}
+
+.checkbox-container input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: relative;
+    height: 24px;
+    width: 24px;
+    background: rgba(26, 15, 15, 0.9);
+    border: 2px solid #5a0000;
+    border-radius: 6px;
+    margin-right: 12px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.checkbox-container:hover .checkmark {
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark {
+    background: linear-gradient(135deg, #d4af37 0%, #b8972f 100%);
+    border-color: #d4af37;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+.checkmark::after {
+    content: '';
+    position: absolute;
+    display: none;
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 12px;
+    border: solid #2d1b1b;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+    display: block;
+}
+
+.checkbox-label {
+    color: #f8f8f8;
+    font-weight: 500;
+    font-size: 1rem;
+    user-select: none;
+    flex: 1;
+}
+
+@keyframes pulseCheck {
+    0% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+    }
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark {
+    animation: pulseCheck 0.6s ease;
+}
+
+/* Upload de foto */
+.upload-container {
+    margin-bottom: 1.2rem;
+}
+
+.upload-area {
+    position: relative;
+    border: 2px dashed #5a0000;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background: rgba(26, 15, 15, 0.6);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.upload-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.upload-area:hover::before {
+    left: 100%;
+}
+
+.upload-area:hover {
+    border-color: #d4af37;
+    background: rgba(26, 15, 15, 0.8);
+    transform: translateY(-2px);
+}
+
+.upload-area.dragover {
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.1);
+    transform: scale(1.02);
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #d4af37;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover .upload-icon {
+    transform: scale(1.1);
+    color: #f8d568;
+}
+
+.upload-text {
+    color: #f8f8f8;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.upload-subtext {
+    color: rgba(248, 248, 248, 0.7);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.upload-btn {
+    display: inline-block;
+    padding: 0.7rem 1.5rem;
+    background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+    color: #f8f8f8;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.upload-btn:hover::before {
+    left: 100%;
+}
+
+.upload-btn:hover {
+    background: linear-gradient(135deg, #a00000 0%, #6a0000 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(139, 0, 0, 0.3);
+}
+
+.upload-preview {
+    margin-top: 1rem;
+    text-align: center;
+    display: none;
+}
+
+.upload-preview.active {
+    display: block;
+    animation: fadeInUp 0.5s ease;
+}
+
+.preview-image {
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: 8px;
+    border: 2px solid #d4af37;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.preview-name {
+    color: #f8f8f8;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    word-break: break-all;
+}
+
+.preview-size {
+    color: rgba(248, 248, 248, 0.7);
+    font-size: 0.8rem;
+}
+
+.upload-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.upload-area.has-file {
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.upload-area.has-file .upload-icon {
+    color: #f8d568;
+}
+
+@keyframes uploadPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+    }
+}
+
+.upload-area.uploading {
+    animation: uploadPulse 2s infinite;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
     .form-container {
@@ -306,6 +588,30 @@
         text-align: left;
         padding: 0.8rem 1rem;
     }
+    
+    .checkbox-container {
+        padding: 1rem;
+    }
+    
+    .checkmark {
+        height: 22px;
+        width: 22px;
+    }
+    
+    .checkmark::after {
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+    }
+    
+    .upload-area {
+        padding: 1.5rem;
+    }
+    
+    .upload-icon {
+        font-size: 2.5rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -322,9 +628,34 @@
     .form-container select {
         padding: 0.7rem 0.8rem;
     }
+    
+    .checkbox-container {
+        padding: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .checkbox-label {
+        font-size: 0.95rem;
+    }
+    
+    .upload-area {
+        padding: 1rem;
+    }
+    
+    .upload-icon {
+        font-size: 2rem;
+    }
+    
+    .upload-text {
+        font-size: 0.95rem;
+    }
+    
+    .upload-subtext {
+        font-size: 0.85rem;
+    }
 }
 
-/* Animações suaves */
+/* Animações */
 .form-container {
     animation: fadeInUp 0.6s ease-out;
 }

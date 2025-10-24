@@ -1,0 +1,105 @@
+.thumb {
+    max-width: 400px;
+    height: auto;
+}
+.gallery-thumb {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    background-color: rgb(156, 91, 0);
+    border: 2px solid goldenrod;
+}
+.gallery-thumb:hover {
+    transform: scale(1.05);
+}
+
+/* Imagem em tela cheia (sem cortes, responsiva e centralizada) */
+.carousel-inner {
+    max-width: 100% !important;
+    max-height: 100vh !important;
+}
+.carousel-img {
+    width: 80% !important;
+    height: 80vh !important;
+    object-fit: contain !important;
+}
+
+/* Setas padrão, sem fundo */
+.carousel-control-prev,
+.carousel-control-next {
+  background: none;
+  border: none;
+  opacity: 1;
+}
+
+/* Tamanho e espaçamento */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgb(203, 88, 0);
+  border-radius: 50%;
+  filter: invert(40%) sepia(80%) saturate(7500%) hue-rotate(1deg) brightness(97%) contrast(107%);
+}
+
+/* Espaçamento das bordas */
+.carousel-control-prev {
+  left: 15px;
+}
+
+.carousel-control-next {
+  right: 15px;
+}
+.carousel-control-prev:hover, .carousel-control-next:hover{
+  filter: invert(27%) sepia(95%) saturate(7500%) hue-rotate(1deg) brightness(120%) contrast(107%);
+
+}
+
+.carousel-control-prev-icon:hover, .carousel-control-next-icon:hover {
+  border: 2px solid rgb(203, 0, 0);
+  filter: invert(27%) sepia(95%) saturate(7500%) hue-rotate(1deg) brightness(120%) contrast(107%);
+}
+
+/* Media query para celulares */
+@media (max-width: 992px ) {
+    /* Nome do evento maior */
+    .modal-title {
+        font-size: 3rem;
+        text-align: center;
+    }
+
+    /* Botão de fechar maior */
+    .modal-header .btn-close {
+        padding: 0;
+        font-size: 60px;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    /* Esconder as setas do carrossel */
+    .carousel-control-prev,
+    .carousel-control-next {
+        display: none;
+        visibility: hidden;
+    }
+
+    /* Ajusta a imagem para caber na tela inteira */
+    .carousel-img {
+        width: 100%;
+        height: auto;
+        max-height: 100vh;
+        object-fit: contain;
+    }
+    .gallery-row .gallery-thumb {
+        max-width: 100%;
+        height: auto;
+        margin: 10px;
+    }
+}
+
+@media (min-width: 992px) {
+    .gallery-row .gallery-thumb {
+    max-width: 500px;
+    height: 250px;
+    margin: 10px;
+}
+}

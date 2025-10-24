@@ -47,14 +47,11 @@
 }
 
 .navbar, .navbar a {
-    font-size: 3rem;
-    --bs-navbar-toggler-font-size: 4rem;
-    --bs-navbar-toggler-margin-y: 3rem;
+    font-size: 1.2rem;
 }
 
 .navbar button {
     margin: 10px;
-
 }
 
 .navbar .user-info {
@@ -98,43 +95,6 @@
     border-bottom-color: #d4af37;
     background: rgba(212, 175, 55, 0.05);
 }
-/* Responsividade */
-@media (max-width: 768px) {
-    .legacy-navbar ul, .navbar.custom-navbar ul {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .legacy-navbar a, .navbar.custom-navbar a {
-        padding: 1rem 1.2rem;
-        font-size: 0.9rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .legacy-navbar ul, .navbar.custom-navbar ul {
-        flex-direction: column;
-    }
-    
-    .legacy-navbar a, .navbar.custom-navbar a {
-        padding: 0.8rem 1rem;
-        width: 100%;
-        text-align: center;
-        border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-    }
-    
-    .legacy-navbar a::after, .navbar.custom-navbar a::after {
-        display: none;
-    }
-}
-
-/* Brand image size for Bootstrap navbar */
-.navbar-brand img {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-    margin-right: 8px;
-}
 
 /* Custom styling for Bootstrap navbar to give an elegant professional look */
 .navbar.custom-navbar {
@@ -171,10 +131,143 @@
     color: rgb(165, 4, 4);
 }
 
-/* Make navbar items slightly more spaced on larger screens */
-@media (min-width: 992px) {
-    .navbar.custom-navbar .navbar-nav .nav-item { margin-left: 0.45rem; margin-right: 0.45rem; }
-    .navbar, .navbar a {
-    font-size: 1.2rem;
+/* Media Queries Melhorados - Abordagem Mobile First */
+@media (max-width: 480px) {
+    .legacy-navbar ul, .navbar.custom-navbar ul {
+        flex-direction: column;
+        width: 100%;
     }
+    
+    .legacy-navbar a, .navbar.custom-navbar a {
+        padding: 1.5rem 2rem !important;
+        width: 100%;
+        text-align: center;
+        border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+        font-size: 1.3rem !important;
+        font-weight: 600;
+        min-height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .legacy-navbar a::after, .navbar.custom-navbar a::after {
+        display: none;
+    }
+    
+    .navbar, .navbar a {
+        font-size: 1.3rem !important;
+    }
+    
+    .navbar.custom-navbar .btn-cta {
+        margin: 1rem 0 !important;
+        width: 100% !important;
+        text-align: center;
+        font-size: 1.3rem !important;
+        padding: 1rem 1.5rem !important;
+        min-height: 60px;
+    }
+    
+    /* Toggle button muito maior para mobile */
+    .navbar-toggler {
+        padding: 1rem 1.2rem !important;
+        font-size: 1.8rem !important;
+        margin: 1rem !important;
+        min-height: 60px;
+        min-width: 60px;
+    }
+    
+    .navbar-toggler-icon {
+        width: 1.8em !important;
+        height: 1.8em !important;
+    }
+    
+    /* User info maior */
+    .navbar .user-info {
+        padding: 1.5rem !important;
+        font-size: 1.2rem !important;
+        text-align: center;
+        width: 100%;
+    }
+    
+    /* Brand image maior */
+    .navbar-brand img {
+        width: 45px !important;
+        height: 45px !important;
+        margin-right: 12px !important;
+    }
+    
+    .navbar-brand {
+        font-size: 1.4rem !important;
+        padding: 1rem !important;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+    .legacy-navbar ul, .navbar.custom-navbar ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .legacy-navbar a, .navbar.custom-navbar a {
+        padding: 1.2rem 1.8rem !important;
+        font-size: 1.2rem !important;
+        min-height: 60px;
+    }
+    
+    .navbar, .navbar a {
+        font-size: 1.2rem !important;
+    }
+    
+    .navbar.custom-navbar .navbar-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    /* Toggle button para tablet - tamanho adequado */
+    .navbar-toggler {
+        padding: 0.8rem 1rem !important;
+        font-size: 1.4rem !important;
+        margin: 0.8rem !important;
+    }
+    
+    .navbar-toggler-icon {
+        width: 1.4em !important;
+        height: 1.4em !important;
+    }
+    
+    .navbar.custom-navbar .btn-cta {
+        font-size: 1.2rem !important;
+        padding: 0.8rem 1.2rem !important;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 991px) {
+    .legacy-navbar a, .navbar.custom-navbar a {
+        padding: 1.1rem 1.5rem;
+    }
+    
+    .navbar, .navbar a {
+        font-size: 1.1rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .navbar.custom-navbar .navbar-nav .nav-item { 
+        margin-left: 0.45rem; 
+        margin-right: 0.45rem; 
+    }
+    .navbar, .navbar a {
+        font-size: 1.2rem;
+    }
+}
+
+/* Brand image size for Bootstrap navbar */
+.navbar-brand img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin-right: 8px;
 }
