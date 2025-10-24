@@ -71,7 +71,7 @@
                         <div class="event-header">
                             <h5 class="event-title">{{ ev.titulo }}</h5>
                             <div class="event-category">
-                                <i class="fas fa-graduation-cap"></i> Acadêmico
+                                <i class="fas fa-graduation-cap"></i> {{ev.tipo.tipo|default:'Acadêmico'}}
                             </div>
                         </div>
 
@@ -171,7 +171,7 @@
                                         <i class="fas fa-user-tie"></i>
                                         <div class="detail-content">
                                             <strong>Organizador</strong>
-                                            <span>{{ ev.organizador|default:"Não informado" }}</span>
+                                            <span>{{ ev.criador|default:"Não informado" }}</span>
                                         </div>
                                     </div>
                                     
@@ -179,7 +179,7 @@
                                         <i class="fas fa-university"></i>
                                         <div class="detail-content">
                                             <strong>Instituição</strong>
-                                            <span>{{ ev.instituicao_organizador|default:"Não informada" }}</span>
+                                            <span>{{ ev.criador.instituicao|default:"Não informada" }}</span>
                                         </div>
                                     </div>
                                     

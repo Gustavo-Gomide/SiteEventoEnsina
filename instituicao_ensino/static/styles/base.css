@@ -117,6 +117,7 @@ a:hover, .btn:hover {
 
 .btn {
     padding: 0.6rem 1rem;
+    margin-top: 5px;
     background: #8b0000;
     color: #f8f8f8;
     text-align: center;
@@ -182,6 +183,12 @@ input::placeholder, textarea::placeholder {
     height: 280px;
     object-fit: cover;
     width: 100%;
+}
+
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.7) !important;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
 }
 
 /* Scrollbar personalizada */

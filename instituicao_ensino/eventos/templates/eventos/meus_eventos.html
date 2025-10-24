@@ -120,6 +120,7 @@
                             <!-- Botão de finalizar (apenas criador) -->
                             {% if is_organizador and evento_selecionado.criador == usuario %}
                                 <a href="{% url 'gerenciar_evento' evento_selecionado.id %}" class="btn btn-outline-secondary ms-2">Gerenciar Evento</a>
+                                <a href="{% url 'galeria_evento' evento_selecionado.id %}" class="btn btn-outline-secondary ms-2">Galeria do evento</a>
                                 {% if not evento_selecionado.finalizado %}
                                 <form method="post" action="{% url 'finalizar_evento' evento_selecionado.id %}" class="d-inline-block mt-2">
                                     {% csrf_token %}

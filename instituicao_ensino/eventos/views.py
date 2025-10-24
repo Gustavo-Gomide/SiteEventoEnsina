@@ -187,7 +187,7 @@ def meus_eventos(request):
 
     # Caso organizador
     if is_organizador:
-        eventos = Evento.objects.filter(criador=usuario).order_by('-finalizado', '-data_inicio')
+        eventos = Evento.objects.filter(criador=usuario).order_by('-finalizado', '-data_inicio').reverse()
         inscricoes = usuario.inscricaoevento_set.select_related('evento').order_by('-evento__finalizado', '-evento__data_inicio')
 
         evento_id = request.GET.get('evento')

@@ -1,0 +1,488 @@
+/* CSS ESPECÍFICO PARA PÁGINA DE CRIAR EVENTO */
+
+/* ===== VARIÁVEIS ===== */
+:root {
+    --primary-gold: #d4af37;
+    --primary-gold-dark: #b8941f;
+    --primary-orange: #ff7f16;
+    --success-green: #28a745;
+    --danger-red: #dc3545;
+    --background-base-dark: #200303;
+    --background-base-medium: #350505;
+    --background-card: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
+    --background-card-hover: linear-gradient(135deg, #3d2424 0%, #4d2c2c 100%);
+    --text-light: #fff7d9;
+    --text-brighter: #fffbe6;
+    --text-heading: #ffeaa7;
+    --text-muted: #ff7f16;
+    --border-color: #d4af37;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --card-shadow-hover: 0 6px 12px rgba(212, 175, 55, 0.2);
+}
+
+input, select, textarea {
+    width: 100%;
+    background-color: rgba(26, 15, 15, 0.8) !important;
+    border: 2px solid #5a0000;
+    border-radius: 8px;
+    color: #f8f8f8;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+
+/* Container principal */
+.container.mt-4 {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Título da página */
+.container.mt-4 h1 {
+    text-align: center;
+    color: #d4af37;
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Ajustes para formulários Django */
+form {
+    background: var(--background-card);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border: 2px solid #5a0000;
+}
+
+.form-label {
+    color: #f8f8f8 !important;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Campos de formulário Django */
+.form-control {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(26, 15, 15, 0.8) !important;
+    border: 2px solid #5a0000 !important;
+    border-radius: 8px;
+    color: #f8f8f8 !important;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #d4af37 !important;
+    background: rgba(26, 15, 15, 0.9) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+    transform: translateY(-1px);
+    color: #f8f8f8 !important;
+}
+
+.form-control::placeholder {
+    color: rgba(248, 248, 248, 0.6) !important;
+}
+
+/* Select customizado - TEMA DARK COM SETAS */
+.form-select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background: rgba(26, 15, 15, 0.8) !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.7rem center !important;
+    background-size: 16px !important;
+    padding-right: 2.5rem !important;
+    border: 2px solid #5a0000 !important;
+    border-radius: 8px;
+    color: #f8f8f8 !important;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: #d4af37 !important;
+    background: rgba(26, 15, 15, 0.9) !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.7rem center !important;
+    background-size: 16px !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+    transform: translateY(-1px);
+    color: #f8f8f8 !important;
+}
+
+/* Options do select - TEMA DARK */
+.form-select option {
+    background: #2d1b1b !important;
+    color: #f8f8f8 !important;
+    padding: 10px;
+}
+
+.form-select option:hover {
+    background: #3d2424 !important;
+}
+
+.form-select option:checked {
+    background: #8b0000 !important;
+    color: #f8f8f8 !important;
+}
+
+/* Textarea */
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* LAYOUT QUANTIDADE + CHECKBOX NA MESMA LINHA */
+.row.align-items-end {
+    display: flex;
+    align-items: stretch !important;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.row.align-items-end .col-md-6 {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Campo de quantidade ocupa mais espaço */
+.row.align-items-end .col-md-6:first-child {
+    flex: 2;
+}
+
+/* Checkbox ocupa menos espaço */
+.row.align-items-end .col-md-6:last-child {
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    background: rgba(26, 15, 15, 0.6);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    margin-bottom: 0;
+    max-height: 50px;
+    border: 2px solid #5a0000;
+    height: 100%;
+    width: 100%;
+    accent-color: var(--primary-gold-dark);
+}
+
+.form-check:hover {
+    border-color: rgba(212, 175, 55, 0.3);
+    background: rgba(26, 15, 15, 0.8);
+    transform: translateY(-2px);
+}
+
+.form-check-input {
+    width: 22px !important;
+    height: 22px !important;
+    margin-right: 12px !important;
+    margin-top: 0 !important;
+    background: rgba(26, 15, 15, 0.9) !important;
+    border: 2px solid #5a0000 !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.form-check-input:checked {
+    background: linear-gradient(135deg, #d4af37 0%, #b8972f 100%) !important;
+    border-color: #d4af37 !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4) !important;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25) !important;
+    border-color: #d4af37 !important;
+}
+
+.form-check-label {
+    color: #f8f8f8 !important;
+    font-weight: 500 !important;
+    font-size: 1rem !important;
+    user-select: none;
+    margin-bottom: 0 !important;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+/* Botão primário */
+.btn-primary {
+    width: 100%;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%) !important;
+    color: #f8f8f8 !important;
+    border: none !important;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #a00000 0%, #6a0000 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(139, 0, 0, 0.4) !important;
+    color: #f8f8f8 !important;
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Mensagens de erro */
+.text-danger {
+    color: #ff6b6b !important;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    display: block;
+    padding: 0.3rem 0.5rem;
+    background: rgba(139, 0, 0, 0.2);
+    border-radius: 4px;
+    border-left: 2px solid #ff6b6b;
+}
+
+/* Input file customizado */
+input[type="file"].form-control {
+    padding: 0.8rem;
+    background: rgba(26, 15, 15, 0.6) !important;
+    border: 2px dashed #5a0000 !important;
+    transition: all 0.3s ease;
+    color: #f8f8f8 !important;
+}
+
+input[type="file"].form-control:hover {
+    border-color: #d4af37 !important;
+    background: rgba(26, 15, 15, 0.8) !important;
+}
+
+input[type="file"].form-control:focus {
+    border-color: #d4af37 !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+}
+
+/* Grid responsivo */
+.row {
+    margin: 0 -0.5rem;
+}
+
+.row .col-md-6 {
+    padding: 0 0.5rem;
+}
+
+/* Ajustes para campos de data e hora */
+input[type="date"].form-control,
+input[type="time"].form-control {
+    color-scheme: dark;
+}
+
+/* Placeholder para campos vazios */
+.form-control:not(:focus):placeholder-shown {
+    border-color: #5a0000;
+}
+
+/* Estados de validação */
+.form-control.is-invalid {
+    border-color: #ff6b6b !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25) !important;
+}
+
+.form-control.is-valid {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+}
+
+/* Ajustes específicos para os campos Tipo e Modalidade */
+#id_tipo, #id_modalidade {
+    background: rgba(26, 15, 15, 0.8) !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.7rem center !important;
+    background-size: 16px !important;
+    border: 2px solid #5a0000 !important;
+    color: #f8f8f8 !important;
+}
+
+#id_tipo:focus, #id_modalidade:focus {
+    border-color: #d4af37 !important;
+    background: rgba(26, 15, 15, 0.9) !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.7rem center !important;
+    background-size: 16px !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container.mt-4 {
+        padding: 0 0.5rem;
+    }
+    
+    .container.mt-4 h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .row.align-items-end {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .row.align-items-end .col-md-6:first-child,
+    .row.align-items-end .col-md-6:last-child {
+        flex: 1;
+        width: 100%;
+    }
+    
+    .form-check {
+        padding: 0.7rem 0.8rem;
+        min-height: 55px;
+    }
+    
+    .btn-primary {
+        padding: 0.9rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    .row .col-md-6 {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container.mt-4 h1 {
+        font-size: 1.6rem;
+    }
+    
+    .form-control {
+        padding: 0.7rem 0.8rem;
+        font-size: 0.95rem;
+    }
+    
+    .form-label {
+        font-size: 0.95rem;
+    }
+    
+    .btn-primary {
+        padding: 0.8rem 1rem;
+        font-size: 0.95rem;
+    }
+    
+    .form-check {
+        min-height: 50px;
+        padding: 0.6rem 0.8rem;
+    }
+    
+    .form-check-input {
+        width: 20px !important;
+        height: 20px !important;
+    }
+    
+    .form-check-label {
+        white-space: normal;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Animações suaves */
+.container.mt-4 {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading state para o botão */
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-primary.loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-primary.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-right-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Efeito de pulso para checkbox quando marcado */
+@keyframes pulseCheckbox {
+    0% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(212, 175, 55, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+    }
+}
+
+.form-check-input:checked {
+    animation: pulseCheckbox 0.6s ease;
+}

@@ -79,10 +79,16 @@
     font-family: 'Georgia', 'Times New Roman', serif;
 }
 
+.form-container input::placeholder,
+.form-container textarea::placeholder {
+    color: #f8d568;
+}
+
 .form-container input:focus,
 .form-container select:focus,
 .form-container textarea:focus {
     border-color: #d4af37;
+    color: #d4af37;
     background: rgba(26, 15, 15, 0.9);
     box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
     transform: translateY(-1px);
@@ -338,7 +344,6 @@
 }
 
 .checkbox-container:hover .checkmark {
-    border-color: #d4af37;
     box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
 }
 

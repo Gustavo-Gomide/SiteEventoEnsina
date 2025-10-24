@@ -1,8 +1,15 @@
 {% extends 'base/base.html' %}
 <!-- Extende o template base, herdando navbar, footer e layout padrão -->
 
+{% load static %}
+
 {% block title %}Gerenciar Evento - {{ evento.titulo }}{% endblock %}
 <!-- Define o título da página, incluindo o título do evento -->
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/gerenciar_evento.css' %}">
+<!-- Inclui CSS específico para esta página -->
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">

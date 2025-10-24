@@ -1,168 +1,745 @@
+/* ===== VARIÁVEIS ===== */
+:root {
+    --primary-gold: #d4af37;
+    --primary-gold-dark: #b8941f;
+    --primary-orange: #ff7f16;
+    --success-green: #28a745;
+    --danger-red: #dc3545;
+    --background-base-dark: #200303;
+    --background-base-medium: #350505;
+    --background-card: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
+    --background-card-hover: linear-gradient(135deg, #3d2424 0%, #4d2c2c 100%);
+    --text-light: #fff7d9;
+    --text-brighter: #fffbe6;
+    --text-heading: #ffeaa7;
+    --text-muted: #ff7f16;
+    --border-color: #d4af37;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --card-shadow-hover: 0 6px 12px rgba(212, 175, 55, 0.2);
+}
+
 /* ============================= */
 /* MEUS EVENTOS - Estilos gerais */
 /* ============================= */
 
 /* Container principal */
-.container {
+.container.mt-4 {
     max-width: 1200px;
     margin: 0 auto;
     padding: 1rem;
+    animation: fadeInUp 0.6s ease-out;
 }
 
 /* Título principal */
-h1 {
+.container.mt-4 h1 {
     text-align: center;
-    color: #d4af37;
+    color: var(--text-heading);
     margin-bottom: 2rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* Lista de eventos / inscrições */
+/* Subtítulos */
+h5 {
+    color: var(--primary-gold);
+    margin-bottom: 1rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+h4 {
+    color: var(--text-heading);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+/* ============================= */
+/* LISTA DE EVENTOS E INSCRIÇÕES - TAMANHO OTIMIZADO */
+/* ============================= */
+
+/* Container da lista */
+.col-12.col-md-4 {
+    background: var(--background-card);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+    height: fit-content;
+}
+
+/* Lista de eventos - TAMANHO OTIMIZADO */
 .list-group {
-    max-height: 100vh;
+    max-height: 250px;
     overflow-y: auto;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    overflow-x: hidden;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
 }
 
-/* Item da lista */
+/* SCROLLBAR CUSTOMIZADA */
+.list-group::-webkit-scrollbar {
+    width: 8px;
+}
+
+.list-group::-webkit-scrollbar-track {
+    background: var(--background-base-medium);
+    border-radius: 4px;
+}
+
+.list-group::-webkit-scrollbar-thumb {
+    background: var(--primary-gold);
+    border-radius: 4px;
+}
+
+.list-group::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-orange);
+}
+
+/* Itens da lista */
 .list-group-item {
     display: flex;
     align-items: center;
-    padding: 0.5rem 0.75rem;
-    transition: background 0.2s ease;
+    padding: 0.75rem;
+    background: rgba(45, 27, 27, 0.8);
+    border: 1px solid var(--background-base-medium);
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--text-light);
 }
 
-.list-group-item.active {
-    background-color: #d4af37;
-    color: #000;
-}
-
-.list-group-item.active p {
-    color: #000;
-}
-
-.list-group-item.active .text-muted {
-    color: #000 !important;
+.list-group-item:last-child {
+    border-bottom: 1px solid var(--border-color);
 }
 
 .list-group-item:hover {
-    background-color: #cea726;
+    background: var(--background-card-hover);
+    transform: translateX(5px);
+    border-color: var(--primary-gold);
 }
 
-.list-group-item:hover p {
-    color: #000;
+.list-group-item.active {
+    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%);
+    border-color: var(--primary-gold);
+    color: var(--background-base-dark);
 }
 
-.list-group-item:hover .text-muted {
-    color: #000 !important;
-}
-
-/* Miniatura do evento ou usuário */
-.list-group-item img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-right: 8px;
-}
-
-/* Flex grow para textos */
-.list-group-item .flex-grow-1 {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Card de detalhes do evento */
-.card {
-    border-radius: 12px;
-    border: 1px solid #ccc;
-    background-color: #2f0000;
-    padding: 10px;
-    font-size: 1.5rem;
-}
-
-/* Card Body */
-.card-body h5 {
-    font-weight: bold;
-    font-size: 2rem;
-}
-
-.card-body p {
-    margin: 0.3rem 0;
-}
-
-/* Botões */
-.btn {
-    padding: 0.5rem 0.75rem;
-    border-radius: 6px;
-    text-decoration: none;
-    text-align: center;
+.list-group-item.active h6,
+.list-group-item.active .text-muted,
+.list-group-item.active p {
+    color: var(--background-base-dark) !important;
     font-weight: 600;
-    transition: all 0.2s ease;
-    cursor: pointer;
 }
 
-.btn-success {
-    background-color: #28a745;
-    color: #fff;
-}
-
-.btn-success:hover {
-    background-color: #218838;
-}
-
-.btn-danger {
-    background-color: #dc3545;
-    color: #fff;
-}
-
-.btn-danger:hover {
-    background-color: #c82333;
-}
-
-.btn-primary {
-    background-color: #d4af37;
-    color: #fff;
-}
-
-.btn-primary:hover {
-    background-color: #d4af37;
-}
-
-/* Lista de inscritos */
-ul.list-unstyled {
-    padding-left: 0;
-    margin-bottom: 0;
-}
-
-ul.list-unstyled li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-ul.list-unstyled li img {
-    width: 48px;
-    height: 48px;
+/* Imagens na lista */
+.list-group-item img {
+    width: 50px;
+    height: 50px;
     object-fit: cover;
-    border-radius: 4px;
-    margin-right: 8px;
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
 }
 
-/* Badges */
-.badge {
-    padding: 0.35em 0.5em;
-    border-radius: 4px;
+.list-group-item:hover img {
+    transform: scale(1.05);
+    border-color: var(--primary-orange);
+}
+
+/* Textos na lista */
+.list-group-item h6 {
+    color: var(--text-heading);
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.list-group-item p {
+    color: var(--text-muted);
+    margin-bottom: 0;
+    font-size: 0.8rem;
+}
+
+.list-group-item .text-muted {
+    color: var(--primary-orange) !important;
     font-size: 0.75rem;
 }
 
-/* Scroll interno para inscritos */
-.col-md-6 > div {
-    max-height: 400px;
-    overflow-y: auto;
+/* ============================= */
+/* CHECKBOX "SEM LIMITES" - CORRIGIDO E ALINHADO */
+/* ============================= */
+
+.form-check {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(45, 27, 27, 0.6);
+    border-radius: 8px;
+    border: 2px solid var(--background-base-medium);
+    transition: all 0.3s ease;
+    margin-bottom: 0;
+    height: 100%;
+    width: 100%;
+    min-height: 70px;
 }
 
-.text-muted{
-    color: #ff7f16 !important;
-    padding: 5px;
+.form-check:hover {
+    border-color: var(--primary-gold);
+    background: rgba(45, 27, 27, 0.8);
+    transform: translateY(-2px);
+}
+
+/* CHECKBOX PERSONALIZADO - CORRIGIDO */
+.form-check-input {
+    width: 22px !important;
+    height: 22px !important;
+    margin-right: 12px !important;
+    margin-top: 0 !important;
+    background: rgba(45, 27, 27, 0.9) !important;
+    border: 2px solid var(--background-base-medium) !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    position: relative;
+    cursor: pointer;
+}
+
+/* CHECKBOX QUANDO MARCADO - COR DOURADA */
+.form-check-input:checked {
+    background: var(--primary-gold-dark) !important;
+    border-color: var(--primary-gold) !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4) !important;
+}
+
+/* ÍCONE DE CHECK PERSONALIZADO */
+.form-check-input:checked::before {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--background-base-dark);
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25) !important;
+    border-color: var(--primary-gold) !important;
+}
+
+.form-check-label {
+    color: var(--text-light) !important;
+    font-weight: 500 !important;
+    font-size: 1rem !important;
+    user-select: none;
+    margin-bottom: 0 !important;
+    line-height: 1.4;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/* ============================= */
+/* INPUTS DE DATA E HORA COM ÍCONES DOURADOS */
+/* ============================= */
+
+/* Input de Data com ícone de calendário */
+input[type="date"].form-control {
+    background: rgba(32, 3, 3, 0.8) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.7rem center !important;
+    background-size: 16px !important;
+    padding-right: 2.5rem !important;
+    border: 2px solid var(--background-base-medium) !important;
+    border-radius: 8px;
+    color: var(--text-light) !important;
+    transition: all 0.3s ease;
+}
+
+input[type="date"].form-control:focus {
+    background: rgba(32, 3, 3, 0.9) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.7rem center !important;
+    background-size: 16px !important;
+    border-color: var(--primary-gold) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+    outline: none;
+}
+
+/* Input de Hora com ícone de relógio */
+input[type="time"].form-control {
+    background: rgba(32, 3, 3, 0.8) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.7rem center !important;
+    background-size: 16px !important;
+    padding-right: 2.5rem !important;
+    border: 2px solid var(--background-base-medium) !important;
+    border-radius: 8px;
+    color: var(--text-light) !important;
+    transition: all 0.3s ease;
+}
+
+input[type="time"].form-control:focus {
+    background: rgba(32, 3, 3, 0.9) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.7rem center !important;
+    background-size: 16px !important;
+    border-color: var(--primary-gold) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+    outline: none;
+}
+
+/* Select com seta personalizada (manter) */
+.form-select {
+    background: rgba(32, 3, 3, 0.8) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.7rem center !important;
+    background-size: 16px !important;
+    padding-right: 2.5rem !important;
+    border: 2px solid var(--background-base-medium) !important;
+    border-radius: 8px;
+    color: var(--text-light) !important;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    background: rgba(32, 3, 3, 0.9) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.7rem center !important;
+    background-size: 16px !important;
+    border-color: var(--primary-gold) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+    outline: none;
+}
+
+/* ============================= */
+/* DETALHES DO EVENTO - DISTÂNCIA DA IMAGEM */
+/* ============================= */
+
+/* Card principal */
+.card {
+    background: var(--background-card);
+    border: 2px solid var(--border-color);
+    border-radius: 15px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+}
+
+/* DISTÂNCIA DA IMAGEM NO CARD */
+.card .row.g-0 .col-12.col-sm-4 {
+    padding: 1rem;
+}
+
+.card .row.g-0 .col-12.col-sm-4 img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    color: var(--text-heading);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.card-text {
+    color: var(--text-light);
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.card-text strong {
+    color: var(--primary-gold);
+}
+
+/* ============================= */
+/* BOTÃO FINALIZAR EVENTO - DESIGN MELHORADO */
+/* ============================= */
+
+/* Container do botão finalizar */
+form.d-inline-block.mt-2 {
+    margin-top: 1rem !important;
+    width: 100%;
+}
+
+/* Botão Finalizar Evento - DESIGN ESPECIAL */
+.btn-finalizar-evento {
+    background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%) !important;
+    color: var(--text-brighter) !important;
+    border: 2px solid #8b0000 !important;
+    padding: 1rem 2rem !important;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    box-shadow: 0 4px 15px rgba(139, 0, 0, 0.4) !important;
+}
+
+.btn-finalizar-evento::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+    transition: left 0.5s ease !important;
+}
+
+.btn-finalizar-evento:hover::before {
+    left: 100% !important;
+}
+
+.btn-finalizar-evento:hover {
+    background: linear-gradient(135deg, #a00000 0%, #6a0000 100%) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 6px 20px rgba(139, 0, 0, 0.6) !important;
+    border-color: var(--danger-red) !important;
+}
+
+.btn-finalizar-evento:active {
+    transform: translateY(-1px) !important;
+}
+
+/* Ícone de alerta no botão */
+.btn-finalizar-evento::after {
+    content: '⚠️' !important;
+    margin-left: 8px !important;
+    font-size: 1.2rem !important;
+}
+
+/* ============================= */
+/* BOTÕES GERAIS */
+/* ============================= */
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-green) 0%, #1e7e34 100%);
+    color: var(--text-brighter);
+    border-color: var(--success-green);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #218838 0%, #1c7430 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger-red) 0%, #c82333 100%);
+    color: var(--text-brighter);
+    border-color: var(--danger-red);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%);
+    color: var(--background-base-dark);
+    border-color: var(--primary-gold);
+    font-weight: 700;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-gold) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+    color: var(--background-base-dark);
+}
+
+.btn-outline-secondary {
+    background: transparent;
+    color: var(--text-light);
+    border-color: var(--text-muted);
+}
+
+.btn-outline-secondary:hover {
+    background: var(--text-muted);
+    color: var(--background-base-dark);
+    transform: translateY(-2px);
+}
+
+.btn-outline-warning {
+    background: transparent;
+    color: var(--primary-orange);
+    border-color: var(--primary-orange);
+}
+
+.btn-outline-warning:hover {
+    background: var(--primary-orange);
+    color: var(--background-base-dark);
+    transform: translateY(-2px);
+}
+
+/* ============================= */
+/* LISTA DE INSCRITOS - TAMANHO OTIMIZADO */
+/* ============================= */
+
+.list-unstyled {
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem;
+    background: rgba(45, 27, 27, 0.6);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+/* SCROLLBAR CUSTOMIZADA PARA INSCRITOS */
+.list-unstyled::-webkit-scrollbar {
+    width: 8px;
+}
+
+.list-unstyled::-webkit-scrollbar-track {
+    background: var(--background-base-medium);
+    border-radius: 4px;
+}
+
+.list-unstyled::-webkit-scrollbar-thumb {
+    background: var(--primary-gold);
+    border-radius: 4px;
+}
+
+.list-unstyled::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-orange);
+}
+
+.list-unstyled li {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: rgba(32, 3, 3, 0.8);
+    border-radius: 8px;
+    border: 1px solid var(--background-base-medium);
+    transition: all 0.3s ease;
+}
+
+.list-unstyled li:hover {
+    background: var(--background-card-hover);
+    transform: translateX(5px);
+    border-color: var(--primary-gold);
+}
+
+.list-unstyled li img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+}
+
+.list-unstyled li a {
+    color: var(--text-heading);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.list-unstyled li a:hover {
+    color: var(--primary-orange);
+}
+
+.list-unstyled .small {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+/* ============================= */
+/* FORMULÁRIO DE EDIÇÃO */
+/* ============================= */
+
+form {
+    background: var(--background-card);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efeito de brilho no formulário */
+form::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.05), transparent);
+    animation: shine 6s infinite linear;
+    pointer-events: none;
+    z-index: 0;
+}
+
+form > * {
+    position: relative;
+    z-index: 1;
+}
+
+form p {
+    margin-bottom: 1rem;
+}
+
+form label {
+    color: var(--text-heading);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* Inputs gerais */
+form input, 
+form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(32, 3, 3, 0.8) !important;
+    border: 2px solid var(--background-base-medium) !important;
+    border-radius: 8px;
+    color: var(--text-light) !important;
+    transition: all 0.3s ease;
+}
+
+form input:focus,
+form textarea:focus {
+    border-color: var(--primary-gold) !important;
+    background: rgba(32, 3, 3, 0.9) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+    outline: none;
+}
+
+/* ============================= */
+/* BADGES E ESTADOS */
+/* ============================= */
+
+.badge {
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, var(--success-green) 0%, #1e7e34 100%) !important;
+    color: var(--text-brighter);
+}
+
+.badge.bg-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important;
+    color: var(--text-brighter);
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.alert-warning {
+    background: rgba(255, 193, 7, 0.1);
+    border-color: #ffc107;
+    color: #ffc107;
+}
+
+/* ============================= */
+/* ANIMAÇÕES */
+/* ============================= */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shine {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ============================= */
+/* RESPONSIVIDADE */
+/* ============================= */
+
+@media (max-width: 768px) {
+    .container.mt-4 {
+        padding: 0.5rem;
+    }
+    
+    .container.mt-4 h1 {
+        font-size: 2rem;
+    }
+    
+    .list-group-item {
+        padding: 0.75rem;
+    }
+    
+    .list-group-item img {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .card .row.g-0 .col-12.col-sm-4 {
+        padding: 0.5rem;
+    }
+    
+    .card .row.g-0 .col-12.col-sm-4 img {
+        height: 150px;
+    }
+    
+    .list-group {
+        max-height: 200px;
+    }
+    
+    .list-unstyled {
+        max-height: 250px;
+    }
+    
+    .btn-finalizar-evento {
+        padding: 0.9rem 1.5rem !important;
+        font-size: 1rem !important;
+    }
 }
