@@ -3,102 +3,72 @@
 
 {% block title %}Lista de Eventos{% endblock %}
 
-
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/lista_eventos.css' %}">
+<link rel="stylesheet" href="{% static 'css/lista_eventos.css' %}">
+<link rel="stylesheet" href="{% static 'css/calendario.css' %}">
+<link rel="stylesheet" href="{% static 'css/popup.css' %}">
+<link href='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/index.global.min.css' rel='stylesheet' />
+<link href='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.8/index.global.min.css' rel='stylesheet' />
+<link href='https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.8/index.global.min.css' rel='stylesheet' />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
+<!-- CALENDÁRIO -->
+<div class="calendar-section mb-4">
+    <div class="calendar-nav">
+        <div></div>
+        <div id="calTitle"></div>
+        <div></div>
+    </div>
+    <div id='calendar'></div>
+
+    <!-- POPUP DE EVENTOS POR DIA -->
+    <div id="popupOverlay"></div>
+    <div id="popupEventos" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+        <h5 id="popupTitle">Eventos do Dia</h5>
+        <div id="popupContent"></div>
+        <button type="button" class="btn btn-secondary" id="popupCloseBtn">Fechar</button>
+    </div>
+</div>
+
+<!-- SEÇÃO DE EVENTOS DISPONÍVEIS -->
 <div class="eventos-container">
-    <h1>Eventos Disponíveis</h1>
+    <h1>Eventos</h1>
 
     {% if eventos %}
-        <div class="eventos-grid">
+        <div class="eventos-grid" id="eventosGrid">
             {% for evento in eventos %}
-                <div class="evento-card">
+                <div class="evento-card" 
+                     data-start="{{ evento.data_inicio }}" 
+                     data-end="{{ evento.data_fim|default:evento.data_inicio }}" 
+                     data-disponivel="{{ evento.disponivel|yesno:'true,false' }}">
                     <h2>{{ evento.titulo }}</h2>
-
                     <p><strong>Modalidade:</strong> {{ evento.modalidade }}</p>
                     <p><strong>Data:</strong> {{ evento.data_inicio }}{% if evento.data_fim %} - {{ evento.data_fim }}{% endif %}</p>
                     <p><strong>Horário:</strong> {{ evento.horario }}</p>
                     <p><strong>Local:</strong> {{ evento.local|default:"Online" }}</p>
-
                     <p><strong>Participantes:</strong>
-                        {% if evento.sem_limites %}
-                            Ilimitado
-                        {% elif evento.quantidade_participantes %}
-                            {{ evento.quantidade_participantes }}
-                        {% else %}
-                            Não informado
-                        {% endif %}
+                        {% if evento.sem_limites %}Ilimitado{% elif evento.quantidade_participantes %}{{ evento.quantidade_participantes }}{% else %}Não informado{% endif %}
                     </p>
-
                     <p><strong>Organizador:</strong> {{ evento.organizador|default:"Não informado" }}</p>
-
-                    {% if evento.link %}
-                        <p><a href="{{ evento.link }}" target="_blank">Link do Evento</a></p>
-                    {% endif %}
-
+                    {% if evento.link %}<p><a href="{{ evento.link }}" target="_blank">Link do Evento</a></p>{% endif %}
                     <p><strong>Inscritos:</strong> {{ evento.inscricaoevento_set.count|stringformat:"02d" }}
-                        {% if not evento.sem_limites and evento.quantidade_participantes %}
-                            /{{ evento.quantidade_participantes|stringformat:"02d" }}
-                        {% elif not evento.sem_limites %}
-                            /--
-                        {% endif %}
+                        {% if not evento.sem_limites and evento.quantidade_participantes %}/{{ evento.quantidade_participantes|stringformat:"02d" }}{% elif not evento.sem_limites %}/--{% endif %}
                     </p>
-
-                    <!-- AÇÕES DO USUÁRIO -->
                     {% if usuario %}
                         <div class="evento-actions">
                             {% if evento.criador == usuario %}
-                                    <a href="{% url 'meus_eventos' %}?evento={{ evento.id }}" class="btn">Gerenciar Evento</a>
-                                    <!-- Galeria disponível para todos usuários logados -->
-                                    <a href="#" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                                    Enviar Fotos
-                                    <a href="{% url 'galeria_evento' evento.id %}" 
-                                    class="btn">
-                                        Ver Galeria do Evento
-                                    </a>
-                                    </a>
-                                    <!-- Modal de Envio de Fotos -->
-                                    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered">
-                                            <div class="modal-content">
-                                                <form method="POST" enctype="multipart/form-data" action="{% url 'galeria_evento' evento.id %}">
-                                                    {% csrf_token %}
-                                                    <div class="modal-header">
-                                                    <h5 class="modal-title" id="uploadModalLabel">Enviar Fotos do Evento</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                    <input type="file" name="photo" accept="image/*" multiple class="form-control" required>
-                                                    <small class="text-muted">Envie uma ou mais fotos do evento (formatos: JPG, PNG, GIF)</small>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                    <button type="submit" class="btn btn-primary">Enviar</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                            {% endif %}
-                            {% if usuario.tipo.tipo == 'Aluno' or usuario.tipo.tipo == 'Professor' %}
+                                <a href="{% url 'meus_eventos' %}?evento={{ evento.id }}" class="btn">Gerenciar Evento</a>
+                                <a href="{% url 'galeria_evento' evento.id %}" class="btn">Ver Galeria do Evento</a>
+                            {% else %}
                                 {% if evento.id in usuario_inscricoes %}
                                     <a href="{% url 'detalhe_evento' evento.id %}" class="btn cancel">Cancelar Inscrição</a>
-                                    <!-- Galeria disponível para todos usuários logados -->
-                                    <a href="{% url 'galeria_evento' evento.id %}" 
-                                    class="btn">
-                                        Ver Galeria do Evento
-                                    </a>
+                                    <a href="{% url 'galeria_evento' evento.id %}" class="btn">Ver Galeria do Evento</a>
                                 {% else %}
-                                    {% if not evento.criador == usuario %}
-                                        <a href="{% url 'detalhe_evento' evento.id %}" class="btn inscr">Inscrever-se</a>
-                                    {% endif %}                                    
+                                    <a href="{% url 'detalhe_evento' evento.id %}" class="btn inscr">Inscrever-se</a>
                                 {% endif %}
                             {% endif %}
-
                         </div>
                     {% else %}
                         <a href="{% url 'login' %}" class="btn">Entrar para se inscrever</a>
@@ -106,8 +76,580 @@
                 </div>
             {% endfor %}
         </div>
+
+        <!-- PAGINAÇÃO -->
+        {% if eventos.has_other_pages %}
+        <div class="paginacao">
+            {% if eventos.has_previous %}
+                <a href="?page=1" class="pagina-link primeira">&laquo; Primeira</a>
+                <a href="?page={{ eventos.previous_page_number }}" class="pagina-link anterior">Anterior</a>
+            {% endif %}
+
+            <span class="pagina-atual">
+                Página {{ eventos.number }} de {{ eventos.paginator.num_pages }}
+            </span>
+
+            {% if eventos.has_next %}
+                <a href="?page={{ eventos.next_page_number }}" class="pagina-link proxima">Próxima</a>
+                <a href="?page={{ eventos.paginator.num_pages }}" class="pagina-link ultima">Última &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
     {% else %}
         <p>Nenhum evento cadastrado.</p>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.8/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.8/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/locales/pt-br.global.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var eventos = {{ eventos_calendario_json|safe }};
+    var calendarEl = document.getElementById('calendar');
+
+    if (typeof FullCalendar === 'undefined') {
+        console.error('FullCalendar não carregou corretamente');
+        renderSimpleFallback();
+        return;
+    }
+
+    if (window._myCalendarInstance) {
+        try { 
+            window._myCalendarInstance.destroy(); 
+        } catch(e) {
+            console.log('Erro ao destruir instância anterior:', e);
+        }
+    }
+
+    var popup = document.getElementById('popupEventos');
+    var overlay = document.getElementById('popupOverlay');
+    var popupContent = document.getElementById('popupContent');
+    var popupCloseBtn = document.getElementById('popupCloseBtn');
+
+    // URLs base
+    var detalheBase = '{% url "detalhe_evento" 0 %}';
+    var galeriaBase = '{% url "galeria_evento" 0 %}';
+    var meusBase = '{% url "meus_eventos" %}';
+    var loginUrl = '{% url "login" %}';
+    var usuario_presente = {% if usuario %}true{% else %}false{% endif %};
+    var usuario_id = {% if usuario %}{{ usuario.id }}{% else %}null{% endif %};
+
+    // Variáveis de controle
+    var isPopupOpen = false;
+    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    // Inicializar spinners
+    initializeSpinners();
+
+    // Configuração do calendário
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        firstDay: 1,
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,dayGridWeek'
+        },
+        buttonText: {
+            today: 'Hoje',
+            month: 'Mês',
+            week: 'Semana'
+        },
+        
+        dateClick: function(info) {
+            console.log('Date click capturado:', info.dateStr);
+            openPopupForDate(info.dateStr);
+        },
+
+        dayCellDidMount: function(info) {
+            try {
+                var data = info.dateStr;
+                var eventosDoDia = eventos.filter(function(e) {
+                    if (!e.data_inicio) return false;
+                    var eventStart = e.data_inicio;
+                    var eventEnd = e.data_fim || e.data_inicio;
+                    return data >= eventStart && data <= eventEnd;
+                });
+
+                var dayFrame = info.el.querySelector('.fc-daygrid-day-frame') || info.el;
+                var dayNumber = info.el.querySelector('.fc-daygrid-day-number');
+                
+                // Aplicar cores
+                dayFrame.style.background = '';
+                if (eventosDoDia.length > 0) {
+                    var anyInscrito = eventosDoDia.some(function(e) { return e.inscrito; });
+                    var anyDisponivel = eventosDoDia.some(function(e) { return e.disponivel; });
+                    
+                    if (anyInscrito) {
+                        dayFrame.style.background = '#d4af37';
+                    } else if (anyDisponivel) {
+                        dayFrame.style.background = '#28a745';
+                    } else {
+                        dayFrame.style.background = '#dc3545';
+                    }
+                    
+                    if (dayNumber) {
+                        dayNumber.style.color = '#fff';
+                        dayNumber.style.fontWeight = 'bold';
+                    }
+                }
+
+                // Listener simplificado
+                if (!info.el._clickListenerAttached) {
+                    info.el._clickListenerAttached = true;
+                    
+                    info.el.addEventListener('click', function(ev) {
+                        console.log('Clique no dia:', data);
+                        openPopupForDate(data);
+                    });
+                }
+            } catch (e) {
+                console.error('Erro no dayCellDidMount:', e);
+            }
+        },
+
+        datesSet: function() {
+            setTimeout(updateAllDayColors, 100);
+        }
+    });
+
+    // Função para atualizar cores
+    function updateAllDayColors() {
+        var dayCells = document.querySelectorAll('.fc-daygrid-day');
+        dayCells.forEach(function(cell) {
+            var dateStr = cell.getAttribute('data-date');
+            if (!dateStr) return;
+            
+            var eventosDoDia = eventos.filter(function(e) {
+                if (!e.data_inicio) return false;
+                var eventStart = e.data_inicio;
+                var eventEnd = e.data_fim || e.data_inicio;
+                return dateStr >= eventStart && dateStr <= eventEnd;
+            });
+
+            var dayFrame = cell.querySelector('.fc-daygrid-day-frame') || cell;
+            var dayNumber = cell.querySelector('.fc-daygrid-day-number');
+            
+            dayFrame.style.background = '';
+            
+            if (eventosDoDia.length > 0) {
+                var anyInscrito = eventosDoDia.some(function(e) { return e.inscrito; });
+                var anyDisponivel = eventosDoDia.some(function(e) { return e.disponivel; });
+                
+                if (anyInscrito) {
+                    dayFrame.style.background = '#d4af37';
+                } else if (anyDisponivel) {
+                    dayFrame.style.background = '#28a745';
+                } else {
+                    dayFrame.style.background = '#dc3545';
+                }
+                
+                if (dayNumber) {
+                    dayNumber.style.color = '#fff';
+                    dayNumber.style.fontWeight = 'bold';
+                }
+            } else {
+                if (dayNumber) {
+                    dayNumber.style.color = '';
+                    dayNumber.style.fontWeight = '';
+                }
+            }
+        });
+    }
+
+    // Renderizar calendário
+    calendar.render();
+    window._myCalendarInstance = calendar;
+
+    updateCalendarTitle(calendar);
+    setTimeout(updateAllDayColors, 500);
+    setupSpinners(calendar);
+    setupPopupClose();
+
+    // FUNÇÕES AUXILIARES
+    function initializeSpinners() {
+        var nav = document.querySelector('.calendar-nav');
+        if (!nav) return;
+        
+        var container = document.createElement('div');
+        container.className = 'calendar-spinners';
+
+        var monthSpinner = document.createElement('select');
+        monthSpinner.id = 'monthSpinner';
+        monthSpinner.className = 'calendar-spinner calendar-spinner-select';
+
+        // CONTAINER PARA O ANO COM SETAS
+        var yearSpinnerContainer = document.createElement('div');
+        yearSpinnerContainer.className = 'calendar-spinner-input-container';
+
+        var yearSpinner = document.createElement('input');
+        yearSpinner.type = 'number';
+        yearSpinner.id = 'yearSpinner';
+        yearSpinner.className = 'calendar-spinner calendar-spinner-input';
+        yearSpinner.min = '2000';
+        yearSpinner.max = '2030';
+
+        // BOTÕES DE SETA
+        var spinnerButtons = document.createElement('div');
+        spinnerButtons.className = 'calendar-spinner-buttons';
+
+        var increaseBtn = document.createElement('button');
+        increaseBtn.type = 'button';
+        increaseBtn.className = 'calendar-spinner-btn';
+        increaseBtn.id = 'yearIncrease';
+        increaseBtn.innerHTML = '▲';
+        increaseBtn.setAttribute('aria-label', 'Aumentar ano');
+
+        var decreaseBtn = document.createElement('button');
+        decreaseBtn.type = 'button';
+        decreaseBtn.className = 'calendar-spinner-btn';
+        decreaseBtn.id = 'yearDecrease';
+        decreaseBtn.innerHTML = '▼';
+        decreaseBtn.setAttribute('aria-label', 'Diminuir ano');
+
+        spinnerButtons.appendChild(increaseBtn);
+        spinnerButtons.appendChild(decreaseBtn);
+        
+        yearSpinnerContainer.appendChild(yearSpinner);
+        yearSpinnerContainer.appendChild(spinnerButtons);
+
+        container.appendChild(monthSpinner);
+        container.appendChild(yearSpinnerContainer);
+
+        var titleEl = document.getElementById('calTitle');
+        if (titleEl && titleEl.parentNode) {
+            titleEl.parentNode.insertBefore(container, titleEl.nextSibling);
+        }
+
+        var months = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+                     "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+        months.forEach(function(month, index) {
+            var option = document.createElement('option');
+            option.value = index;
+            option.textContent = month;
+            monthSpinner.appendChild(option);
+        });
+
+        var today = new Date();
+        yearSpinner.value = today.getFullYear();
+        monthSpinner.value = today.getMonth();
+
+        // Adicionar funcionalidade às setinhas do ano
+        setupYearSpinnerButtons();
+    }
+
+    function setupYearSpinnerButtons() {
+        const yearInput = document.getElementById('yearSpinner');
+        const increaseBtn = document.getElementById('yearIncrease');
+        const decreaseBtn = document.getElementById('yearDecrease');
+        
+        if (increaseBtn && decreaseBtn && yearInput) {
+            increaseBtn.addEventListener('click', function() {
+                let currentYear = parseInt(yearInput.value);
+                if (currentYear < 2030) {
+                    yearInput.value = currentYear + 1;
+                    yearInput.dispatchEvent(new Event('change'));
+                }
+            });
+            
+            decreaseBtn.addEventListener('click', function() {
+                let currentYear = parseInt(yearInput.value);
+                if (currentYear > 2000) {
+                    yearInput.value = currentYear - 1;
+                    yearInput.dispatchEvent(new Event('change'));
+                }
+            });
+
+            // Feedback visual ao usar as setas
+            [increaseBtn, decreaseBtn].forEach(btn => {
+                btn.addEventListener('mousedown', function() {
+                    this.style.transform = 'scale(0.95)';
+                });
+                btn.addEventListener('mouseup', function() {
+                    this.style.transform = 'scale(1)';
+                });
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        }
+    }
+
+    function setupSpinners(calendar) {
+        var monthSpinner = document.getElementById('monthSpinner');
+        var yearSpinner = document.getElementById('yearSpinner');
+
+        if (!monthSpinner || !yearSpinner) return;
+
+        function navigateToDate() {
+            var year = parseInt(yearSpinner.value);
+            var month = parseInt(monthSpinner.value);
+            
+            if (!isNaN(year) && !isNaN(month)) {
+                calendar.gotoDate(new Date(year, month, 1));
+                setTimeout(updateAllDayColors, 300);
+            }
+        }
+
+        monthSpinner.addEventListener('change', navigateToDate);
+        yearSpinner.addEventListener('change', navigateToDate);
+        yearSpinner.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') navigateToDate();
+        });
+
+        // Validar ano enquanto digita
+        yearSpinner.addEventListener('input', function() {
+            var year = parseInt(this.value);
+            if (year < 2000) this.value = 2000;
+            if (year > 2030) this.value = 2030;
+        });
+
+        calendar.on('datesSet', function() {
+            var currentDate = calendar.getDate();
+            if (monthSpinner) monthSpinner.value = currentDate.getMonth();
+            if (yearSpinner) yearSpinner.value = currentDate.getFullYear();
+            updateCalendarTitle(calendar);
+        });
+    }
+
+    function updateCalendarTitle(calendar) {
+        var titleEl = document.getElementById('calTitle');
+        if (titleEl) {
+            titleEl.textContent = calendar.view.title;
+        }
+    }
+
+    function openPopupForDate(dateStr) {
+        console.log('Abrindo popup para:', dateStr);
+        
+        if (isPopupOpen) return;
+        
+        var eventosDoDia = eventos.filter(function(e) {
+            if (!e.data_inicio) return false;
+            var start = e.data_inicio;
+            var end = e.data_fim || e.data_inicio;
+            return dateStr >= start && dateStr <= end;
+        });
+
+        if (eventosDoDia.length === 0) {
+            console.log('Nenhum evento para esta data');
+            return;
+        }
+
+        popupContent.innerHTML = '';
+        document.getElementById('popupTitle').textContent = 
+            'Eventos do Dia ' + formatDateForDisplay(dateStr);
+
+        eventosDoDia.forEach(function(evento) {
+            var eventElement = createEventElement(evento);
+            popupContent.appendChild(eventElement);
+        });
+
+        overlay.style.display = 'block';
+        popup.style.display = 'block';
+        isPopupOpen = true;
+        
+        console.log('Popup aberto');
+    }
+
+    function createEventElement(evento) {
+        var div = document.createElement('div');
+        div.className = 'popup-event-item ' + 
+            (evento.inscrito ? 'inscribed' : evento.disponivel ? 'available' : 'unavailable');
+
+        var title = document.createElement('div');
+        title.className = 'popup-event-title';
+        title.textContent = evento.titulo || 'Sem título';
+        div.appendChild(title);
+
+        var meta = document.createElement('div');
+        meta.className = 'popup-event-meta';
+        meta.innerHTML = '<small><i class="fas fa-clock"></i> ' + 
+            (evento.horario || 'Horário não informado') + '</small>' +
+            '<small><i class="fas fa-map-marker-alt"></i> ' + 
+            (evento.local || 'Online') + '</small>';
+        div.appendChild(meta);
+
+        var badges = document.createElement('div');
+        badges.className = 'popup-event-badges';
+        
+        var statusBadge = document.createElement('span');
+        statusBadge.className = 'badge ' + (evento.disponivel ? 'bg-success' : 'bg-danger');
+        statusBadge.textContent = evento.disponivel ? 'Disponível' : 'Indisponível';
+        badges.appendChild(statusBadge);
+        
+        if (evento.inscrito) {
+            var insBadge = document.createElement('span');
+            insBadge.className = 'badge bg-info';
+            insBadge.textContent = 'Inscrito';
+            badges.appendChild(insBadge);
+        }
+        div.appendChild(badges);
+
+        var actions = document.createElement('div');
+        actions.className = 'popup-event-actions';
+        
+        // MESMA LÓGICA DOS CARDS - BOTÕES IDÊNTICOS
+        var actionButtons = createActionButtons(evento);
+        actionButtons.forEach(function(button) {
+            actions.appendChild(button);
+        });
+
+        div.appendChild(actions);
+        return div;
+    }
+
+    function createActionButtons(evento) {
+        var buttons = [];
+        var detalheUrl = detalheBase.replace('/0/', '/' + evento.id + '/');
+        var galeriaUrl = galeriaBase.replace('/0/', '/' + evento.id + '/');
+        var meusEventosUrl = meusBase + '?evento=' + evento.id;
+
+        // VERIFICAÇÃO CORRIGIDA - com debug
+        var usuarioEhCriador = false;
+        
+        console.log('DEBUG - Verificação criador:', {
+            usuario_id: usuario_id,
+            tipo_usuario_id: typeof usuario_id,
+            evento_criador_id: evento.criador_id,
+            tipo_criador_id: typeof evento.criador_id,
+            evento_id: evento.id,
+            evento_titulo: evento.titulo
+        });
+
+        if (usuario_id && evento.criador_id) {
+            // Converter para número para comparação segura
+            var usuarioIdNum = Number(usuario_id);
+            var criadorIdNum = Number(evento.criador_id);
+            usuarioEhCriador = usuarioIdNum === criadorIdNum;
+            
+            console.log('DEBUG - Comparação numérica:', {
+                usuarioIdNum: usuarioIdNum,
+                criadorIdNum: criadorIdNum,
+                resultado: usuarioEhCriador
+            });
+        }
+
+        console.log('RESULTADO FINAL - Usuário é criador?', usuarioEhCriador);
+
+        if (usuarioEhCriador) {
+            // Usuário é o criador - MESMO que nos cards
+            console.log('✅ Usuário É criador do evento:', evento.titulo);
+            
+            var gerenciarBtn = document.createElement('a');
+            gerenciarBtn.href = meusEventosUrl;
+            gerenciarBtn.className = 'btn';
+            gerenciarBtn.textContent = 'Gerenciar Evento';
+            buttons.push(gerenciarBtn);
+
+            var galeriaBtn = document.createElement('a');
+            galeriaBtn.href = galeriaUrl;
+            galeriaBtn.className = 'btn';
+            galeriaBtn.textContent = 'Ver Galeria do Evento';
+            buttons.push(galeriaBtn);
+        } else {
+            console.log('❌ Usuário NÃO é criador do evento:', evento.titulo);
+            
+            // Usuário não é o criador
+            if (evento.inscrito) {
+                // Usuário já inscrito - MESMO que nos cards
+                var cancelarBtn = document.createElement('a');
+                cancelarBtn.href = detalheUrl;
+                cancelarBtn.className = 'btn cancel';
+                cancelarBtn.textContent = 'Cancelar Inscrição';
+                buttons.push(cancelarBtn);
+
+                var galeriaBtn2 = document.createElement('a');
+                galeriaBtn2.href = galeriaUrl;
+                galeriaBtn2.className = 'btn';
+                galeriaBtn2.textContent = 'Ver Galeria do Evento';
+                buttons.push(galeriaBtn2);
+            } else {
+                // Usuário não inscrito
+                if (usuario_presente && evento.disponivel) {
+                    // Usuário logado - MESMO que nos cards
+                    var inscreverBtn = document.createElement('a');
+                    inscreverBtn.href = detalheUrl;
+                    inscreverBtn.className = 'btn inscr';
+                    inscreverBtn.textContent = 'Inscrever-se';
+                    buttons.push(inscreverBtn);
+                } else {
+                    if (evento.disponivel) {
+                        // Usuário não logado - MESMO que nos cards
+                        var entrarBtn = document.createElement('a');
+                        entrarBtn.href = loginUrl;
+                        entrarBtn.className = 'btn';
+                        entrarBtn.textContent = 'Entrar para se inscrever';
+                        buttons.push(entrarBtn);
+                    }
+                }
+            }
+        }
+
+        return buttons;
+    }
+    
+    function formatDateForDisplay(dateStr) {
+        var date = new Date(dateStr + 'T00:00:00');
+        return date.toLocaleDateString('pt-BR');
+    }
+
+    function setupPopupClose() {
+        // NO MOBILE: SÓ FECHA NO BOTÃO FECHAR
+        // NO DESKTOP: FECHA NO OVERLAY E ESC TAMBÉM
+        
+        if (popupCloseBtn) {
+            popupCloseBtn.addEventListener('click', closePopup);
+        }
+
+        if (overlay && !isMobile) {
+            // Desktop: fecha no overlay
+            overlay.addEventListener('click', closePopup);
+        } else if (overlay && isMobile) {
+            // Mobile: overlay não fecha o popup, apenas escurece o fundo
+            overlay.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+
+        // Tecla ESC funciona em ambos
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && isPopupOpen) {
+                closePopup();
+            }
+        });
+
+        // Prevenir fechamento ao clicar no conteúdo do popup
+        if (popup) {
+            popup.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+    }
+
+    function closePopup() {
+        if (!isPopupOpen) return;
+        
+        if (popup) popup.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+        
+        isPopupOpen = false;
+        console.log('Popup fechado');
+    }
+
+    function renderSimpleFallback() {
+        console.warn('Usando fallback simples do calendário');
+        var calendarEl = document.getElementById('calendar');
+        if (!calendarEl) return;
+        
+        calendarEl.innerHTML = '<div class="alert alert-warning">Calendário não disponível.</div>';
+    }
+});
+</script>
 {% endblock %}

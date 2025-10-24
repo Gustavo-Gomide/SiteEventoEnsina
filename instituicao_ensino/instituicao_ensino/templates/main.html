@@ -23,7 +23,7 @@
                     {% endif %}
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
                         <h5 class="fw-bold text-warning">{{ ev.titulo }}</h5>
-                        <p class="small text-light">{{ ev.data_inicio }}</p>
+                        <p class="small text-light">{{ ev.data_inicio|date:"d/m/Y" }}</p>
                     </div>
                 </a>
             </div>
@@ -38,13 +38,13 @@
     </div>
     {% endif %}
 
-    <h2 class="section-title text-center mb-4">Próximos Eventos</h2>
+    <h2 class="section-title text-center mb-4">Eventos Ativos</h2>
 
     <div id="eventGrid" class="event-grid">
-        {% for ev in proximos %}
+        {% for ev in ativos %}
         <div class="event-card-wrapper" data-index="{{ forloop.counter }}">
             <div class="event-card">
-                <!-- Frente do Card - Visual Limpo e Informações Essenciais -->
+                <!-- Frente do Card -->
                 <div class="card-front">
                     <div class="event-image-container">
                         {% if ev.thumb %}
@@ -66,24 +66,24 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="card-front-content">
                         <div class="event-header">
                             <h5 class="event-title">{{ ev.titulo }}</h5>
                             <div class="event-category">
-                                <i class="fas fa-graduation-cap"></i>
-                                Acadêmico
+                                <i class="fas fa-graduation-cap"></i> Acadêmico
                             </div>
                         </div>
-                        
+
                         <div class="event-info-grid">
                             <div class="info-cell">
                                 <i class="fas fa-clock"></i>
                                 <div class="cell-content">
                                     <span class="cell-label">Horário</span>
-                                    <span class="cell-value">{{ ev.horario }}</span>
+                                    <span class="cell-value">{{ ev.horario|default:"A definir" }}</span>
                                 </div>
                             </div>
-                            
+
                             <div class="info-cell">
                                 <i class="fas fa-users"></i>
                                 <div class="cell-content">
@@ -92,7 +92,7 @@
                                         {{ ev.inscricaoevento_set.count }}
                                         {% if not ev.sem_limites and ev.quantidade_participantes %}
                                             /{{ ev.quantidade_participantes }}
-                                        {% elif not ev.sem_limites %}
+                                        {% elif ev.sem_limites %}
                                             /Ilimitado
                                         {% else %}
                                             /--
@@ -100,7 +100,7 @@
                                     </span>
                                 </div>
                             </div>
-                            
+
                             <div class="info-cell">
                                 <i class="fas fa-map-marker-alt"></i>
                                 <div class="cell-content">
@@ -109,7 +109,7 @@
                                         {% if ev.local %}
                                             {{ ev.local|truncatechars:25 }}
                                         {% elif ev.link %}
-                                            <span class="text-online">Online</span>
+                                            Online
                                         {% else %}
                                             A definir
                                         {% endif %}
@@ -121,59 +121,50 @@
                             <div class="info-cell">
                                 <i class="fas fa-link"></i>
                                 <div class="cell-content">
-                                    <span class="cell-label">Link</span>
-                                    <span class="cell-value event-link" title="{{ ev.link }}">
-                                        {{ ev.link|truncatechars:20 }}
-                                    </span>
+                                    <span class="cell-label">Acesso</span>
+                                    <a href="{{ ev.link }}" target="_blank" class="cell-value text-primary text-decoration-underline">
+                                        Abrir Link
+                                    </a>
                                 </div>
                             </div>
                             {% endif %}
                         </div>
 
                         <div class="flip-cta">
-                            <i class="fas fa-info-circle"></i>
-                            Clique para ver detalhes completos
+                            <i class="fas fa-info-circle"></i> Clique para ver detalhes
                         </div>
                     </div>
                 </div>
-                
-                <!-- Verso do Card - Informações Completas com Scroll -->
+
+                <!-- Verso do Card -->
                 <div class="card-back">
                     <div class="card-back-container">
                         <div class="back-header">
                             <div class="back-title-section">
                                 <h5 class="event-title-back">{{ ev.titulo }}</h5>
                                 <div class="event-meta-quick">
-                                    <span class="meta-badge">
-                                        <i class="fas fa-calendar"></i>
-                                        {{ ev.data_inicio }}
-                                    </span>
-                                    <span class="meta-badge">
-                                        <i class="fas fa-clock"></i>
-                                        {{ ev.horario }}
-                                    </span>
+                                    <span class="meta-badge"><i class="fas fa-calendar"></i> {{ ev.data_inicio|date:"d/m/Y" }}</span>
+                                    <span class="meta-badge"><i class="fas fa-clock"></i> {{ ev.horario|default:"A definir" }}</span>
                                 </div>
                             </div>
                             <button class="close-back" onclick="event.stopPropagation(); this.closest('.event-card').classList.remove('flipped')">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
-                        
+
                         <div class="scroll-content">
                             <div class="description-section">
                                 <h6 class="section-title-back">
-                                    <i class="fas fa-file-alt"></i>
-                                    Descrição do Evento
+                                    <i class="fas fa-file-alt"></i> Descrição
                                 </h6>
                                 <div class="event-description">
-                                    {{ ev.descricao|default:"Este evento acadêmico oferece uma oportunidade única para ampliar conhecimentos, networking com profissionais da área e participação em discussões relevantes. Não perca esta chance de desenvolvimento profissional!"|linebreaks }}
+                                    {{ ev.descricao|default:"Descrição não informada."|linebreaks }}
                                 </div>
                             </div>
 
                             <div class="details-section">
                                 <h6 class="section-title-back">
-                                    <i class="fas fa-info-circle"></i>
-                                    Informações Detalhadas
+                                    <i class="fas fa-info-circle"></i> Detalhes
                                 </h6>
                                 <div class="details-grid">
                                     <div class="detail-item">
@@ -188,21 +179,21 @@
                                         <i class="fas fa-university"></i>
                                         <div class="detail-content">
                                             <strong>Instituição</strong>
-                                            <span>{{ ev.instituicao_organizador|default:"Instituição não informada" }}</span>
+                                            <span>{{ ev.instituicao_organizador|default:"Não informada" }}</span>
                                         </div>
                                     </div>
                                     
                                     <div class="detail-item">
                                         <i class="fas fa-map-marker-alt"></i>
                                         <div class="detail-content">
-                                            <strong>Localização</strong>
+                                            <strong>Local</strong>
                                             <span>
                                                 {% if ev.local %}
                                                     {{ ev.local }}
                                                 {% elif ev.link %}
-                                                    <span class="text-online">Evento Online</span>
+                                                    Evento Online
                                                 {% else %}
-                                                    Local a definir
+                                                    A definir
                                                 {% endif %}
                                             </span>
                                         </div>
@@ -212,9 +203,9 @@
                                     <div class="detail-item">
                                         <i class="fas fa-external-link-alt"></i>
                                         <div class="detail-content">
-                                            <strong>Link de Acesso</strong>
-                                            <a href="{{ ev.link }}" target="_blank" class="event-link-back" title="{{ ev.link }}">
-                                                {{ ev.link|truncatechars:35 }}
+                                            <strong>Link</strong>
+                                            <a href="{{ ev.link }}" target="_blank" class="event-link-back text-primary">
+                                                {{ ev.link|truncatechars:40 }}
                                             </a>
                                         </div>
                                     </div>
@@ -223,13 +214,13 @@
                                     <div class="detail-item">
                                         <i class="fas fa-users"></i>
                                         <div class="detail-content">
-                                            <strong>Situação das Vagas</strong>
-                                            <span class="vagas-status">
-                                                {{ ev.inscricaoevento_set.count }} inscritos
-                                                {% if not ev.sem_limites and ev.quantidade_participantes %}
-                                                    de {{ ev.quantidade_participantes }} vagas
-                                                {% elif not ev.sem_limites %}
-                                                    - Vagas ilimitadas
+                                            <strong>Vagas</strong>
+                                            <span>
+                                                {{ ev.inscricaoevento_set.count }} inscritos 
+                                                {% if ev.quantidade_participantes %}
+                                                    de {{ ev.quantidade_participantes }}
+                                                {% else %}
+                                                    (Ilimitado)
                                                 {% endif %}
                                             </span>
                                         </div>
@@ -239,7 +230,7 @@
                                         <i class="fas fa-tag"></i>
                                         <div class="detail-content">
                                             <strong>Modalidade</strong>
-                                            <span class="modalidade-badge">{{ ev.get_modalidade_display }}</span>
+                                            <span>{{ ev.get_modalidade_display }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -248,13 +239,23 @@
 
                         <div class="back-actions">
                             <a href="{% url 'detalhe_evento' ev.id %}" class="btn btn-secondary">
-                                <i class="fas fa-info-circle"></i>
-                                Ver Detalhes Completos
+                                <i class="fas fa-info-circle"></i> Ver Detalhes
                             </a>
-                            <a href="{% url 'detalhe_evento' ev.id %}" class="btn btn-primary btn-inscribe">
-                                <i class="fas fa-user-plus"></i>
-                                Inscrever-se
-                            </a>
+
+                            {% if ev.criador == current_usuario %}
+                                <a href="{% url 'gerenciar_evento' ev.id %}" class="btn btn-warning">Gerenciar Evento</a>
+                            {% elif current_usuario %}
+                                {% if ev.id in inscricoes_usuario %}
+                                    <form action="{% url 'cancelar_inscricao' ev.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Cancelar Inscrição</button>
+                                    </form>
+                                {% else %}
+                                    <a href="{% url 'detalhe_evento' ev.id %}#inscricao" class="btn btn-primary">Inscrever-se</a>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'login' %}" class="btn btn-secondary">Entrar para Inscrever-se</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -263,7 +264,7 @@
         {% endfor %}
     </div>
 
-    {% if proximos|length > 6 %}
+    {% if ativos|length > 6 %}
     <div class="text-center mt-5 mb-4">
         <button id="showMoreBtn" class="btn btn-load-more">
             <span class="btn-text">Mostrar mais eventos</span>
@@ -273,74 +274,50 @@
         </button>
     </div>
     {% endif %}
-
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const eventGrid = document.getElementById("eventGrid");
     const cards = document.querySelectorAll(".event-card-wrapper");
     const btn = document.getElementById("showMoreBtn");
     const batchSize = 3;
     let visibleCount = 6;
 
-    // Esconde cards além do inicial
     cards.forEach((card, idx) => {
-        if (idx >= visibleCount) {
-            card.style.display = "none";
-        }
+        if (idx >= visibleCount) card.style.display = "none";
     });
 
-    // Flip cards apenas por clique
     cards.forEach(card => {
         const eventCard = card.querySelector('.event-card');
         eventCard.addEventListener('click', function(e) {
-            // Não flipar se clicar em um link ou botão
-            if (e.target.tagName === 'A' || e.target.closest('a') || e.target.closest('.close-back')) {
-                return;
-            }
+            if (e.target.tagName === 'A' || e.target.closest('a') || e.target.closest('.close-back')) return;
             this.classList.toggle('flipped');
         });
     });
 
-    // Botão mostrar mais
     btn?.addEventListener("click", function() {
         const btnText = this.querySelector(".btn-text");
         const btnLoading = this.querySelector(".btn-loading");
-        
         btnText.style.display = "none";
         btnLoading.style.display = "inline-block";
-        
+
         setTimeout(() => {
-            let nextBatch = visibleCount + batchSize;
-            let hasMore = false;
-            
+            const nextBatch = visibleCount + batchSize;
             for (let i = visibleCount; i < nextBatch && i < cards.length; i++) {
                 cards[i].style.display = "block";
-                setTimeout(() => {
-                    cards[i].style.opacity = "1";
-                    cards[i].style.transform = "translateY(0)";
-                }, 100 * (i - visibleCount));
+                cards[i].style.opacity = "1";
+                cards[i].style.transform = "translateY(0)";
             }
-            
             visibleCount = nextBatch;
-            hasMore = visibleCount < cards.length;
-            
-            if (!hasMore) {
-                this.style.display = "none";
-            }
-            
+            if (visibleCount >= cards.length) this.style.display = "none";
             btnText.style.display = "inline-block";
             btnLoading.style.display = "none";
-        }, 500);
+        }, 400);
     });
 
-    // Fechar card-back ao clicar fora
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', e => {
         if (!e.target.closest('.event-card')) {
-            document.querySelectorAll('.event-card.flipped').forEach(card => {
-                card.classList.remove('flipped');
-            });
+            document.querySelectorAll('.event-card.flipped').forEach(c => c.classList.remove('flipped'));
         }
     });
 });

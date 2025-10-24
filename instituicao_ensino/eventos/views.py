@@ -13,11 +13,17 @@ from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib import messages
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+import json
 from django.conf import settings
 import os
+from datetime import timedelta, date
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import logging
 from eventos.models import Evento
 from django.utils.text import slugify
+
+from usuarios.models import Usuario
 from .models import Evento, InscricaoEvento
 from .forms import EventoForm
 from usuarios.views import get_current_usuario
@@ -98,80 +104,113 @@ def criar_evento(request):
 
 
 # -------------------------------------------------------------------
-# Lista de eventos para inscrição
+# Lista de eventos para inscrição - OTIMIZADA COM PAGINAÇÃO
 # -------------------------------------------------------------------
 def lista_eventos(request):
     usuario = get_current_usuario(request)
     
-    # Lista de eventos ordenada pela data de início
-    eventos = Evento.objects.all().order_by('data_inicio')
-    
-    # Contagem de inscritos por evento
-    inscritos_counts = {evento.id: evento.inscricaoevento_set.count() for evento in eventos}
+    # 1. BUSCA TODOS OS EVENTOS (passados, presentes e futuros)
+    todos_eventos = Evento.objects.all().order_by('finalizado', 'data_inicio')
 
-    # Eventos em que o usuário está inscrito
+    # 2. PAGINAÇÃO - 10 eventos por página
+    paginator = Paginator(todos_eventos, 10)
+    page = request.GET.get('page', 1)
+    
+    try:
+        eventos = paginator.page(page)
+    except PageNotAnInteger:
+        eventos = paginator.page(1)
+    except EmptyPage:
+        eventos = paginator.page(paginator.num_pages)
+
+    # 3. Lista de inscrições do usuário
     usuario_inscricoes = []
     if usuario:
-        usuario_inscricoes = InscricaoEvento.objects.filter(inscrito=usuario).values_list('evento_id', flat=True)
-    
+        usuario_inscricoes = list(InscricaoEvento.objects.filter(inscrito=usuario)
+                                    .values_list('evento_id', flat=True))
+
+    # 4. Prepara dados do calendário APENAS DOS EVENTOS DA PÁGINA ATUAL
+    eventos_calendario = []
+    for evento in todos_eventos:  # Agora só itera sobre eventos da página atual
+        # Verifica disponibilidade
+        inscritos = evento.inscricaoevento_set.count()
+        disponivel = (evento.sem_limites or (
+            evento.quantidade_participantes and 
+            evento.quantidade_participantes > inscritos
+        )) and evento.finalizado == False
+        inscrito = usuario and evento.id in usuario_inscricoes
+        
+        # Prepara horário formatado
+        horario_formatado = evento.horario.strftime('%H:%M') if evento.horario else ""
+        
+        evento_data = {
+            'id': evento.id,
+            'titulo': evento.titulo[:20],
+            'data_inicio': evento.data_inicio.strftime('%Y-%m-%d'),
+            'data_fim': evento.data_fim.strftime('%Y-%m-%d') if evento.data_fim else None,
+            'disponivel': disponivel,
+            'inscrito': inscrito,
+            'horario': horario_formatado,
+            'local': evento.local or 'Online',
+            'criador_id': evento.criador.id if evento.criador else None,
+        }
+        eventos_calendario.append(evento_data)
+
+    # 5. ENVIA PARA O TEMPLATE
     return render(request, 'eventos/inscrever_evento.html', {
-        'eventos': eventos,
-        'nav_items': nav_items,
+        'eventos': eventos,                 # Para os CARDS (já paginado)
         'usuario': usuario,
-        'inscritos_counts': inscritos_counts,
-        'usuario_inscricoes': list(usuario_inscricoes)
+        'usuario_inscricoes': usuario_inscricoes,
+        'eventos_calendario': eventos_calendario, # Para o CALENDÁRIO
+        'eventos_calendario_json': json.dumps(eventos_calendario, ensure_ascii=False),
     })
-
-
 
 # -------------------------------------------------------------------
 # Meus eventos (organizador ou participante)
 # -------------------------------------------------------------------
 @login_required
 def meus_eventos(request):
-    usuario = get_current_usuario(request)
-    is_organizador = usuario.tipo.tipo in ['Professor', 'Organizador', 'Funcionario'] if usuario else False
+    usuario = get_current_usuario(request)  # pega usuário completo
 
-    # Organizadores
+    if not usuario:
+        messages.error(request, "Usuário não encontrado.")
+        return redirect('main')
+
+    is_organizador = usuario.tipo.tipo in ['Professor', 'Organizador', 'Funcionario'] if usuario.tipo else False
+
+    eventos = []
+    inscricoes = []
+    evento_selecionado = None
+    form = None
+    inscritos = None
+    usuario_inscrito_no_evento = None
+
+    # Caso organizador
     if is_organizador:
-        eventos = Evento.objects.filter(criador=usuario).order_by('-finalizado', '-data_inicio').reverse()
+        eventos = Evento.objects.filter(criador=usuario).order_by('-finalizado', '-data_inicio')
         inscricoes = usuario.inscricaoevento_set.select_related('evento').order_by('-evento__finalizado', '-evento__data_inicio')
-
-        evento_selecionado = None
-        form = None
-        inscritos = None
-        usuario_inscrito_no_evento = None  # <- corrigido
 
         evento_id = request.GET.get('evento')
         if evento_id:
             try:
                 evento_selecionado = Evento.objects.get(pk=int(evento_id))
                 inscritos = evento_selecionado.inscricaoevento_set.select_related('inscrito', 'evento')
-
-                from usuarios.models import Perfil as PerfilModel
-                for ins in inscritos:
-                    if not hasattr(ins.inscrito, 'perfil'):
-                        PerfilModel.objects.get_or_create(usuario=ins.inscrito)
-
-                # 🔹 Busca a inscrição (caso o organizador também esteja inscrito)
                 usuario_inscrito_no_evento = InscricaoEvento.objects.filter(
                     evento=evento_selecionado,
                     inscrito=usuario
                 ).first()
 
-                # 🔹 Só permite editar se for o criador
-                if evento_selecionado.criador == usuario:
-                    if request.method == 'POST' and request.POST.get('edited_evento') == str(evento_selecionado.id):
-                        form = EventoForm(request.POST, request.FILES, instance=evento_selecionado)
-                        if form.is_valid():
-                            ev = form.save(commit=False)
-                            ev.criador = evento_selecionado.criador
-                            ev.gallery_slug = ev.get_gallery_name()
-                            ev.save()
-                            messages.success(request, 'Evento atualizado com sucesso.')
-                            return redirect(f"{reverse('meus_eventos')}?evento={ev.id}")
-                    else:
-                        form = EventoForm(instance=evento_selecionado)
+                if request.method == 'POST' and request.POST.get('edited_evento') == str(evento_selecionado.id):
+                    form = EventoForm(request.POST, request.FILES, instance=evento_selecionado)
+                    if form.is_valid():
+                        ev = form.save(commit=False)
+                        ev.criador = evento_selecionado.criador
+                        ev.gallery_slug = ev.get_gallery_name()
+                        ev.save()
+                        messages.success(request, 'Evento atualizado com sucesso.')
+                        return redirect(f"{reverse('meus_eventos')}?evento={ev.id}")
+                else:
+                    form = EventoForm(instance=evento_selecionado)  # pré-carrega dados existentes
             except Evento.DoesNotExist:
                 evento_selecionado = None
 
@@ -184,27 +223,18 @@ def meus_eventos(request):
             'form': form,
             'inscritos': inscritos,
             'inscricoes': inscricoes,
-            'usuario_inscrito_no_evento': usuario_inscrito_no_evento  # agora é o objeto!
+            'usuario_inscrito_no_evento': usuario_inscrito_no_evento
         })
 
-    # Participantes
-    inscricoes = usuario.inscricaoevento_set.select_related('evento').order_by('-data_inscricao') if usuario else []
-    evento_selecionado = None
-    inscritos = None
-    usuario_inscrito_no_evento = None  
+    # Caso apenas participante
+    inscricoes = usuario.inscricaoevento_set.select_related('evento').order_by('-data_inscricao')
 
     evento_id = request.GET.get('evento')
-    if evento_id and usuario:
+    if evento_id:
         try:
             evento_selecionado = Evento.objects.get(pk=int(evento_id))
             inscritos = evento_selecionado.inscricaoevento_set.select_related('inscrito', 'evento')
-
-            # busca a inscrição real do usuário para o evento selecionado
-            usuario_inscrito_no_evento = (
-                evento_selecionado and
-                inscricoes.filter(evento__id=evento_selecionado.id).select_related('evento', 'inscrito').first()
-            )
-
+            usuario_inscrito_no_evento = inscricoes.filter(evento__id=evento_selecionado.id).first()
         except Evento.DoesNotExist:
             evento_selecionado = None
 
@@ -215,9 +245,9 @@ def meus_eventos(request):
         'usuario': usuario,
         'nav_items': nav_items,
         'is_organizador': False,
-        'usuario_inscrito_no_evento': usuario_inscrito_no_evento  # <- agora é objeto
+        'usuario_inscrito_no_evento': usuario_inscrito_no_evento,
+        'form': None
     })
-
 
 # -------------------------------------------------------------------
 # Gerenciar evento (validação de inscritos)
@@ -537,7 +567,7 @@ def inscrever_evento(request, evento_id):
     else:
         messages.info(request, f'Você já está inscrito no evento "{evento.titulo}".')
 
-    return redirect('detalhe_evento', evento_id=evento.id)
+    return redirect('lista_eventos')
 
 @login_required
 def cancelar_inscricao(request, evento_id):
@@ -549,7 +579,7 @@ def cancelar_inscricao(request, evento_id):
         messages.success(request, f'Inscrição no evento "{evento.titulo}" cancelada.')
     else:
         messages.info(request, 'Nenhuma inscrição encontrada para cancelar.')
-    return redirect('detalhe_evento', evento_id=evento.id)
+    return redirect('lista_eventos')
 
 
 # -------------------------------------------------------------------

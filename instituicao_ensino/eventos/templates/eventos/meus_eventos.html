@@ -1,5 +1,6 @@
 {% extends 'base/base.html' %}
 {% load static %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/meus_eventos.css' %}">
 {% endblock %}
@@ -13,235 +14,190 @@
 {% block content %}
 <div class="container mt-4">
 
-    <!-- ============================= -->
-    <!-- TÍTULO PRINCIPAL -->
-    <!-- ============================= -->
     <h1 class="mb-3">Meus Eventos</h1>
 
     <div class="row">
-        <!-- ============================= -->
-        <!-- COLUNA ESQUERDA (LISTAS) -->
-        <!-- ============================= -->
+        <!-- COLUNA ESQUERDA: LISTA DE EVENTOS E INSCRIÇÕES -->
         <div class="col-12 col-md-4 mb-4">
 
             {% if is_organizador %}
-                <!-- ============================= -->
-                <!-- LISTA DE EVENTOS CRIADOS -->
-                <!-- ============================= -->
-                <h5>Meus Eventos</h5>
-                <div class="list-group mb-3">
-                    {% for e in eventos %}
-                        <a href="?evento={{ e.id }}" 
-                           class="list-group-item list-group-item-action {% if evento_selecionado and evento_selecionado.id == e.id %}active{% endif %}">
-                            
-                            <div class="d-flex w-100 align-items-center">
-                                <!-- Miniatura -->
-                                {% if e.thumb %}
-                                    <img src="{{ e.thumb.url }}" alt="{{ e.titulo }}" 
-                                        >
-                                {% else %}
-                                    <img src="{% static 'favicon.png' %}" alt="placeholder"
-                                        >
-                                {% endif %}
-                                <div class="flex-grow-1">
-                                    <div class="d-flex justify-content-between">
-                                        <h6 class="mb-1">{{ e.titulo }}</h6>
-                                        <small class="text-muted">{{ e.data_inicio }}</small>
-                                    </div>
-                                    <p class="mb-0 small">{{ e.local|default:"Online" }}</p>
-                                </div>
+            <h5>Meus Eventos</h5>
+            <div class="list-group mb-3">
+                {% for e in eventos %}
+                <a href="?evento={{ e.id }}" 
+                   class="list-group-item list-group-item-action {% if evento_selecionado and evento_selecionado.id == e.id %}active{% endif %}">
+                    <div class="d-flex w-100 align-items-center">
+                        {% if e.thumb %}
+                        <img src="{{ e.thumb.url }}" alt="{{ e.titulo }}" class="me-2" style="width:50px;height:50px;">
+                        {% else %}
+                        <img src="{% static 'favicon.png' %}" alt="placeholder" class="me-2" style="width:50px;height:50px;">
+                        {% endif %}
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="mb-1">{{ e.titulo }}</h6>
+                                <small class="text-muted">{{ e.data_inicio }}</small>
                             </div>
-                        </a>
-                    {% empty %}
-                        <p class="text-muted">Você não criou nenhum evento ainda.</p>
-                    {% endfor %}
-                </div>
-                {% endif %}
+                            <p class="mb-0 small">{{ e.local|default:"Online" }}</p>
+                        </div>
+                    </div>
+                </a>
+                {% empty %}
+                <p class="text-muted">Você não criou nenhum evento ainda.</p>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-            <!-- ============================= -->
-            <!-- LISTA DE INSCRIÇÕES -->
-            <!-- ============================= -->                
             <h5>Minhas Inscrições</h5>
             <div class="list-group">
                 {% if inscricoes %}
-                    {% for ins in inscricoes %}
-                        <a href="?evento={{ ins.evento.id }}" 
-                           class="list-group-item list-group-item-action {% if evento_selecionado and evento_selecionado.id == ins.evento.id %}active{% endif %}">
-                            <div class="d-flex align-items-center">
-                                <!-- Miniatura -->
-                                {% if ins.evento.thumb %}
-                                    <img src="{{ ins.evento.thumb.url }}" alt="{{ ins.evento.titulo }}" 
-                                        >
-                                {% else %}
-                                    <img src="{% static 'favicon.png' %}" alt="placeholder"
-                                        >
-                                {% endif %}
-                                <div class="flex-grow-1">
-                                    <div class="d-flex justify-content-between">
-                                        <h6 class="mb-1">{{ ins.evento.titulo }}</h6>
-                                        <small class="text-muted">{{ ins.evento.data_inicio }}</small>
-                                    </div>
-                                    <p class="mb-0 small">{{ ins.evento.local|default:"Online" }}</p>
-                                </div>
+                {% for ins in inscricoes %}
+                <a href="?evento={{ ins.evento.id }}" 
+                   class="list-group-item list-group-item-action {% if evento_selecionado and evento_selecionado.id == ins.evento.id %}active{% endif %}">
+                    <div class="d-flex align-items-center">
+                        {% if ins.evento.thumb %}
+                        <img src="{{ ins.evento.thumb.url }}" alt="{{ ins.evento.titulo }}" class="me-2" style="width:50px;height:50px;">
+                        {% else %}
+                        <img src="{% static 'favicon.png' %}" alt="placeholder" class="me-2" style="width:50px;height:50px;">
+                        {% endif %}
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="mb-1">{{ ins.evento.titulo }}</h6>
+                                <small class="text-muted">{{ ins.evento.data_inicio }}</small>
                             </div>
-                        </a>
-                    {% endfor %}
+                            <p class="mb-0 small">{{ ins.evento.local|default:"Online" }}</p>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
                 {% else %}
-                    <p class="text-muted">Nenhuma inscrição.</p>
+                <p class="text-muted">Nenhuma inscrição.</p>
                 {% endif %}
             </div>
         </div>
 
-        <!-- ============================= -->
-        <!-- COLUNA DIREITA (DETALHES) -->
-        <!-- ============================= -->
+        <!-- COLUNA DIREITA: DETALHES E EDIÇÃO -->
         <div class="col-12 col-md-8">
-
             {% if evento_selecionado %}
-                <div class="card mb-3">
-                    <div class="row g-0">
-                        <!-- Imagem -->
-                        <div class="col-12 col-sm-4">
-                            {% if evento_selecionado.thumb %}
-                                <img src="{{ evento_selecionado.thumb.url }}" 
-                                     class="img-fluid rounded-start" alt="{{ evento_selecionado.titulo }}">
-                            {% else %}
-                                <img src="{% static 'favicon.png' %}" 
-                                     class="img-fluid rounded-start" alt="placeholder">
-                            {% endif %}
-                        </div>
-
-                        <!-- Informações principais -->
-                        <div class="col-12 col-sm-8">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ evento_selecionado.titulo }}</h5>
-                                <p class="card-text"><strong>Data:</strong> {{ evento_selecionado.data_inicio }}{% if evento_selecionado.data_fim %} a {{ evento_selecionado.data_fim }}{% endif %}</p>
-                                <p class="card-text"><strong>Horário:</strong> {{ evento_selecionado.horario }}</p>
-                                <p class="card-text"><strong>Local:</strong> {{ evento_selecionado.local }}</p>
-                                <p class="card-text">
-                                    <strong>Participantes:</strong> 
-                                    {{ evento_selecionado.inscricaoevento_set.count }}
-                                    {% if not evento_selecionado.sem_limites and evento_selecionado.quantidade_participantes %}
-                                        /{{ evento_selecionado.quantidade_participantes }}
-                                    {% endif %}
-                                </p>
-                                <p class="card-text"><strong>Organizador:</strong> <a href="{% url 'perfil_publico' evento_selecionado.organizador %}">{{ evento_selecionado.criador}}</a></p>
-                                <p class="card-text"><strong>Horas:</strong> {{ evento_selecionado.horas }}</p>
-
-                                <!-- Botão de certificado -->
-                                {% if evento_selecionado.finalizado %}
-                                    {% if usuario_inscrito_no_evento and usuario_inscrito_no_evento.is_validated %}
-                                        <!-- Usuário aprovado -->
-                                        <a href="{% url 'pegar_certificado' evento_selecionado.id %}"
-                                        class="btn btn-success btn-lg mt-3"
-                                        target="_blank"
-                                        rel="noopener noreferrer">
-                                            Pegar Certificado
-                                        </a>
-                                    {% elif usuario_inscrito_no_evento %}
-                                        <!-- Usuário inscrito, mas aguardando aprovação -->
-                                        <div class="alert alert-warning mt-3" role="alert">
-                                            Seu certificado estará disponível após a aprovação da inscrição.
-                                        </div>
-                                    {% endif %}
-                                {% endif %}
-
-
-                                <!-- Botão de finalizar (apenas criador) -->
-                                {% if is_organizador and evento_selecionado.criador == usuario and not evento_selecionado.finalizado %}
-                                    <form method="post" action="{% url 'finalizar_evento' evento_selecionado.id %}" class="d-inline-block mt-2">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger btn-lg">Finalizar evento</button>
-                                    </form>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ============================= -->
-                <!-- ABAIXO: EDIÇÃO / INSCRITOS -->
-                <!-- ============================= -->
-                <div class="row">
-                    <!-- Edição -->
-                    <div class="col-12 col-md-6 mb-3">
-                        {% if is_organizador and evento_selecionado.criador == usuario %}
-                            <h4>Editar Evento</h4>
-                            {% if form %}
-                                <form method="post">
-                                    {% csrf_token %}
-                                    {{ form.as_p }}
-                                    <input type="hidden" name="edited_evento" value="{{ evento_selecionado.id }}" />
-                                    <button type="submit" class="btn btn-primary">Salvar alterações</button>
-                                </form>
-                            {% else %}
-                                <p class="text-muted">Não é possível editar este evento.</p>
-                            {% endif %}
+            <div class="card mb-3">
+                <div class="row g-0">
+                    <!-- Imagem -->
+                    <div class="col-12 col-sm-4">
+                        {% if evento_selecionado.thumb %}
+                        <img src="{{ evento_selecionado.thumb.url }}" class="img-fluid rounded-start" alt="{{ evento_selecionado.titulo }}">
                         {% else %}
-                        <h4>Detalhes do Evento</h4>
-                        <!-- Card com descrição e link da galeria -->
-                        <div class="card mt-3">
-                            <p class="text-muted">
-                                Quando for finalizado, seu certificado ficará disponível.
-                            </p>
-
-                            <div class="card-body">
-                                <h5 class="card-title">Descrição do Evento</h5>
-                                <p class="card-text">
-                                    {{ evento_selecionado.descricao|default:"Nenhuma descrição disponível." }}
-                                </p>
-                                <a href="{% url 'galeria_evento' evento_selecionado.id %}" 
-                                class="btn btn-outline-warning mt-2">
-                                    Ver Galeria do Evento
-                                </a>
-                            </div>
-                        </div>
-                    {% endif %}
+                        <img src="{% static 'favicon.png' %}" class="img-fluid rounded-start" alt="placeholder">
+                        {% endif %}
                     </div>
 
-                    <!-- Lista de inscritos -->
-                    <div class="col-12 col-md-6">
-                        <h4>Inscritos</h4>
-                        <div>
-                            {% if inscritos %}
-                                <ul class="list-unstyled">
-                                    {% for ins in inscritos %}
-                                        <li class="d-flex align-items-center mb-2">
-                                            {% if ins.inscrito.perfil.foto %}
-                                                <img src="{{ ins.inscrito.perfil.foto.url }}"/>
-                                            {% else %}
-                                                <img src="{% static 'images/unknown.svg' %}"/>
-                                            {% endif %}
-                                            <div class="flex-grow-1">
-                                                <a href="{% url 'perfil_publico' ins.inscrito.nome_usuario %}" target="_blank" rel="noopener noreferrer">{{ ins.inscrito.nome }}</a>
-                                                <div class="small text-muted">
-                                                    {% if ins.inscrito.instituicao %}
-                                                        <a href="{% url 'instituicao_publica' ins.inscrito.instituicao.id %}" target="_blank" rel="noopener noreferrer">{{ ins.inscrito.instituicao.nome }}</a>
-                                                    {% else %}
-                                                        -
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                            <div>
-                                                {% if ins.is_validated %}
-                                                    <span class="badge bg-success" title="Este participante foi validado">Validado</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary" title="Inscrição pendente">Pendente</span>
-                                                {% endif %}
-                                            </div>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p class="text-muted">Nenhum inscrito ainda.</p>
+                    <!-- Informações principais -->
+                    <div class="col-12 col-sm-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ evento_selecionado.titulo }}</h5>
+                            <p class="card-text"><strong>Data:</strong> {{ evento_selecionado.data_inicio }}{% if evento_selecionado.data_fim %} a {{ evento_selecionado.data_fim }}{% endif %}</p>
+                            <p class="card-text"><strong>Horário:</strong> {{ evento_selecionado.horario }}</p>
+                            <p class="card-text"><strong>Local:</strong> {{ evento_selecionado.local }}</p>
+                            <p class="card-text">
+                                <strong>Participantes:</strong> 
+                                {{ evento_selecionado.inscricaoevento_set.count }}
+                                {% if not evento_selecionado.sem_limites and evento_selecionado.quantidade_participantes %}
+                                /{{ evento_selecionado.quantidade_participantes }}
+                                {% endif %}
+                            </p>
+                            <p class="card-text"><strong>Organizador:</strong> <a href="{% url 'perfil_publico' evento_selecionado.organizador %}">{{ evento_selecionado.criador }}</a></p>
+                            <p class="card-text"><strong>Horas:</strong> {{ evento_selecionado.horas }}</p>
+
+                            <!-- Botão de certificado -->
+                            {% if evento_selecionado.finalizado %}
+                                {% if usuario_inscrito_no_evento and usuario_inscrito_no_evento.is_validated %}
+                                <a href="{% url 'pegar_certificado' evento_selecionado.id %}" class="btn btn-success btn-lg mt-3" target="_blank" rel="noopener noreferrer">Pegar Certificado</a>
+                                {% elif usuario_inscrito_no_evento %}
+                                <div class="alert alert-warning mt-3" role="alert">
+                                    Seu certificado estará disponível após a aprovação da inscrição.
+                                </div>
+                                {% endif %}
+                            {% endif %}
+
+                            <!-- Botão de finalizar (apenas criador) -->
+                            {% if is_organizador and evento_selecionado.criador == usuario %}
+                                <a href="{% url 'gerenciar_evento' evento_selecionado.id %}" class="btn btn-outline-secondary ms-2">Gerenciar Evento</a>
+                                {% if not evento_selecionado.finalizado %}
+                                <form method="post" action="{% url 'finalizar_evento' evento_selecionado.id %}" class="d-inline-block mt-2">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-lg">Finalizar evento</button>
+                                </form>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- EDIÇÃO / INSCRITOS -->
+            <div class="row">
+                <!-- Formulário de edição -->
+                <div class="col-12 col-md-6 mb-3">
+                    {% if is_organizador and evento_selecionado.criador == usuario %}
+                    <h4>Editar Evento</h4>
+                    {% if form %}
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <input type="hidden" name="edited_evento" value="{{ evento_selecionado.id }}">
+                        <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                    </form>
+                    {% else %}
+                    <p class="text-muted">Não é possível editar este evento.</p>
+                    {% endif %}
+                    {% else %}
+                    <h4>Detalhes do Evento</h4>
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Descrição do Evento</h5>
+                            <p class="card-text">{{ evento_selecionado.descricao|default:"Nenhuma descrição disponível." }}</p>
+                            <a href="{% url 'galeria_evento' evento_selecionado.id %}" class="btn btn-outline-warning mt-2">Ver Galeria do Evento</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Lista de inscritos -->
+                <div class="col-12 col-md-6">
+                    <h4>Inscritos</h4>
+                    {% if inscritos %}
+                    <ul class="list-unstyled">
+                        {% for ins in inscritos %}
+                        <li class="d-flex align-items-center mb-2">
+                            {% if ins.inscrito.perfil.foto %}
+                            <img src="{{ ins.inscrito.perfil.foto.url }}" class="me-2" style="width:40px;height:40px;">
+                            {% else %}
+                            <img src="{% static 'images/unknown.svg' %}" class="me-2" style="width:40px;height:40px;">
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <a href="{% url 'perfil_publico' ins.inscrito.nome_usuario %}" target="_blank">{{ ins.inscrito.nome }}</a>
+                                <div class="small text-muted">
+                                    {% if ins.inscrito.instituicao %}
+                                    <a href="{% url 'instituicao_publica' ins.inscrito.instituicao.id %}" target="_blank">{{ ins.inscrito.instituicao.nome }}</a>
+                                    {% else %}-{% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                {% if ins.is_validated %}
+                                <span class="badge bg-success" title="Este participante foi validado">Validado</span>
+                                {% else %}
+                                <span class="badge bg-secondary" title="Inscrição pendente">Pendente</span>
+                                {% endif %}
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">Nenhum inscrito ainda.</p>
+                    {% endif %}
+                </div>
+            </div>
 
             {% else %}
-                <!-- Nenhum evento selecionado -->
-                <p class="text-muted">Selecione um evento na lista à esquerda para ver detalhes.</p>
+            <p class="text-muted">Selecione um evento na lista à esquerda para ver detalhes.</p>
             {% endif %}
         </div>
     </div>

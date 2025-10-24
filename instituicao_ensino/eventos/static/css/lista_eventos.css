@@ -1,64 +1,140 @@
-.eventos-container { 
-    max-width: 1000px; 
-    margin: 2rem auto; 
-    padding: 0 1rem; 
+/* eventos.css - MOBILE FIRST 1 COLUNA MOBILE, 2 COLUNAS PC */
+/* ===== VARIÁVEIS ===== */
+:root {
+  --primary-gold: #d4af37;
+  --primary-gold-dark: #b8941f;
+  --success-green: #28a745;
+  --danger-red: #dc3545;
+  --background-dark: #2d2d2d;
+  --background-medium: #3d3d3d;
+  --text-light: #ffffff;
+  --text-muted: #cccccc;
+  --card-bg: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
+  --border-radius: 12px;
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.eventos-container h1 { 
-    text-align: center; 
-    margin-bottom: 2rem; 
-    color: #d4af37; 
+/* ===== LAYOUT PRINCIPAL ===== */
+.eventos-container {
+    width: 100%;
+    margin: 1rem auto;
+    padding: 0 1rem;
 }
 
-.eventos-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-    gap: 1.5rem; 
+.eventos-container h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--primary-gold);
+    text-shadow: 4px 4px #ad0101;
+    font-size: 2rem;
+    font-weight: 700;
 }
 
-.evento-card { 
-    background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%); 
-    border: 2px solid #d4af37; 
-    border-radius: 12px; 
-    padding: 1.5rem; 
-    color: #f8f8f8; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: space-between; 
+/* ===== GRID DE EVENTOS ===== */
+.eventos-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    justify-items: center;
 }
 
-.evento-card h2 { 
-    margin-bottom: 0.5rem; 
-    color: #f8d568; 
+/* ===== CARDS DE EVENTO ===== */
+.evento-card {
+    background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
+    border: 2px solid var(--primary-gold);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    color: #f8f8f8;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 280px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    width: 85vw;
+    max-width: 400px;
 }
 
-.evento-card p { 
-    margin: 0.3rem 0; 
-    font-size: 0.95rem; 
+.evento-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(212, 175, 55, 0.2);
+    border-color: #f8d568;
 }
 
-.evento-card .evento-actions { 
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 0.5rem; 
-    margin-top: 1rem; 
+/* ===== CONTEÚDO DOS CARDS ===== */
+.evento-card h2 {
+    margin-bottom: 0.5rem;
+    color: #f8d568;
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.3;
 }
 
-.evento-card a.btn { 
-    padding: 0.6rem 0.8rem; 
-    background: #8b0000; 
-    color: #f8f8f8; 
-    text-align: center; 
-    text-decoration: none; 
-    border-radius: 6px; 
-    font-weight: 600; 
-    transition: all 0.3s ease; 
-    flex: 1;
+.evento-card p {
+    margin: 0.3rem 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #f8f8f8;
 }
 
-.evento-card a.btn:hover { 
-    background: #a00000; 
-    transform: translateY(-2px); 
+.evento-card p strong {
+    color: var(--primary-gold);
+}
+
+/* ===== LINK DO EVENTO ===== */
+.evento-card a:not(.btn) {
+    color: #ffeb3b !important;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.3rem 0.6rem;
+    background: rgba(255, 235, 59, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 235, 59, 0.3);
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin: 0.2rem 0;
+}
+
+.evento-card a:not(.btn):hover {
+    color: #ffffff !important;
+    background: rgba(255, 235, 59, 0.2);
+    border-color: #ffeb3b;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(255, 235, 59, 0.3);
+}
+
+/* ===== BOTÕES DE AÇÃO DOS CARDS ===== */
+.evento-card .evento-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.evento-card a.btn {
+    padding: 0.7rem 0.8rem;
+    background: #8b0000;
+    color: #f8f8f8;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    min-height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid transparent;
+}
+
+.evento-card a.btn:hover {
+    background: #a00000;
+    transform: translateY(-2px);
+    border-color: var(--primary-gold);
 }
 
 .evento-card a.btn.inscr {
@@ -77,8 +153,246 @@
     background-color: rgb(255, 0, 0);
 }
 
-@media (max-width: 768px) {
+/* ===== PAGINAÇÃO - HORIZONTAL MOBILE E PC ===== */
+.paginacao {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin: auto;
+    margin-top: 3rem;
+    padding: 1rem;
+    max-width: 700px;
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+}
+
+.pagina-link {
+    padding: 0.8rem 1rem;
+    background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
+    color: #f8f8f8;
+    text-decoration: none;
+    border-radius: 8px;
+    border: 2px solid #d4af37;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-size: 1rem;
+    white-space: nowrap;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    flex-shrink: 0;
+}
+
+.pagina-link:hover {
+    background: #d4af37;
+    color: #2d1b1b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
+}
+
+.pagina-atual {
+    color: #f8d568;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0.8rem 1.2rem;
+    background: rgba(212, 175, 55, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    flex-shrink: 0;
+}
+
+/* ===== RESPONSIVIDADE - MOBILE (até 762px) ===== */
+@media (max-width: 762px) {
+    .paginacao {
+        gap: 0.4rem;
+        padding: 0.8rem 0.5rem;
+        justify-content: flex-start;
+    }
+    
+    .pagina-link {
+        min-width: 50px;
+        min-height: 44px;
+        padding: 0.6rem 0.8rem;
+        font-size: 1.5rem;
+    }
+    
+    .primeira { min-width: 70px; }
+    .anterior { min-width: 70px; }
+    .proxima { min-width: 70px; }
+    .ultima { min-width: 70px; }
+    
+    .pagina-atual {
+        font-size: 0.9rem;
+        padding: 0.7rem 1rem;
+        min-width: 120px;
+        min-height: 44px;
+    }
+}
+
+/* ===== RESPONSIVIDADE - PC (763px+) ===== */
+@media (min-width: 763px) {
+    .eventos-container {
+        max-width: 650px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    .eventos-container h1 {
+        font-size: 2.2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .eventos-grid {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 2rem;
+        justify-items: stretch;
+    }
+    
+    .evento-card {
+        width: auto;
+        max-width: none;
+        padding: 1.5rem;
+    }
+    
+    .evento-card h2 {
+        font-size: 1.4rem;
+    }
+    
+    .evento-card .evento-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
     .evento-card a.btn {
+        flex: 1;
+        padding: 0.6rem 0.8rem;
         max-height: 45px;
     }
+    
+    /* Paginação Desktop */
+    .paginacao {
+        gap: 0.8rem;
+        justify-content: center;
+        overflow-x: visible;
+        flex-direction: unset !important;
+    }
+    
+    .pagina-link {
+        min-width: 90px;
+        min-height: 50px;
+        padding: 0.8rem 1rem;
+        font-size: 1.5rem;
+    }
+    
+    .primeira { min-width: 100px; }
+    .anterior { min-width: 100px; }
+    .proxima { min-width: 100px; }
+    .ultima { min-width: 100px; }
+    
+    .pagina-atual {
+        font-size: 1.5rem;
+        padding: 0.8rem 1.5rem;
+        min-width: 160px;
+        min-height: 50px;
+    }
+}
+
+/* ===== RESPONSIVIDADE - DESKTOP GRANDE (1024px+) ===== */
+@media (min-width: 1024px) {
+    .eventos-container {
+        max-width: 1200px;
+    }
+    
+    .eventos-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+    
+    .evento-card {
+        padding: 1.8rem;
+    }
+    
+    .evento-card h2 {
+        font-size: 1.5rem;
+    }
+    
+    .evento-card p {
+        font-size: 1rem;
+    }
+    
+    /* Paginação Desktop Grande */
+    .paginacao {
+        gap: 1rem;
+    }
+    
+    .pagina-link {
+        min-width: 100px;
+        padding: 0.9rem 1.2rem;
+        font-size: 1rem;
+    }
+    
+    .primeira { min-width: 110px; }
+    .anterior { min-width: 110px; }
+    .proxima { min-width: 110px; }
+    .ultima { min-width: 110px; }
+    
+    .pagina-atual {
+        font-size: 1rem;
+        padding: 0.9rem 1.8rem;
+        min-width: 180px;
+    }
+}
+
+/* ===== ACESSIBILIDADE ===== */
+.evento-card a.btn:focus,
+.pagina-link:focus {
+    outline: 2px solid var(--primary-gold);
+    outline-offset: 2px;
+}
+
+.evento-card a:not(.btn):focus {
+    outline: 2px solid #ffeb3b;
+    outline-offset: 2px;
+    background: rgba(255, 235, 59, 0.2);
+}
+
+/* ===== REDUCE MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+    .evento-card,
+    .evento-card a.btn,
+    .evento-card a:not(.btn),
+    .pagina-link {
+        transition: none;
+    }
+    
+    .evento-card:hover,
+    .evento-card a.btn:hover,
+    .evento-card a:not(.btn):hover,
+    .pagina-link:hover {
+        transform: none;
+    }
+}
+
+/* ===== ESTADOS DESABILITADOS ===== */
+.pagina-link:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.pagina-link:disabled:hover {
+    background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
+    color: #f8f8f8;
+    transform: none;
+    box-shadow: none;
 }

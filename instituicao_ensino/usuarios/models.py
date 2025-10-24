@@ -11,10 +11,9 @@ decisions:
     stable `base_dir` inside `MEDIA_ROOT`. `Usuario.base_dir` is computed on
     first save and used afterwards so file paths don't change when display
     fields (nome_usuario/instituicao) are updated.
-- The `user_directory_path` helper uses `instance._upload_field` to infer the
-    subfolder for a specific FileField (e.g. 'foto_perfil', 'certificados').
-
-Read the inline comments on methods for rationale and edge-case handling.
+- The `user_directory_path` helper dynamically infers the subfolder for a
+    specific FileField (e.g. 'foto_perfil', 'certificados'), sem depender de
+    atributos transitórios (_upload_field).
 """
 
 import re
@@ -26,6 +25,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
 from .utils import create_user_dirs
 
+
 # -----------------------------
 # Tabela de DDD
 # -----------------------------
@@ -34,8 +34,8 @@ class DDD(models.Model):
     pais = models.CharField(max_length=50, default='Brasil')
 
     def __str__(self):
-        # Exibe no spinner: "55 (Brasil)"
         return f"{self.codigo} ({self.pais})"
+
 
 # -----------------------------
 # Tipos de Usuário
@@ -45,6 +45,7 @@ class TipoUsuario(models.Model):
 
     def __str__(self):
         return self.tipo
+
 
 # -----------------------------
 # Instituições de Ensino
@@ -60,61 +61,56 @@ class Instituicao(models.Model):
     def __str__(self):
         return self.nome
 
+
 # -----------------------------
 # Usuário
 # -----------------------------
 class Usuario(models.Model):
     nome = models.CharField(max_length=150)
     ddd = models.ForeignKey(DDD, on_delete=models.SET_NULL, null=True, blank=True)
-    telefone = models.CharField(max_length=15, blank=True, null=True)  # já com +
+    telefone = models.CharField(max_length=15, blank=True, null=True)
     instituicao = models.ForeignKey(Instituicao, on_delete=models.SET_NULL, null=True, blank=True)
     tipo = models.ForeignKey(TipoUsuario, on_delete=models.CASCADE)
     nome_usuario = models.CharField(max_length=50, unique=True)
     email = models.EmailField(blank=True, null=True)
-    senha = models.CharField(max_length=128, blank=True, null=True)  # criptografada (legacy)
-    # link para o User do Django (autenticação nativa)
+    senha = models.CharField(max_length=128, blank=True, null=True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='profile')
-    # base directory under MEDIA_ROOT for this user (e.g. usuarios/aluno1_UnivX)
     base_dir = models.CharField(max_length=255, blank=True, null=True)
 
-    # -----------------------------
-    # Validação personalizada
-    # -----------------------------
     def clean(self):
-        # Alunos e professores obrigatoriamente têm instituição
         if self.tipo.tipo in ['Aluno', 'Professor'] and not self.instituicao:
             raise ValidationError("Alunos e Professores devem ter instituição cadastrada.")
 
-        # Validação do telefone
-        if self.ddd and self.telefone:
-            numero = re.sub(r'\D', '', self.telefone)  # remove qualquer não-dígito
-            if not re.match(r'^\d{8,9}$', numero):
+
+        if self.telefone:
+            numero = re.sub(r'\D', '', self.telefone)
+            ddd_num = self.ddd.codigo if self.ddd else ''
+            # remove DDD do começo antes de validar
+            if numero.startswith(ddd_num):
+                numero_local = numero[len(ddd_num):]
+            else:
+                numero_local = numero
+
+            if not re.match(r'^\d{8,9}$', numero_local):
                 raise ValidationError("Telefone inválido. Exemplo aceito: 996135479")
 
-    # -----------------------------
-    # Salvamento do usuário
-    # -----------------------------
     def save(self, *args, **kwargs):
-        # Criptografa senha se necessário
         if self.senha and not self.senha.startswith('pbkdf2_'):
             self.senha = make_password(self.senha)
 
-        # Salva telefone com +DDD + número
         if self.ddd and self.telefone:
             numero = re.sub(r'\D', '', self.telefone)
             ddd_num = self.ddd.codigo.lstrip('+')
             if not self.telefone.startswith('+'):
                 self.telefone = f"+{ddd_num}{numero}"
             else:
-                self.telefone = f"+{numero}"  # mantém + original
+                self.telefone = f"+{numero}"
 
-        # compute desired base dir
         nome_clean = str(self.nome_usuario).replace(' ', '_')
         instituicao = self.instituicao.nome if self.instituicao else 'sem_instituicao'
         instituicao_clean = str(instituicao).replace(' ', '_')
         desired_base = f'usuarios/{nome_clean}_{instituicao_clean}'
 
-        # try to load existing record to see if base_dir needs to be moved
         old_base = None
         if self.pk:
             try:
@@ -123,7 +119,6 @@ class Usuario(models.Model):
             except Exception:
                 old_base = None
 
-        # if old_base exists and is different, attempt to move files on disk and update related file fields
         if old_base and old_base != desired_base:
             old_abs = os.path.join(settings.MEDIA_ROOT, old_base)
             new_abs = os.path.join(settings.MEDIA_ROOT, desired_base)
@@ -132,20 +127,18 @@ class Usuario(models.Model):
                 if os.path.exists(old_abs):
                     shutil.move(old_abs, new_abs)
             except Exception:
-                # if moving fails, continue without raising to avoid blocking save
                 pass
             self.base_dir = desired_base
             super().save(*args, **kwargs)
-            # update related filefield paths to point to new base when they referenced the old one
+
             try:
-                # atualizar foto do perfil
                 from .models import Perfil as PerfilModel, Certificado as CertModel
                 perfil = getattr(self, 'perfil', None)
                 if perfil and perfil.foto:
                     if perfil.foto.name and perfil.foto.name.startswith(old_base):
                         perfil.foto.name = perfil.foto.name.replace(old_base, desired_base, 1)
                         perfil.save()
-                # atualizar certificados
+
                 for cert in self.certificado_set.all():
                     changed = False
                     if cert.pdf and cert.pdf.name.startswith(old_base):
@@ -163,42 +156,50 @@ class Usuario(models.Model):
                 pass
             return
 
-        # first-time save or no move needed: set base_dir if empty
         if not self.base_dir:
             self.base_dir = desired_base
 
         super().save(*args, **kwargs)
 
-    # -----------------------------
-    # Verificação da senha
-    # -----------------------------
     def check_senha(self, senha):
         return check_password(senha, self.senha)
 
     def __str__(self):
         return f"{self.nome} ({self.tipo.tipo})"
 
+
+# -----------------------------
+# Caminho de upload
+# -----------------------------
+def user_directory_path(instance, filename):
+    """Gera caminho para armazenar arquivos do usuário.
+
+    Formato:
+        usuarios/<nome_usuario>_<instituicao>/<tipo_arquivo>/<filename>
+    Exemplo:
+        usuarios/aluno1_UniversidadeExemplo/foto_perfil/avatar.jpg
+    """
+    usuario = instance.usuario
+    base = getattr(usuario, 'base_dir', None)
+    if not base:
+        nome = usuario.nome_usuario
+        instituicao = usuario.instituicao.nome if usuario.instituicao else 'sem_instituicao'
+        base = f"usuarios/{str(nome).replace(' ', '_')}_{str(instituicao).replace(' ', '_')}"
+
+    # detecta o tipo de arquivo dinamicamente, sem depender de _upload_field
+    if isinstance(instance, Perfil):
+        subpasta = "foto_perfil"
+    elif isinstance(instance, Certificado):
+        subpasta = "certificados"
+    else:
+        subpasta = "arquivos"
+
+    return f"{base}/{subpasta}/{filename}"
+
+
 # -----------------------------
 # Perfil do Usuário
 # -----------------------------
-def user_directory_path(instance, filename):
-    """Caminho para armazenar arquivos do usuário.
-
-    Formato: usuarios/<nome_usuario>_<instituicao>/<tipo_arquivo>/<filename>
-    Ex: usuarios/aluno1_UniversidadeExemplo/foto_perfil/avatar.jpg
-    """
-    # Prefer using stored base_dir (so paths remain stable after first save)
-    base = getattr(instance.usuario, 'base_dir', None)
-    if not base:
-        nome = instance.usuario.nome_usuario
-        instituicao = instance.usuario.instituicao.nome if instance.usuario.instituicao else 'sem_instituicao'
-        nome_clean = str(nome).replace(' ', '_')
-        instituicao_clean = str(instituicao).replace(' ', '_')
-        base = f'usuarios/{nome_clean}_{instituicao_clean}'
-    # distinguir tipo de arquivo se o campo estiver presente
-    campo = getattr(instance, '_upload_field', 'files')
-    return f"{base}/{campo}/{filename}"
-
 class Perfil(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
     foto = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
@@ -207,10 +208,6 @@ class Perfil(models.Model):
     mostrar_telefone = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        # marcaremos o campo _upload_field para que user_directory_path saiba que se trata de foto
-        if self.foto:
-            setattr(self, '_upload_field', 'foto_perfil')
-        # Ensure user directories exist before saving the foto file
         try:
             if getattr(self, 'usuario', None):
                 create_user_dirs(self.usuario)
@@ -222,29 +219,22 @@ class Perfil(models.Model):
         return f'Perfil de {self.usuario.nome_usuario}'
 
 
+# -----------------------------
+# Certificados
+# -----------------------------
 class Certificado(models.Model):
-    """Armazena certificados gerados/recebidos pelo usuário após participação.
-
-    Mantemos o arquivo em uma pasta por usuário (mesma lógica de user_directory_path).
-    """
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    # opcional: associar certificado a um Evento
     evento = models.ForeignKey('eventos.Evento', on_delete=models.SET_NULL, null=True, blank=True)
     arquivo = models.FileField(upload_to=user_directory_path, blank=True, null=True)
     pdf = models.FileField(upload_to=user_directory_path, blank=True, null=True)
     png = models.ImageField(upload_to=user_directory_path, blank=True, null=True)
     qr_data = models.CharField(max_length=500, blank=True, null=True)
     nome = models.CharField(max_length=200, blank=True)
-    # number of credited hours (optional). Stored as integer minutes or hours
     horas = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    # public identifier for certificate verification via web (e.g. uuid)
     public_id = models.CharField(max_length=64, blank=True, null=True, unique=True)
     data_emitido = models.DateField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        # indica ao path generator que esse é um certificado
-        setattr(self, '_upload_field', 'certificados')
-        # Ensure user directories exist before saving certificate files
         try:
             if getattr(self, 'usuario', None):
                 create_user_dirs(self.usuario)

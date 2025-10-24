@@ -202,8 +202,10 @@ def perfil(request):
         for field, errors in pform.errors.items():
             for e in errors:
                 messages.error(request, f'Erro no campo do perfil "{field}": {e}')
+    
+    telefone = usuario.telefone.split(usuario.ddd.codigo)[-1]
 
-    return render(request, 'perfil.html', {'usuario': usuario, 'uform': uform, 'pform': pform, 'nav_items': nav_items})
+    return render(request, 'perfil.html', {'usuario': usuario, 'uform': uform, 'pform': pform, 'nav_items': nav_items, 'telefone': telefone})
 
 
 

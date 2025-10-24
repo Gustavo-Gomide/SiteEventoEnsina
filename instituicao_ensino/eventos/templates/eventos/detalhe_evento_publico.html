@@ -88,36 +88,33 @@
             <!-- Só aparece se usuário estiver logado e ainda não inscrito -->
             <!-- ======================================== -->
             {% if usuario %}
-                {% if not inscrito %}
-                    {% if usuario.tipo.tipo == 'Aluno' or usuario.tipo.tipo == 'Professor' %}
-                        <form method="post" action="{% url 'inscrever_evento' evento.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary">Confirmar inscrição</button>
-                        </form>
-                    {% elif usuario.tipo.tipo == 'Organizador' %}
-                        <p class="text-muted">Organizadores não podem se inscrever em eventos.</p>
-                    {% endif %}
+                <!-- ======================================== -->
+                <!-- Botões do criador do evento -->
+                <!-- ======================================== -->
+                {% if usuario and evento.criador and usuario.id == evento.criador.id %}
+                    <a href="{% url 'gerenciar_evento' evento.id %}" class="btn btn-outline-secondary ms-2">Gerenciar Evento</a>
+                    <a href="{% url 'galeria_evento' evento.id %}" class="btn btn-outline-secondary ms-2">Galeria</a>
                 {% else %}
-                    <!-- Se já estiver inscrito, mostra mensagem -->
-                    <p class="text-success">Você já está inscrito neste evento.</p>
-
-                    <!-- Botão para cancelar inscrição -->
-                    <form method="post" action="{% url 'cancelar_inscricao' evento.id %}" class="mt-2">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Cancelar inscrição</button>
-                    </form>
+                    {% if not inscrito%}
+                        {% if usuario.tipo.tipo == 'Aluno' or usuario.tipo.tipo == 'Professor' %}
+                            <form method="post" action="{% url 'inscrever_evento' evento.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">Confirmar inscrição</button>
+                            </form>
+                        {% elif usuario.tipo.tipo == 'Organizador' %}
+                            <p class="text-muted">Organizadores não podem se inscrever em eventos.</p>
+                        {% endif %}
+                    {% else %}
+                        <!-- Botão para cancelar inscrição -->
+                        <form method="post" action="{% url 'cancelar_inscricao' evento.id %}" class="mt-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Cancelar inscrição</button>
+                        </form>
+                    {% endif %}
                 {% endif %}
             {% else %}
                 <!-- Usuário não logado é redirecionado para login -->
                 <a href="{% url 'login' %}" class="btn btn-primary">Entrar para inscrever</a>
-            {% endif %}
-
-            <!-- ======================================== -->
-            <!-- Botões do criador do evento -->
-            <!-- ======================================== -->
-            {% if usuario and evento.criador and usuario.id == evento.criador.id %}
-                <a href="{% url 'gerenciar_evento' evento.id %}" class="btn btn-outline-secondary ms-2">Gerenciar Evento</a>
-                <a href="{% url 'galeria_evento' evento.id %}" class="btn btn-outline-secondary ms-2">Galeria</a>
             {% endif %}
 
             <!-- ======================================== -->

@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'usuarios',
     'eventos',
     'instituicao_ensino',
+    'bootstrap_datepicker_plus',
 ]
 
 MIDDLEWARE = [

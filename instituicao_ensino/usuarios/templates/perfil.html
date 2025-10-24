@@ -3,13 +3,17 @@
 
 {% block title %}Perfil{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/forms.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4 perfil-container">
     <h1 class="mb-3">Perfil de {{ usuario.nome }}</h1>
 
     <div class="row perfil-grid">
+        <!-- Lateral esquerda: foto, dados e certificados -->
         <div class="col-md-4 perfil-left">
-            {% comment %} Prefer explicit perfil_obj if provided, otherwise assume usuario.perfil relation {% endcomment %}
             {% if usuario.perfil.foto %}
                 <img src="{{ usuario.perfil.foto.url }}" alt="Foto de {{ usuario.nome }}" class="img-fluid rounded" style="max-width:200px;"/>
             {% else %}
@@ -26,20 +30,147 @@
                 {% endif %}
             </p>
             <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
-            
+
             <h3 class="mt-4">Certificados</h3>
             <a href="{% url 'perfil_certificados' usuario.nome_usuario %}" class="btn btn-success mt-2">Ver todos os certificados</a>
-
         </div>
+
+        <!-- Lateral direita: formulário de edição -->
         <div class="col-md-8 perfil-right">
-            <h3>Editar Informações</h3>
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ uform.as_p }}
-                {{ pform.as_p }}
-                <button type="submit" class="btn btn-primary">Salvar</button>
-            </form>
+            <div class="form-container">
+                <h3>Editar Informações</h3>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <!-- Nome -->
+                    <p>
+                        <label for="{{ uform.nome.id_for_label }}">Nome</label>
+                        {{ uform.nome }}
+                        {% if uform.nome.errors %}
+                            <span class="erro">{{ uform.nome.errors }}</span>
+                        {% endif %}
+                    </p>
+
+                    <!-- Nome de usuário -->
+                    <p>
+                        <label for="{{ uform.nome_usuario.id_for_label }}">Usuário</label>
+                        {{ uform.nome_usuario }}
+                        {% if uform.nome_usuario.errors %}
+                            <span class="erro">{{ uform.nome_usuario.errors }}</span>
+                        {% endif %}
+                    </p>
+
+                    <!-- DDD e Telefone lado a lado -->
+                    <div class="telefone-group">
+                        <div class="ddd-container">
+                            <label for="{{ uform.ddd.id_for_label }}" class="ddd-label">DDD</label>
+                            {{ uform.ddd }}
+                            {% if uform.ddd.errors %}
+                                <span class="erro">{{ uform.ddd.errors }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="telefone-main-container">
+                            <label for="{{ uform.telefone.id_for_label }}" class="telefone-label">Telefone</label>
+                            {{ uform.telefone }}
+                            {% if uform.telefone.errors %}
+                                <span class="erro">{{ uform.telefone.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- E-mail -->
+                    <p>
+                        <label for="{{ uform.email.id_for_label }}">E-mail (opcional)</label>
+                        {{ uform.email }}
+                        {% if uform.email.errors %}
+                            <span class="erro">{{ uform.email.errors }}</span>
+                        {% endif %}
+                    </p>
+
+                    <!-- Instituição -->
+                    <p>
+                        <label for="{{ uform.instituicao.id_for_label }}">Instituição</label>
+                        {{ uform.instituicao }}
+                        {% if uform.instituicao.errors %}
+                            <span class="erro">{{ uform.instituicao.errors }}</span>
+                        {% endif %}
+                    </p>
+
+                    <!-- Senha com toggle -->
+                    <p class="senha-container">
+                        <label for="{{ uform.nova_senha.id_for_label }}">Nova senha</label>
+                        {{ uform.nova_senha }}
+                        <button type="button" id="toggleSenha" title="Mostrar/ocultar senha">
+                            <svg id="iconShow" class="active" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                                <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5m0 11a3.5 3.5 0 1 1 0-7a3.5 3.5 0 0 1 0 7"/>
+                            </svg>
+                            <svg id="iconHide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                                <path fill="currentColor" d="M12 6a9.77 9.77 0 0 1 9 6a9.6 9.6 0 0 1-1.72 2.82l1.42 1.42A11.85 11.85 0 0 0 23 12a11.77 11.77 0 0 0-11-7a11.43 11.43 0 0 0-3.93.73l1.53 1.53A9.43 9.43 0 0 1 12 6m-9.9.68l2.23 2.23A11.66 11.66 0 0 0 1 12a11.85 11.85 0 0 0 11 7a11.43 11.43 0 0 0 3.93-.73l2.3 2.3l1.27-1.27L4.37 5.41zm9.9 11.82A9.77 9.77 0 0 1 3 12a9.6 9.6 0 0 1 1.72-2.82l1.47 1.47a7.5 7.5 0 0 0 9.12 9.12l1.47 1.47A11.43 11.43 0 0 1 12 18.5M9 12a3 3 0 0 1 3-3a3 3 0 0 1 2.82 2.1L9.9 15a3 3 0 0 1-.9-3"/>
+                            </svg>
+                        </button>
+                        {% if uform.nova_senha.errors %}
+                            <span class="erro">{{ uform.nova_senha.errors }}</span>
+                        {% endif %}
+                    </p>
+
+                    <!-- Biografia -->
+                    <p>
+                        <label for="{{ pform.biografia.id_for_label }}">Biografia</label>
+                        {{ pform.biografia }}
+                        {% if pform.biografia.errors %}
+                            <span class="erro">{{ pform.biografia.errors }}</span>
+                        {% endif %}
+                    </p>
+
+                    <!-- Upload de foto moderno -->
+                    <div class="upload-container">
+                        <label for="{{ pform.foto.id_for_label }}">Foto de perfil</label>
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/>
+                                    <line x1="16" y1="5" x2="22" y2="5"/>
+                                    <line x1="19" y1="2" x2="19" y2="8"/>
+                                    <circle cx="9" cy="9" r="2"/>
+                                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                                </svg>
+                            </div>
+                            <div class="upload-text">Clique para fazer upload da foto</div>
+                            <div class="upload-subtext">ou arraste e solte aqui</div>
+                            <button type="button" class="upload-btn">Selecionar arquivo</button>
+                            {{ pform.foto }}
+                            {% if pform.foto.errors %}
+                                <span class="erro">{{ pform.foto.errors }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="upload-preview" id="uploadPreview">
+                            <img src="" alt="Preview" class="preview-image">
+                            <div class="preview-name"></div>
+                            <div class="preview-size"></div>
+                        </div>
+                    </div>
+
+                    <!-- Checkboxes modernos -->
+                    <label class="checkbox-container">
+                        {{ pform.mostrar_email }}
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label">Mostrar e-mail no perfil público</span>
+                    </label>
+
+                    <label class="checkbox-container">
+                        {{ pform.mostrar_telefone }}
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label">Mostrar telefone no perfil público</span>
+                    </label>
+
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'scripts/senha.js' %}"></script>
+<script src="{% static 'scripts/upload.js' %}"></script>
 {% endblock %}
