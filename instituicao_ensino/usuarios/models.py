@@ -23,7 +23,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
-from .utils import create_user_dirs
+from .utils import create_user_dirs, resize_image
 
 
 # -----------------------------
@@ -189,6 +189,8 @@ def user_directory_path(instance, filename):
     # detecta o tipo de arquivo dinamicamente, sem depender de _upload_field
     if isinstance(instance, Perfil):
         subpasta = "foto_perfil"
+        ext = os.path.splitext(filename)[1]  # mantém a extensão original
+        filename = f"foto_perfil{ext}"
     elif isinstance(instance, Certificado):
         subpasta = "certificados"
     else:
@@ -213,10 +215,29 @@ class Perfil(models.Model):
                 create_user_dirs(self.usuario)
         except Exception:
             pass
-        super().save(*args, **kwargs)
+
+        # Remove foto antiga se for substituir
+        try:
+            if self.pk and self.foto:
+                old_instance = Perfil.objects.filter(pk=self.pk).first()
+                if old_instance and old_instance.foto and old_instance.foto != self.foto:
+                    if old_instance.foto and os.path.exists(old_instance.foto.path):
+                        os.remove(old_instance.foto.path)
+        except Exception:
+            pass
+
+        super().save(*args, **kwargs)  # salva o objeto primeiro
+
+        # Redimensiona a foto
+        try:
+            if self.foto and os.path.exists(self.foto.path):
+                resize_image(self.foto.path, max_size=(400, 400), quality=70)
+        except Exception:
+            pass
 
     def __str__(self):
         return f'Perfil de {self.usuario.nome_usuario}'
+
 
 
 # -----------------------------

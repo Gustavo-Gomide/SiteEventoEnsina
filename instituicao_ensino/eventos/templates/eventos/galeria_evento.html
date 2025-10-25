@@ -14,9 +14,11 @@
 {% block content %}
 <div class="container mt-4">
     <h1>{{ evento.titulo }}</h1>
+    
     {% if usuario and usuario.id == evento.criador.id or request.user.is_staff %}
         <form method="post" enctype="multipart/form-data" class="mb-4">
             {% csrf_token %}
+            <input type="hidden" name="action" value="upload">
             <div class="mb-3">
                 <label for="photo" class="form-label">Enviar foto do evento</label>
                 <input type="file" name="photo" id="photo" class="form-control" required>
@@ -31,12 +33,28 @@
     {% if fotos %}
         <h4>Galeria de Fotos</h4>
         <div class="gallery-row">
-            {% for f in fotos %}
-                <img src="{{ MEDIA_URL }}{{ f }}" class="img-fluid img-thumbnail gallery-thumb"
-                    alt="Foto {{ forloop.counter }}"
-                    data-bs-toggle="modal"
-                    data-bs-target="#mobileLightbox"
-                    data-bs-slide-to="{{ forloop.counter0 }}">
+            {% for foto in fotos %}
+                <div class="gallery-item position-relative">
+                    <img src="{{ MEDIA_URL }}{{ foto.path }}" 
+                        class="img-fluid img-thumbnail gallery-thumb"
+                        onload="this.classList.add('loaded')"
+                        alt="Foto {{ forloop.counter }}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mobileLightbox"
+                        data-bs-slide-to="{{ forloop.counter0 }}">
+                    
+                    {% if usuario and usuario.id == evento.criador.id or request.user.is_staff %}
+                        <form method="post" class="position-absolute top-0 end-0 m-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="foto_path" value="{{ foto.path }}">
+                            <button type="submit" class="btn btn-danger btn-sm" 
+                                    onclick="return confirm('Tem certeza que deseja apagar esta foto?')">
+                                ×
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
             {% endfor %}
         </div>
 
@@ -57,10 +75,22 @@
 
                             <!-- Imagens -->
                             <div class="carousel-inner h-100">
-                                {% for f in fotos %}
+                                {% for foto in fotos %}
                                 <div class="carousel-item {% if forloop.first %}active{% endif %} h-100">
-                                    <div class="d-flex justify-content-center align-items-center h-100">
-                                        <img src="{{ MEDIA_URL }}{{ f }}" class="carousel-img" alt="Foto {{ forloop.counter }}">
+                                    <div class="d-flex justify-content-center align-items-center h-100 position-relative">
+                                        <img src="{{ MEDIA_URL }}{{ foto.path }}" class="carousel-img" alt="Foto {{ forloop.counter }}">
+                                        
+                                        {% if usuario and usuario.id == evento.criador.id or request.user.is_staff %}
+                                            <form method="post" class="position-absolute top-0 end-0 m-3">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="delete">
+                                                <input type="hidden" name="foto_path" value="{{ foto.path }}">
+                                                <button type="submit" class="btn btn-danger btn-sm" 
+                                                        onclick="return confirm('Tem certeza que deseja apagar esta foto?')">
+                                                    Apagar Foto
+                                                </button>
+                                            </form>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 {% endfor %}

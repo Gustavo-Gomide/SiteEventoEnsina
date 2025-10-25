@@ -3,7 +3,11 @@ from django.db import models
 from django.conf import settings
 from django.db import models as dj_models
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
+from io import BytesIO
+from PIL import Image
 from django.utils.text import slugify
+from .utils import resize_image
 
 
 # ============================================================
@@ -13,10 +17,9 @@ class TipoEvento(models.Model):
     """
     Armazena os tipos de eventos disponíveis (Ex: Palestra, Oficina, Curso).
     """
-    tipo = models.CharField(max_length=50, unique=True)  # campo único para evitar duplicados
+    tipo = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
-        # Retorna o nome do tipo de evento (ex: "Palestra")
         return self.tipo
 
 
@@ -29,34 +32,20 @@ class Evento(models.Model):
     local, imagens e pastas de mídia gerenciadas automaticamente.
     """
 
-    # -------------------------------
-    # Escolhas para modalidade
-    # -------------------------------
     MODALIDADES = [
         ('online', 'Online'),
         ('presencial', 'Presencial'),
         ('hibrido', 'Híbrido'),
     ]
 
-    # -------------------------------
-    # Campos principais
-    # -------------------------------
     titulo = models.CharField(max_length=200)
     tipo = models.ForeignKey(TipoEvento, on_delete=models.CASCADE)
     modalidade = models.CharField(max_length=10, choices=MODALIDADES)
     data_inicio = models.DateField()
     data_fim = models.DateField()
     horario = models.TimeField()
-
-    # -------------------------------
-    # Local ou link (um dos dois é obrigatório)
-    # -------------------------------
     local = models.CharField(max_length=200, blank=True, null=True)
     link = models.URLField(blank=True, null=True)
-
-    # -------------------------------
-    # Participantes e organização
-    # -------------------------------
     quantidade_participantes = models.PositiveIntegerField(null=True, blank=True)
     sem_limites = models.BooleanField(default=False)
     organizador = models.CharField(max_length=200, null=True, blank=True)
@@ -74,13 +63,12 @@ class Evento(models.Model):
     def evento_thumb_upload_to(instance, filename):
         """
         Define o caminho da imagem principal (thumb) do evento.
-        Exemplo:
-            media/eventos/2025_10_11_meu_evento/thumb.jpg
+        Sempre substitui a anterior com nome fixo 'thumb.ext'.
         """
         date_str = instance.data_inicio.strftime('%Y_%m_%d') if instance.data_inicio else 'sem_data'
-        nome = slugify(instance.titulo)
-        base, ext = os.path.splitext(filename)
-        return f'eventos/{date_str}_{nome}/thumb{ext}'
+        slug = slugify(instance.titulo)
+        ext = os.path.splitext(filename)[1]
+        return f'eventos/{date_str}_{slug}/thumb{ext}'
 
     thumb = models.ImageField(upload_to=evento_thumb_upload_to, blank=True, null=True)
     descricao = models.TextField(blank=True, null=True)
@@ -103,10 +91,6 @@ class Evento(models.Model):
     # Nome para a pasta da galeria
     # -------------------------------
     def get_gallery_name(self):
-        """
-        Retorna um nome único e legível para a galeria do evento.
-        Exemplo: "meu_evento-2025-10-11"
-        """
         slug = slugify(self.titulo)
         date_s = self.data_inicio.strftime('%Y_%m_%d') if self.data_inicio else 'sem_data'
         return f"{date_s}_{slug}"
@@ -115,11 +99,6 @@ class Evento(models.Model):
     # Validação personalizada
     # -------------------------------
     def clean(self):
-        """
-        Regras de validação antes de salvar:
-        - Deve haver pelo menos local OU link.
-        - A data final não pode ser anterior à data inicial.
-        """
         if not self.local and not self.link:
             raise ValidationError("Informe pelo menos um: local ou link.")
         if self.data_fim and self.data_inicio and self.data_fim < self.data_inicio:
@@ -129,50 +108,50 @@ class Evento(models.Model):
     # Sobrescrita do método save()
     # -------------------------------
     def save(self, *args, **kwargs):
-        """
-        Cria automaticamente a estrutura de pastas do evento:
-        media/eventos/<data>_<slug>/
-            ├── thumb.jpg
-            └── galeria/
-        """
         # Gera o slug da galeria automaticamente, se não existir
         if not self.gallery_slug:
             self.gallery_slug = slugify(f"{self.titulo}-{self.data_inicio}")
 
-        # Define o nome da pasta do evento com data + título slugificado
+        # Cria pastas do evento e galeria
         date_str = self.data_inicio.strftime('%Y_%m_%d') if self.data_inicio else 'sem_data'
         event_dir_name = f"{date_str}_{slugify(self.titulo)}"
         event_base = os.path.join(settings.MEDIA_ROOT, 'eventos', event_dir_name)
-
-        # Cria a pasta principal e a subpasta da galeria
         os.makedirs(event_base, exist_ok=True)
         galeria_dir = os.path.join(event_base, 'galeria')
         os.makedirs(galeria_dir, exist_ok=True)
 
-        # Chama o método original do Django para salvar o objeto
+        # Remove thumb antiga se for substituir
+        if self.pk and self.thumb:
+            old_instance = Evento.objects.filter(pk=self.pk).first()
+            if old_instance and old_instance.thumb and old_instance.thumb.name != self.thumb.name:
+                old_path = os.path.join(settings.MEDIA_ROOT, old_instance.thumb.name)
+                if os.path.exists(old_path):
+                    os.remove(old_path)
+
+        # SALVA PRIMEIRO para ter o arquivo físico
         super().save(*args, **kwargs)
+
+        # DEPOIS redimensiona a thumb se ela existir
+        if self.thumb:
+            try:
+                thumb_path = self.thumb.path
+                if os.path.exists(thumb_path):
+                    resize_image(thumb_path, max_size=(400, 400), quality=70)
+            except Exception as e:
+                print(f"Erro ao redimensionar thumb do evento: {e}")
 
 
 # ============================================================
 # MODELO: InscricaoEvento
 # ============================================================
 class InscricaoEvento(models.Model):
-    """
-    Relaciona o usuário (inscrito) com um evento,
-    registrando se foi validado e quando se inscreveu.
-    """
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
     inscrito = dj_models.ForeignKey('usuarios.Usuario', on_delete=dj_models.CASCADE)
     is_validated = models.BooleanField(default=False)
     data_inscricao = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        # Exibe no admin ou shell: "<inscrito> inscrito em <evento>"
         return f"{self.inscrito.nome_usuario} inscrito em {self.evento.titulo}"
 
     def is_complete(self):
-        """
-        Retorna True se a inscrição foi validada e o evento finalizado.
-        Pode ser usado para liberar certificados automaticamente.
-        """
         return self.is_validated and self.evento.finalizado

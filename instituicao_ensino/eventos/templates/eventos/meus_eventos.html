@@ -17,7 +17,7 @@
     <h1 class="mb-3">Meus Eventos</h1>
 
     <div class="row">
-        <!-- COLUNA ESQUERDA: LISTA DE EVENTOS E INSCRIÇÕES -->
+        <!-- COLUNA ESQUERDA -->
         <div class="col-12 col-md-4 mb-4">
 
             {% if is_organizador %}
@@ -75,12 +75,11 @@
             </div>
         </div>
 
-        <!-- COLUNA DIREITA: DETALHES E EDIÇÃO -->
+        <!-- COLUNA DIREITA -->
         <div class="col-12 col-md-8">
             {% if evento_selecionado %}
             <div class="card mb-3">
                 <div class="row g-0">
-                    <!-- Imagem -->
                     <div class="col-12 col-sm-4">
                         {% if evento_selecionado.thumb %}
                         <img src="{{ evento_selecionado.thumb.url }}" class="img-fluid rounded-start" alt="{{ evento_selecionado.titulo }}">
@@ -89,7 +88,6 @@
                         {% endif %}
                     </div>
 
-                    <!-- Informações principais -->
                     <div class="col-12 col-sm-8">
                         <div class="card-body">
                             <h5 class="card-title">{{ evento_selecionado.titulo }}</h5>
@@ -106,10 +104,9 @@
                             <p class="card-text"><strong>Organizador:</strong> <a href="{% url 'perfil_publico' evento_selecionado.organizador %}">{{ evento_selecionado.criador }}</a></p>
                             <p class="card-text"><strong>Horas:</strong> {{ evento_selecionado.horas }}</p>
 
-                            <!-- Botão de certificado -->
                             {% if evento_selecionado.finalizado %}
                                 {% if usuario_inscrito_no_evento and usuario_inscrito_no_evento.is_validated %}
-                                <a href="{% url 'pegar_certificado' evento_selecionado.id %}" class="btn btn-success btn-lg mt-3" target="_blank" rel="noopener noreferrer">Pegar Certificado</a>
+                                <a href="{% url 'pegar_certificado' evento_selecionado.id %}" class="btn btn-gold btn-lg mt-3" target="_blank" rel="noopener noreferrer">Pegar Certificado</a>
                                 {% elif usuario_inscrito_no_evento %}
                                 <div class="alert alert-warning mt-3" role="alert">
                                     Seu certificado estará disponível após a aprovação da inscrição.
@@ -117,14 +114,13 @@
                                 {% endif %}
                             {% endif %}
 
-                            <!-- Botão de finalizar (apenas criador) -->
                             {% if is_organizador and evento_selecionado.criador == usuario %}
-                                <a href="{% url 'gerenciar_evento' evento_selecionado.id %}" class="btn btn-outline-secondary ms-2">Gerenciar Evento</a>
-                                <a href="{% url 'galeria_evento' evento_selecionado.id %}" class="btn btn-outline-secondary ms-2">Galeria do evento</a>
+                                <a href="{% url 'gerenciar_evento' evento_selecionado.id %}" class="btn btn-outline-gold ms-2">Gerenciar Evento</a>
+                                <a href="{% url 'galeria_evento' evento_selecionado.id %}" class="btn btn-outline-gold ms-2">Galeria do evento</a>
                                 {% if not evento_selecionado.finalizado %}
                                 <form method="post" action="{% url 'finalizar_evento' evento_selecionado.id %}" class="d-inline-block mt-2">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger btn-lg">Finalizar evento</button>
+                                    <button type="submit" class="btn btn-gold btn-lg">Finalizar evento</button>
                                 </form>
                                 {% endif %}
                             {% endif %}
@@ -133,18 +129,88 @@
                 </div>
             </div>
 
-            <!-- EDIÇÃO / INSCRITOS -->
             <div class="row">
-                <!-- Formulário de edição -->
                 <div class="col-12 col-md-6 mb-3">
                     {% if is_organizador and evento_selecionado.criador == usuario %}
                     <h4>Editar Evento</h4>
                     {% if form %}
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <input type="hidden" name="edited_evento" value="{{ evento_selecionado.id }}">
-                        <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                    <form method="post" enctype="multipart/form-data" class="form-evento">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="{{ form.titulo.id_for_label }}">Título do evento</label>
+                        {{ form.titulo }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.tipo.id_for_label }}">Tipo de evento</label>
+                        {{ form.tipo }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.modalidade.id_for_label }}">Modalidade</label>
+                        {{ form.modalidade }}
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                        <label for="{{ form.data_inicio.id_for_label }}">Data de início</label>
+                        {{ form.data_inicio }}
+                        </div>
+
+                        <div class="form-group">
+                        <label for="{{ form.data_fim.id_for_label }}">Data de término</label>
+                        {{ form.data_fim }}
+                        </div>
+
+                        <div class="form-group">
+                        <label for="{{ form.horario.id_for_label }}">Horário</label>
+                        {{ form.horario }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                        <label for="{{ form.local.id_for_label }}">Local</label>
+                        {{ form.local }}
+                        </div>
+
+                        <div class="form-group">
+                        <label for="{{ form.link.id_for_label }}">Link (caso online)</label>
+                        {{ form.link }}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                        <label for="{{ form.quantidade_participantes.id_for_label }}">Qtd. de Participantes</label>
+                        {{ form.quantidade_participantes }}
+                        </div>
+
+                        <div class="form-check">
+                        <label for="{{ form.sem_limites.id_for_label }}">Sem limites de participantes</label>
+                        {{ form.sem_limites }}
+                        </div>
+
+                        <div class="form-group">
+                        <label for="{{ form.horas.id_for_label }}">Horas complementares</label>
+                        {{ form.horas }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.descricao.id_for_label }}">Descrição</label>
+                        {{ form.descricao }}
+                    </div>
+
+                    <div class="form-group thumb-field">
+                        <label for="{{ form.thumb.id_for_label }}">Imagem do evento</label>
+                        {{ form.thumb }}
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">Salvar</button>
+                    </div>
                     </form>
                     {% else %}
                     <p class="text-muted">Não é possível editar este evento.</p>
@@ -155,13 +221,12 @@
                         <div class="card-body">
                             <h5 class="card-title">Descrição do Evento</h5>
                             <p class="card-text">{{ evento_selecionado.descricao|default:"Nenhuma descrição disponível." }}</p>
-                            <a href="{% url 'galeria_evento' evento_selecionado.id %}" class="btn btn-outline-warning mt-2">Ver Galeria do Evento</a>
+                            <a href="{% url 'galeria_evento' evento_selecionado.id %}" class="btn btn-outline-gold mt-2">Ver Galeria do Evento</a>
                         </div>
                     </div>
                     {% endif %}
                 </div>
 
-                <!-- Lista de inscritos -->
                 <div class="col-12 col-md-6">
                     <h4>Inscritos</h4>
                     {% if inscritos %}
@@ -183,9 +248,9 @@
                             </div>
                             <div>
                                 {% if ins.is_validated %}
-                                <span class="badge bg-success" title="Este participante foi validado">Validado</span>
+                                <span class="badge bg-success">Validado</span>
                                 {% else %}
-                                <span class="badge bg-secondary" title="Inscrição pendente">Pendente</span>
+                                <span class="badge bg-secondary">Pendente</span>
                                 {% endif %}
                             </div>
                         </li>

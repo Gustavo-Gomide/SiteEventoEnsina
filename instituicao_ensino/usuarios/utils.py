@@ -52,3 +52,15 @@ def create_user_dirs(usuario):
     except Exception as e:
         logger.exception(f'Erro criando diretorios de usuario {getattr(usuario, "id", None)}: {e}')
         return False
+    
+from PIL import Image
+import os
+from django.conf import settings
+
+def resize_image(path, max_size=(400, 400), quality=70):
+    if not os.path.exists(path):
+        return
+    with Image.open(path) as img:
+        # Pillow 10+ usa Resampling.LANCZOS no lugar de ANTIALIAS
+        img.thumbnail(max_size, Image.Resampling.LANCZOS)
+        img.save(path, quality=quality)

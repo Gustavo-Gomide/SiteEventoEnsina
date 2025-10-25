@@ -17,12 +17,10 @@ from django.contrib.auth.models import User
 import json
 from django.conf import settings
 import os
-from datetime import timedelta, date
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import logging
 from eventos.models import Evento
 from django.utils.text import slugify
-
 from usuarios.models import Usuario
 from .models import Evento, InscricaoEvento
 from .forms import EventoForm
@@ -469,15 +467,12 @@ def galeria(request):
     return render(request, 'eventos/galeria.html', {'eventos': eventos})
 
 # -------------------------------------------------------------------
-# Galeria de fotos de evento (upload + visualização)
+# Galeria de fotos de evento (upload + visualização + apagar)
 # -------------------------------------------------------------------
 def galeria_evento(request, evento_id):
     """
-    Mostra a galeria de fotos do evento e permite upload de fotos pelo organizador.
-    Estrutura de pastas criada automaticamente:
-    MEDIA_ROOT/eventos/<data_yyyy_mm_dd>_<slug_titulo>/
-        galeria/     -> todas as fotos do evento
-        thumb.ext    -> imagem principal do evento (thumb)
+    Mostra a galeria de fotos do evento e permite upload e exclusão de fotos pelo organizador.
+    SEM BANCO DE DADOS - usa apenas sistema de arquivos.
     """
 
     # Pega o usuário atual
@@ -497,50 +492,97 @@ def galeria_evento(request, evento_id):
 
     # Flag para informar se upload ocorreu
     upload_ok = False
+    delete_ok = False
 
     # -------------------------------
-    # Upload de foto
+    # Processa POST (upload ou delete)
     # -------------------------------
     if request.method == 'POST':
-        # Somente o organizador ou staff pode enviar fotos
+        action = request.POST.get('action')
+        
+        # Somente o organizador ou staff pode modificar fotos
         if not _is_event_owner(request, usuario, evento):
-            messages.error(request, 'Acesso negado ao enviar fotos')
+            messages.error(request, 'Acesso negado.')
             return redirect('galeria_evento', evento_id=evento.id)
 
-        # Pega o arquivo enviado pelo form
-        file_obj = request.FILES.get('photo')
-        if file_obj:
-            # Caminho completo para salvar a foto dentro da galeria do evento
-            save_path = os.path.join('eventos', event_dir_name, 'galeria', file_obj.name)
-            # Salva o arquivo usando o storage padrão
-            from django.core.files.storage import default_storage
-            from django.core.files.base import ContentFile
-            default_storage.save(save_path, ContentFile(file_obj.read()))
-            upload_ok = True  # upload concluído
+        if action == 'upload':
+            # UPLOAD DE FOTO
+            file_obj = request.FILES.get('photo')
+            if file_obj:
+                # Caminho completo para salvar a foto
+                save_path = os.path.join('eventos', event_dir_name, 'galeria', file_obj.name)
+                full_path = os.path.join(settings.MEDIA_ROOT, save_path)
+                
+                # Salva o arquivo primeiro
+                from django.core.files.storage import default_storage
+                from django.core.files.base import ContentFile
+                default_storage.save(save_path, ContentFile(file_obj.read()))
+                
+                # DEPOIS redimensiona a imagem
+                try:
+                    if os.path.exists(full_path):
+                        from PIL import Image
+                        with Image.open(full_path) as img:
+                            # Converte para RGB se necessário
+                            if img.mode in ('RGBA', 'P'):
+                                img = img.convert('RGB')
+                            
+                            # Redimensiona mantendo proporção
+                            img.thumbnail((600, 600), Image.Resampling.LANCZOS)
+                            
+                            # Salva substituindo o arquivo original
+                            img.save(full_path, 'JPEG', quality=70, optimize=True)
+                            print(f"Imagem redimensionada: {file_obj.name} -> {img.size}")
+                except Exception as e:
+                    print(f"Erro ao redimensionar {file_obj.name}: {e}")
+                    # Continua mesmo com erro de redimensionamento
+                
+                upload_ok = True
+                messages.success(request, 'Foto adicionada com sucesso!')
+            else:
+                messages.error(request, 'Nenhuma foto foi enviada.')
+
+        elif action == 'delete':
+            # EXCLUIR FOTO
+            foto_path = request.POST.get('foto_path')
+            if foto_path:
+                full_path = os.path.join(settings.MEDIA_ROOT, foto_path)
+                if os.path.exists(full_path):
+                    try:
+                        os.remove(full_path)
+                        delete_ok = True
+                        messages.success(request, 'Foto apagada com sucesso!')
+                    except Exception as e:
+                        messages.error(request, f'Erro ao apagar foto: {e}')
+                else:
+                    messages.error(request, 'Foto não encontrada.')
+            else:
+                messages.error(request, 'Caminho da foto não especificado.')
+
+        return redirect('galeria_evento', evento_id=evento.id)
 
     # -------------------------------
     # Lista todas as fotos da galeria
     # -------------------------------
     fotos = []
     if os.path.exists(galeria_dir):
-        # Lista arquivos que são imagens
-        fotos = [
-            f"eventos/{event_dir_name}/galeria/{f}"
-            for f in os.listdir(galeria_dir)
-            if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif'))
-        ]
+        # Lista arquivos que são imagens e cria estrutura com path completo
+        for f in os.listdir(galeria_dir):
+            if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                fotos.append({
+                    'path': f"eventos/{event_dir_name}/galeria/{f}",
+                    'filename': f
+                })
 
     # Renderiza template com informações da galeria
     return render(request, 'eventos/galeria_evento.html', {
-    'evento': evento,
-    'fotos': fotos,
-    'usuario': usuario,
-    'upload_ok': upload_ok,
-    'MEDIA_URL': settings.MEDIA_URL,
-    }
-)
-
-
+        'evento': evento,
+        'fotos': fotos,
+        'usuario': usuario,
+        'upload_ok': upload_ok,
+        'delete_ok': delete_ok,
+        'MEDIA_URL': settings.MEDIA_URL,
+    })
 
 # -------------------------------------------------------------------
 # Inscrever e cancelar inscrição em eventos

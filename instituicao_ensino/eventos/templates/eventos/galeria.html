@@ -15,9 +15,14 @@
         {% for evento in eventos %}
             <a href="{% url 'galeria_evento' evento.id %}" class="galeria-card">
                 {% if evento.thumb %}
-                    <img src="{{ evento.thumb.url }}" alt="{{ evento.titulo }}" class="galeria-imagem">
+                    <img src="{{ evento.thumb.url }}" 
+                         alt="{{ evento.titulo }}" 
+                         class="galeria-imagem"
+                         onload="this.classList.add('loaded')">
                 {% else %}
-                    <img src="{% static 'favicon.png' %}" alt="Sem imagem" class="galeria-imagem">
+                    <img src="{% static 'favicon.png' %}" 
+                         alt="Sem imagem" 
+                         class="galeria-imagem loaded">
                 {% endif %}
                 <div class="galeria-info">
                     <h5>{{ evento.titulo }}</h5>
@@ -29,6 +34,4 @@
         {% endfor %}
     </div>
 </div>
-
-<link rel="stylesheet" href="{% static 'css/galeria_evento.css' %}">
 {% endblock %}
