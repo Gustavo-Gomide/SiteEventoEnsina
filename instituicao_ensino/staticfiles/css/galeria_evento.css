@@ -2,104 +2,243 @@
     max-width: 400px;
     height: auto;
 }
-.gallery-thumb {
-    cursor: pointer;
-    transition: transform 0.2s ease;
-    background-color: rgb(156, 91, 0);
-    border: 2px solid goldenrod;
-}
-.gallery-thumb:hover {
-    transform: scale(1.05);
+
+/* Container da galeria estilo revista */
+.gallery-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+    padding: 10px;
 }
 
-/* Imagem em tela cheia (sem cortes, responsiva e centralizada) */
+/* Itens da galeria */
+.gallery-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #9c5b00 0%, #7a4700 100%);
+    aspect-ratio: 4/3;
+}
+
+.gallery-item:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(156, 91, 0, 0.3);
+}
+
+.gallery-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid goldenrod;
+    border-radius: 10px;
+}
+
+.gallery-thumb:hover {
+    transform: scale(1.05);
+    border-color: #ffd700;
+}
+
+/* Botão de apagar */
+.gallery-item .btn-danger {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    opacity: 0;
+    background: rgba(220, 53, 69, 0.9);
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 0;
+    transition: all 0.3s ease;
+    transform: scale(0.8);
+}
+
+.gallery-item:hover .btn-danger {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.gallery-item .btn-danger:hover {
+    background: #dc3545;
+    transform: scale(1.1);
+}
+
+/* Modal em tela cheia */
 .carousel-inner {
     max-width: 100% !important;
     max-height: 100vh !important;
 }
+
 .carousel-img {
     width: 80% !important;
     height: 80vh !important;
     object-fit: contain !important;
 }
 
-/* Setas padrão, sem fundo */
+/* Setas do carousel */
 .carousel-control-prev,
 .carousel-control-next {
-  background: none;
-  border: none;
-  opacity: 1;
+    background: none;
+    border: none;
+    opacity: 1;
+    width: 80px;
 }
 
-/* Tamanho e espaçamento */
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-  width: 40px;
-  height: 40px;
-  border: 2px solid rgb(203, 88, 0);
-  border-radius: 50%;
-  filter: invert(40%) sepia(80%) saturate(7500%) hue-rotate(1deg) brightness(97%) contrast(107%);
+    width: 50px;
+    height: 50px;
+    border: 2px solid rgb(203, 88, 0);
+    border-radius: 50%;
+    background-size: 20px 20px;
+    filter: invert(40%) sepia(80%) saturate(7500%) hue-rotate(1deg) brightness(97%) contrast(107%);
+    transition: all 0.3s ease;
 }
 
-/* Espaçamento das bordas */
 .carousel-control-prev {
-  left: 15px;
+    left: 20px;
 }
 
 .carousel-control-next {
-  right: 15px;
-}
-.carousel-control-prev:hover, .carousel-control-next:hover{
-  filter: invert(27%) sepia(95%) saturate(7500%) hue-rotate(1deg) brightness(120%) contrast(107%);
-
+    right: 20px;
 }
 
-.carousel-control-prev-icon:hover, .carousel-control-next-icon:hover {
-  border: 2px solid rgb(203, 0, 0);
-  filter: invert(27%) sepia(95%) saturate(7500%) hue-rotate(1deg) brightness(120%) contrast(107%);
+.carousel-control-prev:hover .carousel-control-prev-icon,
+.carousel-control-next:hover .carousel-control-next-icon {
+    border: 2px solid rgb(203, 0, 0);
+    filter: invert(27%) sepia(95%) saturate(7500%) hue-rotate(1deg) brightness(120%) contrast(107%);
+    transform: scale(1.1);
 }
 
-/* Media query para celulares */
-@media (max-width: 992px ) {
-    /* Nome do evento maior */
+/* Botão de apagar no modal */
+.carousel-item .btn-danger {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(220, 53, 69, 0.9);
+    border: 2px solid white;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.carousel-item .btn-danger:hover {
+    background: #dc3545;
+    transform: scale(1.05);
+}
+
+/* Media queries responsivas */
+@media (max-width: 1200px) {
+    .gallery-row {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .gallery-row {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+    
+    .gallery-item {
+        aspect-ratio: 1/1;
+    }
+    
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 60px;
+    }
+    
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        width: 40px;
+        height: 40px;
+        background-size: 15px 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .gallery-row {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 8px;
+    }
+    
+    .gallery-item .btn-danger {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+        top: 5px;
+        right: 5px;
+    }
+    
+    /* Nome do evento maior no mobile */
     .modal-title {
-        font-size: 3rem;
+        font-size: 1.5rem;
         text-align: center;
     }
 
-    /* Botão de fechar maior */
+    /* Botão de fechar maior no mobile */
     .modal-header .btn-close {
-        padding: 0;
-        font-size: 60px;
-        max-width: 100%;
-        max-height: 100%;
-    }
-
-    /* Esconder as setas do carrossel */
-    .carousel-control-prev,
-    .carousel-control-next {
-        display: none;
-        visibility: hidden;
+        transform: scale(1.3);
     }
 
     /* Ajusta a imagem para caber na tela inteira */
     .carousel-img {
-        width: 100%;
-        height: auto;
-        max-height: 100vh;
-        object-fit: contain;
+        width: 95% !important;
+        height: auto !important;
+        max-height: 70vh !important;
     }
-    .gallery-row .gallery-thumb {
-        max-width: 100%;
-        height: auto;
-        margin: 10px;
+    
+    /* Esconder setas em mobile muito pequeno */
+    @media (max-width: 400px) {
+        .carousel-control-prev,
+        .carousel-control-next {
+            display: none;
+        }
     }
 }
 
-@media (min-width: 992px) {
-    .gallery-row .gallery-thumb {
-    max-width: 500px;
-    height: 250px;
-    margin: 10px;
+/* Efeitos de loading suave */
+.gallery-thumb {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
 }
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.gallery-thumb.loaded {
+    animation: none;
+    background: none;
+}
+
+/* Scroll suave */
+.gallery-row {
+    scroll-behavior: smooth;
+}
+
+/* Efeito de foco para acessibilidade */
+.gallery-thumb:focus {
+    outline: 3px solid #ffd700;
+    outline-offset: 2px;
 }

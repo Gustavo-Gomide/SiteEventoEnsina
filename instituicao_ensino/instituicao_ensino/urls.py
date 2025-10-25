@@ -21,6 +21,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import main
 
+from django.conf.urls import handler404
+from django.shortcuts import redirect
+from django.contrib import messages
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", main, name='main'),
@@ -37,14 +41,23 @@ if settings.DEBUG is False:
         path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
     ]
 
-from django.conf.urls import handler404
-from django.shortcuts import redirect
-from django.contrib import messages
-
-def custom_404(request, exception):
-    # Adiciona uma mensagem de erro
-    messages.error(request, "A página que você tentou acessar não existe.")
-    # Redireciona para a home
+def custom_400(request, exception):
+    messages.info(request, "Requisição inválida (400).")
     return redirect('main')
 
+def custom_403(request, exception):
+    messages.info(request, "Acesso negado (403).")
+    return redirect('main')
+
+def custom_404(request, exception):
+    messages.info(request, "A página que você tentou acessar não existe (404).")
+    return redirect('main')
+
+def custom_500(request):
+    messages.info(request, "Ocorreu um erro interno no servidor ou parâmetro informado inválido (500).")
+    return redirect('main')
+
+handler400 = custom_400
+handler403 = custom_403
 handler404 = custom_404
+handler500 = custom_500

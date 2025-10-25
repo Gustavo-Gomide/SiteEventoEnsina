@@ -35,7 +35,7 @@
     text-align: center;
     color: var(--text-heading);
     margin-bottom: 2rem;
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 700;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
@@ -47,12 +47,14 @@ h5 {
     font-weight: 600;
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 0.5rem;
+    font-size: 1.1rem;
 }
 
 h4 {
     color: var(--text-heading);
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
     font-weight: 600;
+    font-size: 1.3rem;
 }
 
 /* ============================= */
@@ -63,7 +65,7 @@ h4 {
 .col-12.col-md-4 {
     background: var(--background-card);
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1.2rem;
     border: 1px solid var(--border-color);
     box-shadow: var(--card-shadow);
     height: fit-content;
@@ -71,7 +73,7 @@ h4 {
 
 /* Lista de eventos - TAMANHO OTIMIZADO */
 .list-group {
-    max-height: 250px;
+    max-height: 280px;
     overflow-y: auto;
     overflow-x: hidden;
     border: none;
@@ -81,17 +83,17 @@ h4 {
 
 /* SCROLLBAR CUSTOMIZADA */
 .list-group::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 .list-group::-webkit-scrollbar-track {
     background: var(--background-base-medium);
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .list-group::-webkit-scrollbar-thumb {
     background: var(--primary-gold);
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .list-group::-webkit-scrollbar-thumb:hover {
@@ -102,22 +104,26 @@ h4 {
 .list-group-item {
     display: flex;
     align-items: center;
-    padding: 0.75rem;
+    padding: 0.8rem;
     background: rgba(45, 27, 27, 0.8);
     border: 1px solid var(--background-base-medium);
     border-bottom: 1px solid var(--border-color);
     transition: all 0.3s ease;
     text-decoration: none;
     color: var(--text-light);
+    margin-bottom: 0.4rem;
+    border-radius: 8px;
+    min-height: 70px;
 }
 
 .list-group-item:last-child {
     border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0;
 }
 
 .list-group-item:hover {
     background: var(--background-card-hover);
-    transform: translateX(5px);
+    transform: translateX(3px);
     border-color: var(--primary-gold);
 }
 
@@ -134,7 +140,7 @@ h4 {
     font-weight: 600;
 }
 
-/* Imagens na lista */
+/* THUMBS PROPORCIONAIS */
 .list-group-item img {
     width: 50px;
     height: 50px;
@@ -142,6 +148,7 @@ h4 {
     border-radius: 8px;
     border: 2px solid var(--border-color);
     transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
 .list-group-item:hover img {
@@ -149,184 +156,460 @@ h4 {
     border-color: var(--primary-orange);
 }
 
+.list-group-item.active img {
+    border-color: var(--background-base-dark);
+}
+
 /* Textos na lista */
+.list-group-item .flex-grow-1 {
+    flex: 1;
+    min-width: 0;
+    padding-left: 0.8rem;
+}
+
 .list-group-item h6 {
     color: var(--text-heading);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.2rem;
     font-weight: 600;
     font-size: 0.9rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .list-group-item p {
     color: var(--text-muted);
     margin-bottom: 0;
     font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .list-group-item .text-muted {
     color: var(--primary-orange) !important;
     font-size: 0.75rem;
+    font-weight: 500;
 }
 
 /* ============================= */
-/* CHECKBOX "SEM LIMITES" - CORRIGIDO E ALINHADO */
+/* FORMULÁRIO DE EDIÇÃO - PROPORCIONAL */
+/* ============================= */
+.col-md-6 {
+    width: 50%;
+    word-wrap: break-word;
+}
+
+.col-md-6 label a {
+    word-break: break-all;  /* força a quebra do link em qualquer ponto se for longo */
+    overflow-wrap: break-word; /* compatibilidade extra */
+    display: inline-block; /* garante que respeite limites do container */
+    color: var(--primary-gold); /* cor do link */
+    text-decoration: underline; /* opcional */
+}
+
+.form-evento {
+    background: var(--background-card);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+/* Efeito de brilho no formulário */
+.form-evento::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.03), transparent);
+    animation: shine 8s infinite linear;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.form-evento > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Grupos de formulário com ESPAÇAMENTO PROPORCIONAL */
+.form-group {
+    margin-bottom: 1.2rem;
+    position: relative;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    align-items: start;
+}
+
+.form-row .form-group {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Labels proporcionais */
+.form-group label {
+    color: var(--text-heading);
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    display: block;
+    font-size: 0.95rem;
+}
+
+/* Inputs proporcionais */
+.form-evento input,
+.form-evento textarea,
+.form-evento select {
+    width: 100%;
+    padding: 0.8rem;
+    background: rgba(32, 3, 3, 0.9) !important;
+    border: 2px solid var(--background-base-medium) !important;
+    border-radius: 8px;
+    color: var(--text-light) !important;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    min-height: 20px;
+    font-family: inherit;
+    accent-color: var(--primary-gold-dark);
+}
+
+.form-evento input:focus,
+.form-evento textarea:focus,
+.form-evento select:focus {
+    border-color: var(--primary-gold) !important;
+    background: rgba(32, 3, 3, 0.95) !important;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2) !important;
+    outline: none;
+}
+
+.form-evento textarea {
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.4;
+    padding: 0.8rem;
+}
+
+/* ============================= */
+/* CHECKBOX "SEM LIMITES" - TAMANHO CORRIGIDO */
 /* ============================= */
 
 .form-check {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding: 1rem;
     background: rgba(45, 27, 27, 0.6);
     border-radius: 8px;
     border: 2px solid var(--background-base-medium);
     transition: all 0.3s ease;
-    margin-bottom: 0;
-    height: 100%;
-    width: 100%;
-    min-height: 70px;
+    margin-bottom: 1.2rem;
+    position: relative;
+    cursor: pointer;
 }
 
 .form-check:hover {
     border-color: var(--primary-gold);
     background: rgba(45, 27, 27, 0.8);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
-/* CHECKBOX PERSONALIZADO - CORRIGIDO */
+/* CHECKBOX PERSONALIZADO - TAMANHO CORRIGIDO */
 .form-check-input {
-    width: 22px !important;
-    height: 22px !important;
-    margin-right: 12px !important;
-    margin-top: 0 !important;
-    background: rgba(45, 27, 27, 0.9) !important;
-    border: 2px solid var(--background-base-medium) !important;
-    border-radius: 4px !important;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-    position: relative;
-    cursor: pointer;
-}
-
-/* CHECKBOX QUANDO MARCADO - COR DOURADA */
-.form-check-input:checked {
-    background: var(--primary-gold-dark) !important;
-    border-color: var(--primary-gold) !important;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4) !important;
-}
-
-/* ÍCONE DE CHECK PERSONALIZADO */
-.form-check-input:checked::before {
-    content: '✓';
+    width: 0;
+    height: 0;
+    opacity: 0;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: var(--background-base-dark);
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.form-check-input:focus {
-    box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25) !important;
-    border-color: var(--primary-gold) !important;
 }
 
 .form-check-label {
     color: var(--text-light) !important;
-    font-weight: 500 !important;
-    font-size: 1rem !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
     user-select: none;
-    margin-bottom: 0 !important;
     line-height: 1.4;
-    white-space: nowrap;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0 !important;
+    position: relative;
+    padding-left: 2rem;
+    width: 100%;
+}
+
+.form-check-label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--background-base-medium);
+    border-radius: 4px;
+    background: rgba(32, 3, 3, 0.9);
+    transition: all 0.3s ease;
+}
+
+/* Checkbox quando marcado */
+.form-check-input:checked + .form-check-label::before {
+    background: var(--primary-gold-dark);
+    border-color: var(--primary-gold);
+}
+
+/* Ícone de check personalizado - TAMANHO CORRIGIDO */
+.form-check-input:checked + .form-check-label::after {
+    content: '✓';
+    position: absolute;
+    left: 4px;
+    top: 0.1rem;
+    color: var(--background-base-dark);
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 1;
+}
+
+/* Descrição do checkbox */
+.checkbox-description {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 400;
+    margin-top: 0.4rem;
+    line-height: 1.3;
+}
+
+/* ============================= */
+/* INPUTS ESPECÍFICOS - CORRIGIDOS */
+/* ============================= */
+
+/* Input de Data */
+input[type="date"] {
+    background: rgba(32, 3, 3, 0.9) !important;
+    border: 2px solid var(--background-base-medium) !important;
+    color: var(--text-light) !important;
+    cursor: pointer;
+    padding-right: 2.5rem !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8) sepia(1) saturate(5) hue-rotate(0deg);
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 3px;
+}
+
+/* Input de Hora */
+input[type="time"] {
+    background: rgba(32, 3, 3, 0.9) !important;
+    border: 2px solid var(--background-base-medium) !important;
+    color: var(--text-light) !important;
+    cursor: pointer;
+    padding-right: 2.5rem !important;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8) sepia(1) saturate(5) hue-rotate(0deg);
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 3px;
+}
+
+/* NUMBER INPUT */
+input[type="number"] {
+    background: rgba(32, 3, 3, 0.9) !important;
+    border: 2px solid var(--background-base-medium) !important;
+    color: var(--text-light) !important;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    --moz-appearance: textfield;
+}
+
+/* Força o link a quebrar linha se for longo */
+.thumb-field a {
+    display: block; /* garante que fique em linha separada */
+    word-break: break-all; /* quebra em qualquer ponto se necessário */
+    overflow-wrap: break-word;
+    color: var(--primary-gold);
+    text-decoration: underline;
+    margin-bottom: 0.5rem; /* espaço entre link e checkbox */
+}
+
+/* Container do checkbox + label como caixinha */
+.thumb-field input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    accent-color: var(--primary-gold);
+}
+
+.thumb-field input[type="checkbox"] + label {
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    border: 2px solid var(--background-base-medium);
+    border-radius: 6px;
+    background: rgba(45, 27, 27, 0.6);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-light);
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+/* Hover na label */
+.thumb-field input[type="checkbox"] + label:hover {
+    border-color: var(--primary-gold);
+    background: rgba(45, 27, 27, 0.8);
+}
+
+/* Quando marcado */
+.thumb-field input[type="checkbox"]:checked + label {
+    background: var(--primary-gold);
+    color: var(--background-base-dark);
+    font-weight: 600;
+}
+
+
+/* SELECT */
+.form-evento select {
+    background: rgba(32, 3, 3, 0.9) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.8rem center !important;
+    background-size: 14px !important;
+    padding-right: 2.5rem !important;
+    border: 2px solid var(--background-base-medium) !important;
+    border-radius: 8px;
+    color: var(--text-light) !important;
+    appearance: none;
     cursor: pointer;
 }
 
 /* ============================= */
-/* INPUTS DE DATA E HORA COM ÍCONES DOURADOS */
+/* CAMPO DE THUMB MELHORADO */
 /* ============================= */
 
-/* Input de Data com ícone de calendário */
-input[type="date"].form-control {
-    background: rgba(32, 3, 3, 0.8) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/%3e%3c/svg%3e") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 0.7rem center !important;
-    background-size: 16px !important;
-    padding-right: 2.5rem !important;
-    border: 2px solid var(--background-base-medium) !important;
+.thumb-field {
+    margin-top: 1.2rem;
+    padding: 1.2rem;
+    background: rgba(45, 27, 27, 0.6);
     border-radius: 8px;
-    color: var(--text-light) !important;
+    border: 2px dashed var(--border-color);
     transition: all 0.3s ease;
 }
 
-input[type="date"].form-control:focus {
-    background: rgba(32, 3, 3, 0.9) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/%3e%3c/svg%3e") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 0.7rem center !important;
-    background-size: 16px !important;
-    border-color: var(--primary-gold) !important;
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
-    outline: none;
+.thumb-field:hover {
+    border-color: var(--primary-orange);
+    background: rgba(45, 27, 27, 0.8);
 }
 
-/* Input de Hora com ícone de relógio */
-input[type="time"].form-control {
-    background: rgba(32, 3, 3, 0.8) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z'/%3e%3c/svg%3e") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 0.7rem center !important;
-    background-size: 16px !important;
-    padding-right: 2.5rem !important;
-    border: 2px solid var(--background-base-medium) !important;
+.thumb-field label {
+    color: var(--text-heading);
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    display: block;
+    font-size: 0.95rem;
+    text-wrap: initial;
+}
+
+.thumb-field input[type="file"] {
+    background: rgba(32, 3, 3, 0.9);
+    border: 2px solid var(--background-base-medium);
     border-radius: 8px;
-    color: var(--text-light) !important;
+    padding: 0.8rem;
+    color: var(--text-light);
     transition: all 0.3s ease;
+    width: 100%;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: inline-block;
+    white-space: normal;       /* permite quebra de linha se necessário */
+    overflow-wrap: break-word;  /* compatibilidade extra */
 }
 
-input[type="time"].form-control:focus {
-    background: rgba(32, 3, 3, 0.9) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z'/%3e%3c/svg%3e") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 0.7rem center !important;
-    background-size: 16px !important;
-    border-color: var(--primary-gold) !important;
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+.thumb-field input[type="file"]:focus {
+    border-color: var(--primary-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
     outline: none;
 }
 
-/* Select com seta personalizada (manter) */
-.form-select {
-    background: rgba(32, 3, 3, 0.8) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 0.7rem center !important;
-    background-size: 16px !important;
-    padding-right: 2.5rem !important;
-    border: 2px solid var(--background-base-medium) !important;
-    border-radius: 8px;
-    color: var(--text-light) !important;
+/* Botão do file input */
+.thumb-field input[type="file"]::file-selector-button {
+    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%);
+    color: var(--background-base-dark);
+    border: 2px solid var(--primary-gold);
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
     transition: all 0.3s ease;
+    margin-right: 0.8rem;
+    font-size: 0.9rem;
 }
 
-.form-select:focus {
-    background: rgba(32, 3, 3, 0.9) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 0.7rem center !important;
-    background-size: 16px !important;
-    border-color: var(--primary-gold) !important;
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
-    outline: none;
+.thumb-field input[type="file"]::file-selector-button:hover {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-gold) 100%);
 }
 
 /* ============================= */
-/* DETALHES DO EVENTO - DISTÂNCIA DA IMAGEM */
+/* BOTÕES DO FORMULÁRIO */
+/* ============================= */
+.form-actions {
+    margin-top: 1.5rem;
+    text-align: center;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%);
+    color: var(--background-base-dark);
+    border: 2px solid var(--primary-gold);
+    padding: 0.9rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    max-width: 250px;
+}
+
+.btn-submit:hover {
+    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-gold) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+/* ============================= */
+/* CARD DE DETALHES - IMAGEM CORRIGIDA */
 /* ============================= */
 
-/* Card principal */
 .card {
     background: var(--background-card);
     border: 2px solid var(--border-color);
-    border-radius: 15px;
+    border-radius: 12px;
     box-shadow: var(--card-shadow);
     overflow: hidden;
     transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
 }
 
 .card:hover {
@@ -334,99 +617,68 @@ input[type="time"].form-control:focus {
     transform: translateY(-2px);
 }
 
-/* DISTÂNCIA DA IMAGEM NO CARD */
-.card .row.g-0 .col-12.col-sm-4 {
-    padding: 1rem;
+.card .row.g-0 {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
 }
 
-.card .row.g-0 .col-12.col-sm-4 img {
+/* IMAGEM DO EVENTO - CORRIGIDA (SEM CORTE) */
+.card .col-12.col-sm-4 {
+    padding: 1.2rem;
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card .col-12.col-sm-8 {
+    padding: 1.2rem;
+    flex: 0 0 66.667%;
+    max-width: 66.667%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.card .col-12.col-sm-4 img {
     width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 12px;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 8px;
     border: 2px solid var(--border-color);
+    background: rgba(45, 27, 27, 0.6);
+    padding: 0.5rem;
+}
+
+.card:hover .col-12.col-sm-4 img {
+    border-color: var(--primary-orange);
 }
 
 .card-body {
-    padding: 1.5rem;
+    padding: 0;
 }
 
 .card-title {
     color: var(--text-heading);
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 700;
     margin-bottom: 1rem;
+    line-height: 1.2;
 }
 
 .card-text {
     color: var(--text-light);
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
 }
 
 .card-text strong {
     color: var(--primary-gold);
-}
-
-/* ============================= */
-/* BOTÃO FINALIZAR EVENTO - DESIGN MELHORADO */
-/* ============================= */
-
-/* Container do botão finalizar */
-form.d-inline-block.mt-2 {
-    margin-top: 1rem !important;
-    width: 100%;
-}
-
-/* Botão Finalizar Evento - DESIGN ESPECIAL */
-.btn-finalizar-evento {
-    background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%) !important;
-    color: var(--text-brighter) !important;
-    border: 2px solid #8b0000 !important;
-    padding: 1rem 2rem !important;
-    font-size: 1.1rem !important;
-    font-weight: 700 !important;
-    border-radius: 10px !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-    transition: all 0.3s ease !important;
-    position: relative !important;
-    overflow: hidden !important;
-    width: 100% !important;
-    box-shadow: 0 4px 15px rgba(139, 0, 0, 0.4) !important;
-}
-
-.btn-finalizar-evento::before {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: -100% !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
-    transition: left 0.5s ease !important;
-}
-
-.btn-finalizar-evento:hover::before {
-    left: 100% !important;
-}
-
-.btn-finalizar-evento:hover {
-    background: linear-gradient(135deg, #a00000 0%, #6a0000 100%) !important;
-    transform: translateY(-3px) !important;
-    box-shadow: 0 6px 20px rgba(139, 0, 0, 0.6) !important;
-    border-color: var(--danger-red) !important;
-}
-
-.btn-finalizar-evento:active {
-    transform: translateY(-1px) !important;
-}
-
-/* Ícone de alerta no botão */
-.btn-finalizar-evento::after {
-    content: '⚠️' !important;
-    margin-left: 8px !important;
-    font-size: 1.2rem !important;
+    font-weight: 600;
 }
 
 /* ============================= */
@@ -434,7 +686,7 @@ form.d-inline-block.mt-2 {
 /* ============================= */
 
 .btn {
-    padding: 0.75rem 1.5rem;
+    padding: 0.7rem 1.2rem;
     border-radius: 8px;
     font-weight: 600;
     text-decoration: none;
@@ -445,73 +697,38 @@ form.d-inline-block.mt-2 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    font-size: 0.9rem;
 }
 
-.btn-success {
-    background: linear-gradient(135deg, var(--success-green) 0%, #1e7e34 100%);
-    color: var(--text-brighter);
-    border-color: var(--success-green);
-}
-
-.btn-success:hover {
-    background: linear-gradient(135deg, #218838 0%, #1c7430 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-}
-
-.btn-danger {
-    background: linear-gradient(135deg, var(--danger-red) 0%, #c82333 100%);
-    color: var(--text-brighter);
-    border-color: var(--danger-red);
-}
-
-.btn-danger:hover {
-    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-}
-
-.btn-primary {
+.btn-gold {
     background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%);
     color: var(--background-base-dark);
     border-color: var(--primary-gold);
-    font-weight: 700;
+    font-weight: 600;
 }
 
-.btn-primary:hover {
+.btn-gold:hover {
     background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-gold) 100%);
     transform: translateY(-2px);
     box-shadow: var(--card-shadow-hover);
     color: var(--background-base-dark);
 }
 
-.btn-outline-secondary {
+.btn-outline-gold {
     background: transparent;
     color: var(--text-light);
     border-color: var(--text-muted);
 }
 
-.btn-outline-secondary:hover {
+.btn-outline-gold:hover {
     background: var(--text-muted);
     color: var(--background-base-dark);
     transform: translateY(-2px);
 }
 
-.btn-outline-warning {
-    background: transparent;
-    color: var(--primary-orange);
-    border-color: var(--primary-orange);
-}
-
-.btn-outline-warning:hover {
-    background: var(--primary-orange);
-    color: var(--background-base-dark);
-    transform: translateY(-2px);
-}
-
 /* ============================= */
-/* LISTA DE INSCRITOS - TAMANHO OTIMIZADO */
+/* LISTA DE INSCRITOS - SCROLL CORRIGIDO */
 /* ============================= */
 
 .list-unstyled {
@@ -522,21 +739,22 @@ form.d-inline-block.mt-2 {
     background: rgba(45, 27, 27, 0.6);
     border-radius: 8px;
     border: 1px solid var(--border-color);
+    margin-top: 1rem;
 }
 
 /* SCROLLBAR CUSTOMIZADA PARA INSCRITOS */
 .list-unstyled::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 .list-unstyled::-webkit-scrollbar-track {
     background: var(--background-base-medium);
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .list-unstyled::-webkit-scrollbar-thumb {
     background: var(--primary-gold);
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .list-unstyled::-webkit-scrollbar-thumb:hover {
@@ -546,26 +764,35 @@ form.d-inline-block.mt-2 {
 .list-unstyled li {
     display: flex;
     align-items: center;
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
+    padding: 0.8rem;
+    margin-bottom: 0.6rem;
     background: rgba(32, 3, 3, 0.8);
     border-radius: 8px;
     border: 1px solid var(--background-base-medium);
     transition: all 0.3s ease;
+    gap: 0.8rem;
+    min-height: 60px;
 }
 
 .list-unstyled li:hover {
     background: var(--background-card-hover);
-    transform: translateX(5px);
+    transform: translateX(3px);
     border-color: var(--primary-gold);
 }
 
 .list-unstyled li img {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     object-fit: cover;
     border-radius: 50%;
     border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.list-unstyled li:hover img {
+    transform: scale(1.05);
+    border-color: var(--primary-orange);
 }
 
 .list-unstyled li a {
@@ -573,6 +800,7 @@ form.d-inline-block.mt-2 {
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
+    font-size: 0.9rem;
 }
 
 .list-unstyled li a:hover {
@@ -585,75 +813,12 @@ form.d-inline-block.mt-2 {
 }
 
 /* ============================= */
-/* FORMULÁRIO DE EDIÇÃO */
-/* ============================= */
-
-form {
-    background: var(--background-card);
-    padding: 1.5rem;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    position: relative;
-    overflow: hidden;
-}
-
-/* Efeito de brilho no formulário */
-form::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.05), transparent);
-    animation: shine 6s infinite linear;
-    pointer-events: none;
-    z-index: 0;
-}
-
-form > * {
-    position: relative;
-    z-index: 1;
-}
-
-form p {
-    margin-bottom: 1rem;
-}
-
-form label {
-    color: var(--text-heading);
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-/* Inputs gerais */
-form input, 
-form textarea {
-    width: 100%;
-    padding: 0.75rem;
-    background: rgba(32, 3, 3, 0.8) !important;
-    border: 2px solid var(--background-base-medium) !important;
-    border-radius: 8px;
-    color: var(--text-light) !important;
-    transition: all 0.3s ease;
-}
-
-form input:focus,
-form textarea:focus {
-    border-color: var(--primary-gold) !important;
-    background: rgba(32, 3, 3, 0.9) !important;
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
-    outline: none;
-}
-
-/* ============================= */
 /* BADGES E ESTADOS */
 /* ============================= */
 
 .badge {
-    padding: 0.5rem 0.75rem;
-    border-radius: 20px;
+    padding: 0.4rem 0.8rem;
+    border-radius: 16px;
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -676,8 +841,12 @@ form textarea:focus {
 
 .alert-warning {
     background: rgba(255, 193, 7, 0.1);
-    border-color: #ffc107;
+    border: 1px solid #ffc107;
     color: #ffc107;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    font-size: 0.9rem;
 }
 
 /* ============================= */
@@ -687,7 +856,7 @@ form textarea:focus {
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -706,15 +875,17 @@ form textarea:focus {
 
 @media (max-width: 768px) {
     .container.mt-4 {
-        padding: 0.5rem;
+        padding: 0.8rem;
     }
     
     .container.mt-4 h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
     }
     
     .list-group-item {
-        padding: 0.75rem;
+        padding: 0.7rem;
+        min-height: 60px;
     }
     
     .list-group-item img {
@@ -722,12 +893,16 @@ form textarea:focus {
         height: 45px;
     }
     
-    .card .row.g-0 .col-12.col-sm-4 {
-        padding: 0.5rem;
+    .card .col-12.col-sm-4,
+    .card .col-12.col-sm-8 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        padding: 1rem;
     }
     
-    .card .row.g-0 .col-12.col-sm-4 img {
+    .card .col-12.col-sm-4 img {
         height: 150px;
+        object-fit: contain;
     }
     
     .list-group {
@@ -736,10 +911,73 @@ form textarea:focus {
     
     .list-unstyled {
         max-height: 250px;
+        padding: 0.8rem;
     }
     
-    .btn-finalizar-evento {
-        padding: 0.9rem 1.5rem !important;
-        font-size: 1rem !important;
+    /* FORMULÁRIO MOBILE */
+    .form-evento {
+        padding: 1.2rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .form-check {
+        padding: 0.8rem;
+    }
+    
+    .form-check-label {
+        padding-left: 1.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-check-label::before {
+        width: 16px;
+        height: 16px;
+        top: 0.15rem;
+    }
+    
+    .form-check-input:checked + .form-check-label::after {
+        left: 3px;
+        top: 0.15rem;
+        font-size: 10px;
+    }
+    
+    .checkbox-description {
+        font-size: 0.8rem;
+        margin-top: 0.3rem;
+    }
+    
+    .btn-submit {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.95rem;
+        max-width: 100%;
+    }
+    
+    .form-group label {
+        font-size: 0.9rem;
+    }
+    
+    .form-evento input,
+    .form-evento textarea,
+    .form-evento select {
+        padding: 0.7rem;
+        min-height: 40px;
+        font-size: 0.9rem;
+    }
+    
+    .thumb-field {
+        padding: 1rem;
+    }
+    
+    .thumb-field input[type="file"] {
+        padding: 0.7rem;
+    }
+    
+    .thumb-field input[type="file"]::file-selector-button {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.85rem;
     }
 }
