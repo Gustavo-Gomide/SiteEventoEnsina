@@ -242,19 +242,29 @@
                                 <i class="fas fa-info-circle"></i> Ver Detalhes
                             </a>
 
-                            {% if ev.criador == current_usuario %}
-                                <a href="{% url 'gerenciar_evento' ev.id %}" class="btn btn-warning">Gerenciar Evento</a>
-                            {% elif current_usuario %}
-                                {% if ev.id in inscricoes_usuario %}
-                                    <form action="{% url 'cancelar_inscricao' ev.id %}" method="POST">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger">Cancelar Inscrição</button>
-                                    </form>
+                            {% if current_usuario %}
+                                {% if ev.criador == current_usuario %}
+                                    <a href="{% url 'gerenciar_evento' ev.id %}" class="btn btn-warning">
+                                        <i class="fas fa-cog"></i> Gerenciar Evento
+                                    </a>
                                 {% else %}
-                                    <a href="{% url 'detalhe_evento' ev.id %}#inscricao" class="btn btn-primary">Inscrever-se</a>
+                                    {% if ev.id in inscricoes_usuario %}
+                                        <form action="{% url 'detalhe_evento' ev.id %}" method="POST" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">
+                                                <i class="fas fa-times"></i> Cancelar Inscrição
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <a href="{% url 'detalhe_evento' ev.id %}#inscricao" class="btn btn-primary">
+                                            <i class="fas fa-user-plus"></i> Inscrever-se
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
                             {% else %}
-                                <a href="{% url 'login' %}" class="btn btn-secondary">Entrar para Inscrever-se</a>
+                                <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-sign-in-alt"></i> Entrar para Inscrever-se
+                                </a>
                             {% endif %}
                         </div>
                     </div>
