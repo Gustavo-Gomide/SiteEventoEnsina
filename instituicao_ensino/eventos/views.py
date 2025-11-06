@@ -455,13 +455,14 @@ def galeria(request):
     eventos_com_fotos = []
 
     for evento in Evento.objects.all().order_by('-data_inicio'):
-        galeria_path = os.path.join(settings.MEDIA_ROOT, 'eventos', evento.get_gallery_name(), 'galeria')
+            galeria_path = os.path.join(settings.MEDIA_ROOT, 'eventos', evento.get_gallery_name(), 'galeria')
 
-        # Verifica se a galeria possui imagens
-        imagens = [f for f in os.listdir(galeria_path)
-                    if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif'))]
-        if imagens:
-            eventos_com_fotos.append(evento)
+            # Verifica se a galeria possui imagens
+            if os.path.exists(galeria_path) and os.path.isdir(galeria_path):
+                imagens = [f for f in os.listdir(galeria_path)
+                        if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif'))]
+                if imagens:
+                    eventos_com_fotos.append(evento)
 
     eventos = eventos_com_fotos  # só mostra eventos com fotos
     return render(request, 'eventos/galeria.html', {'eventos': eventos})
