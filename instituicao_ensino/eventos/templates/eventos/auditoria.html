@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<h1>Auditoria de Ações</h1>
+<form method="get">
+  <label>Data (YYYY-MM-DD): <input type="text" name="date" value="{{ request.GET.date }}"></label>
+  <label>Usuário ID: <input type="text" name="usuario_id" value="{{ request.GET.usuario_id }}"></label>
+  <button type="submit">Filtrar</button>
+</form>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Timestamp</th>
+      <th>Usuário</th>
+      <th>Ação</th>
+      <th>Objeto</th>
+      <th>Objeto ID</th>
+      <th>Descrição</th>
+      <th>Extra</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for l in logs %}
+    <tr>
+      <td>{{ l.timestamp }}</td>
+      <td>
+        {% if l.usuario %}
+          {{ l.usuario.nome_usuario }}
+        {% elif l.django_user %}
+          {{ l.django_user.username }}
+        {% else %}
+          sistema
+        {% endif %}
+      </td>
+      <td>{{ l.action }}</td>
+      <td>{{ l.object_type }}</td>
+      <td>{{ l.object_id }}</td>
+      <td>{{ l.description }}</td>
+      <td>{{ l.extra }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7">Nenhum registro encontrado.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="pagination">
+  {% if logs.has_previous %}
+    <a href="?page={{ logs.previous_page_number }}">Anterior</a>
+  {% endif %}
+  <span>Página {{ logs.number }} de {{ logs.paginator.num_pages }}</span>
+  {% if logs.has_next %}
+    <a href="?page={{ logs.next_page_number }}">Próxima</a>
+  {% endif %}
+</div>
+{% endblock %}
