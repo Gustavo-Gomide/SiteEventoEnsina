@@ -39,6 +39,9 @@ urlpatterns = [
     # Galeria de fotos de um evento específico
     path('galeria/<int:evento_id>/', views.galeria_evento, name='galeria_evento'),
 
+    # Auditoria - consulta de logs (organizadores)
+    path('auditoria/', views.auditoria, name='auditoria_eventos'),
+
     # Endpoint de debug para informações do evento (somente desenvolvimento)
     path('debug/<int:evento_id>/', views.debug_eventos, name='debug_evento'),
 ]

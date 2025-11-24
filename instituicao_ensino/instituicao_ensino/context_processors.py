@@ -41,6 +41,8 @@ def global_nav(request):
         nav_right.append({'label': 'Perfil', 'url': reverse('perfil')})
         if usuario.tipo.tipo in ['Professor', 'Organizador', 'Funcionario']:
             nav_right.append({'label': 'Criar Evento', 'url': reverse('criar_evento')})
+            # Link para auditoria visível apenas a organizadores/professores/funcionarios
+            nav_right.append({'label': 'Auditoria', 'url': reverse('auditoria_eventos')})
         nav_right.append({'label': 'Logout', 'url': reverse('logout')})
     else:
         nav_right.append({'label': 'Login', 'url': reverse('login')})

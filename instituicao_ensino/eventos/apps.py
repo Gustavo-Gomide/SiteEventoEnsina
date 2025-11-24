@@ -10,3 +10,10 @@ class EventoConfig(AppConfig):
     
     # Nome da aplicação, usado internamente pelo Django e para referências no settings.INSTALLED_APPS
     name = "eventos"
+
+    def ready(self):
+        # register signals
+        try:
+            from . import signals  # noqa: F401
+        except Exception:
+            pass
