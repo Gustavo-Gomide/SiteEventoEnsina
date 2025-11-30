@@ -13,6 +13,11 @@ class AuditTests(TestCase):
         self.instit = Instituicao.objects.create(nome='Uni Test')
         self.org_user = User.objects.create_user(username='org_audit', password='pass')
         self.org = Usuario.objects.create(nome='Org Audit', tipo=self.tipo_org, nome_usuario='org_audit', user=self.org_user)
+        # garante existência do usuário admin para os testes
+        self.admin_user = User.objects.create_user(username='admin', password='123456')
+        self.admin_user.is_staff = True
+        self.admin_user.is_superuser = True
+        self.admin_user.save()
 
     def test_creating_event_generates_auditlog(self):
         # cria evento diretamente (sinal post_save deve registrar)
@@ -57,3 +62,18 @@ class AuditTests(TestCase):
         # verifica AuditLog com action api_query_events ou debug
         found = AuditLog.objects.filter(action__icontains='api_query', object_type='Evento').exists()
         self.assertTrue(found, 'Esperava AuditLog para consulta API de eventos')
+
+    def test_auditoria_access_only_admin(self):
+        url = reverse('auditoria_eventos')
+
+        # acesso com organizador normal deve ser negado (redirect para meus_eventos)
+        self.client.login(username='org_audit', password='pass')
+        resp = self.client.get(url)
+        self.assertIn(resp.status_code, (302, 403))
+        self.client.logout()
+
+        # acesso com admin deve ser permitido
+        logged = self.client.login(username='admin', password='123456')
+        self.assertTrue(logged, 'Não conseguiu logar como admin')
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)

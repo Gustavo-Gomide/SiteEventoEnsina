@@ -6,6 +6,7 @@ from eventos.models import Evento, TipoEvento, InscricaoEvento
 from unittest.mock import patch
 from django.core.files.uploadedfile import SimpleUploadedFile
 import io
+import datetime
 
 
 class EventFlowTests(TestCase):
@@ -60,9 +61,9 @@ class EventFlowTests(TestCase):
             titulo='Teste Evento',
             tipo=self.tipo_ev,
             modalidade='online',
-            data_inicio='2025-10-01',
-            data_fim='2025-10-02',
-            horario='10:00',
+            data_inicio=datetime.date(2025, 10, 1),
+            data_fim=datetime.date(2025, 10, 2),
+            horario=datetime.time(10, 0),
             quantidade_participantes=10,
             organizador='org1',
             criador=self.org,
@@ -89,10 +90,10 @@ class EventFlowTests(TestCase):
 
         # verifica se inscrição existe no banco
         self.assertTrue(
-            InscricaoEvento.objects.filter(evento=self.evento, inscrito=self.inscrito).exists()
+            InscricaoEvento.objects.filter(evento=self.evento, inscrito=self.aluno).exists()
         )
 
-    @patch('django.core.management.call_command')
+    @patch('usuarios.generator.generate_certificates_for_event')
     def test_finalizar_calls_generate(self, mock_call):
         """
         Testa o endpoint de finalizar evento:
@@ -102,7 +103,7 @@ class EventFlowTests(TestCase):
         - verifica se comando de gerar certificados foi chamado
         """
         # cria inscrição já validada
-        InscricaoEvento.objects.create(evento=self.evento, inscrito=self.inscrito, is_validated=True)
+        InscricaoEvento.objects.create(evento=self.evento, inscrito=self.aluno, is_validated=True)
 
         # login do organizador
         self.client.login(username='org1', password='pass')
@@ -110,8 +111,8 @@ class EventFlowTests(TestCase):
         resp = self.client.post(url)
         self.assertEqual(resp.status_code, 302)
 
-        # verifica se management.call_command foi chamado para gerar certificados
-        mock_call.assert_any_call('generate_certificates', evento=self.evento.id)
+        # verifica se a função generate_certificates_for_event foi chamada
+        mock_call.assert_called_with(self.evento.id)
 
     def test_pegar_certificado_redirects_to_pdf(self):
         """

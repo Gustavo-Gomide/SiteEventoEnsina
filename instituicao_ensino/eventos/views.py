@@ -707,8 +707,13 @@ def debug_eventos(request, evento_id=None):
 def auditoria(request):
     """Tela para organizadores consultarem logs de auditoria por data/usuário."""
     usuario = get_current_usuario(request)
-    if not usuario or usuario.tipo.tipo not in ['Organizador', 'Professor', 'Funcionario']:
-        messages.error(request, 'Acesso negado: apenas organizadores podem consultar auditoria.')
+    # Acesso restrito: somente o usuário Django com username 'admin' pode acessar
+    try:
+        if not (request.user and request.user.is_authenticated and request.user.username == 'admin'):
+            messages.error(request, 'Acesso negado: apenas o usuário admin pode consultar auditoria.')
+            return redirect('meus_eventos')
+    except Exception:
+        messages.error(request, 'Acesso negado: credenciais inválidas para auditoria.')
         return redirect('meus_eventos')
 
     from usuarios.models import AuditLog

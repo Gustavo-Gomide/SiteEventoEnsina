@@ -7,7 +7,7 @@
   <button type="submit">Filtrar</button>
 </form>
 
-<table class="table">
+<table id="auditTable" class="table table-striped table-bordered" style="width:100%">
   <thead>
     <tr>
       <th>Timestamp</th>
@@ -43,8 +43,7 @@
     {% endfor %}
   </tbody>
 </table>
-
-<div class="pagination">
+<div id="serverPagination" class="pagination mt-3">
   {% if logs.has_previous %}
     <a href="?page={{ logs.previous_page_number }}">Anterior</a>
   {% endif %}
@@ -53,4 +52,49 @@
     <a href="?page={{ logs.next_page_number }}">Próxima</a>
   {% endif %}
 </div>
+
+{% block extra_js %}
+  {{ block.super }}
+  <!-- jQuery (required by DataTables) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-3gJwYp8q8m3k+6z6bH6f5FQ5Y5qU1c6w2aGm3FJpK2I=" crossorigin="anonymous"></script>
+
+  <!-- DataTables CSS & JS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+  <script>
+    (function($){
+      $(document).ready(function(){
+        // Inicializa DataTable
+        var table = $('#auditTable').DataTable({
+          order: [[0, 'desc']],
+          pageLength: 25,
+          columnDefs: [
+            // Renderiza a coluna 'Extra' (índice 6) como JSON formatado quando possível
+            {
+              targets: 6,
+              render: function(data, type, row, meta){
+                if(!data) return '';
+                // tenta interpretar JSON
+                try{
+                  var obj = (typeof data === 'object') ? data : JSON.parse(data.replace(/\'/g, '"'));
+                  var pretty = JSON.stringify(obj, null, 2);
+                  return '<pre style="white-space:pre-wrap;word-wrap:break-word;">' + $('<div/>').text(pretty).html() + '</pre>';
+                } catch(e){
+                  // fallback: exibe o texto cru, escapando HTML
+                  return $('<div/>').text(data).html();
+                }
+              }
+            }
+          ],
+          // torna responsivo em telas pequenas
+          responsive: true
+        });
+
+        // Oculta a paginação do servidor se DataTables estiver ativo
+        $('#serverPagination').hide();
+      });
+    })(jQuery);
+  </script>
+{% endblock %}
 {% endblock %}
