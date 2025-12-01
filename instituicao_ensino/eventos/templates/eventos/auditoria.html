@@ -1,66 +1,95 @@
 {% extends 'base/base.html' %}
-{% block content %}
-<h1>Auditoria de Ações</h1>
-<form method="get">
-  <label>Data (YYYY-MM-DD): <input type="text" name="date" value="{{ request.GET.date }}"></label>
-  <label>Usuário ID: <input type="text" name="usuario_id" value="{{ request.GET.usuario_id }}"></label>
-  <button type="submit">Filtrar</button>
-</form>
+{% load static %}
 
-<table id="auditTable" class="table table-striped table-bordered" style="width:100%">
-  <thead>
-    <tr>
-      <th>Timestamp</th>
-      <th>Usuário</th>
-      <th>Ação</th>
-      <th>Objeto</th>
-      <th>Objeto ID</th>
-      <th>Descrição</th>
-      <th>Extra</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for l in logs %}
-    <tr>
-      <td>{{ l.timestamp }}</td>
-      <td>
-        {% if l.usuario %}
-          {{ l.usuario.nome_usuario }}
-        {% elif l.django_user %}
-          {{ l.django_user.username }}
-        {% else %}
-          sistema
-        {% endif %}
-      </td>
-      <td>{{ l.action }}</td>
-      <td>{{ l.object_type }}</td>
-      <td>{{ l.object_id }}</td>
-      <td>{{ l.description }}</td>
-      <td>{{ l.extra }}</td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="7">Nenhum registro encontrado.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
-<div id="serverPagination" class="pagination mt-3">
-  {% if logs.has_previous %}
-    <a href="?page={{ logs.previous_page_number }}">Anterior</a>
-  {% endif %}
-  <span>Página {{ logs.number }} de {{ logs.paginator.num_pages }}</span>
-  {% if logs.has_next %}
-    <a href="?page={{ logs.next_page_number }}">Próxima</a>
-  {% endif %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auditoria.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="audit-container">
+  <div class="audit-header">
+    <h1><i class="fas fa-shield-alt"></i> Auditoria de Ações</h1>
+    <form method="get" class="audit-filters">
+      <div class="filter-group">
+        <label for="date">Data (YYYY-MM-DD):</label>
+        <input type="text" id="date" name="date" value="{{ request.GET.date }}" placeholder="2024-12-01">
+      </div>
+      <div class="filter-group">
+        <label for="username">Nome de Usuário:</label>
+        <input type="text" id="username" name="username" value="{{ request.GET.username }}" placeholder="Digite o nome do usuário" list="usernames-list">
+        <datalist id="usernames-list">
+          {% for name in all_usernames %}
+            <option value="{{ name }}">
+          {% endfor %}
+        </datalist>
+      </div>
+      <button type="submit" class="btn-filter"><i class="fas fa-filter"></i> Filtrar</button>
+    </form>
+  </div>
+
+  <div class="audit-table-container">
+
+    <table id="auditTable" class="table table-striped table-bordered" style="width:100%">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Usuário</th>
+          <th>Ação</th>
+          <th>Objeto</th>
+          <th>Objeto ID</th>
+          <th>Descrição</th>
+          <th>Extra</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in logs %}
+        <tr>
+          <td>{{ l.timestamp|date:"Y/m/d H:i:s" }}</td>
+          <td>
+            {% if l.usuario %}
+              <span title="Usuario ID: {{ l.usuario.id }}">{{ l.usuario.nome_usuario }}</span>
+            {% elif l.django_user %}
+              <span title="Django User ID: {{ l.django_user.id }}">{{ l.django_user.username }}</span>
+            {% else %}
+              <em>sistema</em>
+            {% endif %}
+          </td>
+          <td>{{ l.action }}</td>
+          <td>{{ l.object_type }}</td>
+          <td>{{ l.object_id|default:"-" }}</td>
+          <td>{{ l.description|default:"-" }}</td>
+          <td>{{ l.extra|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" style="text-align: center; padding: 2rem; color: #ff7f16;">Nenhum registro encontrado.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div id="serverPagination" class="pagination">
+    {% if logs.has_previous %}
+      <a href="?page={{ logs.previous_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if request.GET.username %}&username={{ request.GET.username }}{% endif %}">
+        <i class="fas fa-chevron-left"></i> Anterior
+      </a>
+    {% endif %}
+    <span>Página {{ logs.number }} de {{ logs.paginator.num_pages }}</span>
+    {% if logs.has_next %}
+      <a href="?page={{ logs.next_page_number }}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if request.GET.username %}&username={{ request.GET.username }}{% endif %}">
+        Próxima <i class="fas fa-chevron-right"></i>
+      </a>
+    {% endif %}
+  </div>
 </div>
 
 {% block extra_js %}
   {{ block.super }}
   <!-- jQuery (required by DataTables) -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-3gJwYp8q8m3k+6z6bH6f5FQ5Y5qU1c6w2aGm3FJpK2I=" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <!-- DataTables CSS & JS -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
   <script>
     (function($){
@@ -69,17 +98,23 @@
         var table = $('#auditTable').DataTable({
           order: [[0, 'desc']],
           pageLength: 25,
+          paging: false,
+          searching: false,
+          info: false,
+          language: {
+            emptyTable: "Nenhum registro encontrado"
+          },
           columnDefs: [
             // Renderiza a coluna 'Extra' (índice 6) como JSON formatado quando possível
             {
               targets: 6,
               render: function(data, type, row, meta){
-                if(!data) return '';
+                if(!data || data === '-') return '-';
                 // tenta interpretar JSON
                 try{
                   var obj = (typeof data === 'object') ? data : JSON.parse(data.replace(/\'/g, '"'));
                   var pretty = JSON.stringify(obj, null, 2);
-                  return '<pre style="white-space:pre-wrap;word-wrap:break-word;">' + $('<div/>').text(pretty).html() + '</pre>';
+                  return '<pre style="white-space:pre-wrap;word-wrap:break-word;color:#fff7d9;background:rgba(0,0,0,0.2);padding:0.5rem;border-radius:4px;margin:0;">' + $('<div/>').text(pretty).html() + '</pre>';
                 } catch(e){
                   // fallback: exibe o texto cru, escapando HTML
                   return $('<div/>').text(data).html();
@@ -90,9 +125,6 @@
           // torna responsivo em telas pequenas
           responsive: true
         });
-
-        // Oculta a paginação do servidor se DataTables estiver ativo
-        $('#serverPagination').hide();
       });
     })(jQuery);
   </script>

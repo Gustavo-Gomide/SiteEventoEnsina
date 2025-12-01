@@ -705,22 +705,24 @@ def debug_eventos(request, evento_id=None):
 
 @login_required
 def auditoria(request):
-    """Tela para organizadores consultarem logs de auditoria por data/usuário."""
+    """Tela para superusuários Django consultarem logs de auditoria por data/usuário."""
     usuario = get_current_usuario(request)
-    # Acesso restrito: somente o usuário Django com username 'admin' pode acessar
+    # Acesso restrito: somente superusuários Django podem acessar
     try:
-        if not (request.user and request.user.is_authenticated and request.user.username == 'admin'):
-            messages.error(request, 'Acesso negado: apenas o usuário admin pode consultar auditoria.')
+        if not (request.user and request.user.is_authenticated and request.user.is_superuser):
+            messages.error(request, 'Acesso negado: apenas superusuários podem consultar auditoria.')
             return redirect('meus_eventos')
     except Exception:
         messages.error(request, 'Acesso negado: credenciais inválidas para auditoria.')
         return redirect('meus_eventos')
 
     from usuarios.models import AuditLog
+    from django.db.models import Q
 
-    qs = AuditLog.objects.all()
+    qs = AuditLog.objects.all().order_by('-timestamp')
     date_str = request.GET.get('date')
-    usuario_id = request.GET.get('usuario_id')
+    username = request.GET.get('username', '').strip()
+    
     if date_str:
         try:
             from django.utils.dateparse import parse_date
@@ -730,11 +732,20 @@ def auditoria(request):
         except Exception:
             pass
 
-    if usuario_id:
+    if username:
         try:
-            qs = qs.filter(usuario__id=int(usuario_id))
+            # Filter by Usuario.nome_usuario or django_user.username
+            qs = qs.filter(
+                Q(usuario__nome_usuario__icontains=username) | 
+                Q(django_user__username__icontains=username)
+            )
         except Exception:
             pass
+
+    # Get all unique usernames for autocomplete
+    all_usuarios = Usuario.objects.values_list('nome_usuario', flat=True).distinct()
+    all_django_users = User.objects.values_list('username', flat=True).distinct()
+    all_usernames = sorted(set(list(all_usuarios) + list(all_django_users)))
 
     paginator = Paginator(qs, 50)
     page = request.GET.get('page', 1)
@@ -747,4 +758,5 @@ def auditoria(request):
         'logs': logs,
         'usuario': usuario,
         'nav_items': nav_items,
+        'all_usernames': all_usernames,
     })

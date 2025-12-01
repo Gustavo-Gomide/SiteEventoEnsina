@@ -1,0 +1,205 @@
+/* Auditoria Page Styles - Dark Red/Gold Theme */
+
+.audit-container {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.audit-header {
+  background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
+  border: 2px solid var(--border-color, #d4af37);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.audit-header h1 {
+  color: #ffeaa7;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+
+.audit-filters {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 200px;
+}
+
+.filter-group label {
+  color: #ffeaa7;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.filter-group input,
+.filter-group select {
+  padding: 0.6rem;
+  border: 2px solid #d4af37;
+  border-radius: 6px;
+  background: #1a0f0f;
+  color: #fff7d9;
+  font-size: 0.95rem;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  outline: none;
+  border-color: #f8d568;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.btn-filter {
+  padding: 0.6rem 1.5rem;
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  color: #2d1b1b;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.btn-filter:hover {
+  background: linear-gradient(135deg, #f8d568 0%, #d4af37 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
+}
+
+.audit-table-container {
+  background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
+  border: 2px solid #d4af37;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  overflow-x: auto;
+}
+
+#auditTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+}
+
+#auditTable thead {
+  background: rgba(212, 175, 55, 0.1);
+  border-bottom: 2px solid #d4af37;
+}
+
+#auditTable th {
+  color: #ffeaa7;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #d4af37;
+}
+
+#auditTable td {
+  color: #fff7d9;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+#auditTable tbody tr {
+  transition: background 0.2s ease;
+}
+
+#auditTable tbody tr:hover {
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.pagination {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding: 1rem;
+}
+
+.pagination a {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  color: #2d1b1b;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.pagination a:hover {
+  background: linear-gradient(135deg, #f8d568 0%, #d4af37 100%);
+  transform: translateY(-2px);
+}
+
+.pagination span {
+  color: #ffeaa7;
+  font-weight: 500;
+}
+
+/* DataTables Custom Styling */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 0.4rem 0.8rem;
+  margin: 0 0.2rem;
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  color: #2d1b1b !important;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: linear-gradient(135deg, #f8d568 0%, #d4af37 100%) !important;
+  color: #2d1b1b !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #8b0000 !important;
+  color: #ffeaa7 !important;
+}
+
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+  background: #1a0f0f;
+  color: #fff7d9;
+  border: 2px solid #d4af37;
+  border-radius: 4px;
+  padding: 0.4rem;
+}
+
+.dataTables_wrapper .dataTables_filter label,
+.dataTables_wrapper .dataTables_length label,
+.dataTables_wrapper .dataTables_info {
+  color: #ffeaa7;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .audit-filters {
+    flex-direction: column;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .audit-table-container {
+    padding: 1rem;
+  }
+
+  #auditTable th,
+  #auditTable td {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+}
