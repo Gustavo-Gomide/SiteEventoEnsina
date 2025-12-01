@@ -27,6 +27,7 @@ from .forms import EventoForm
 from usuarios.views import get_current_usuario
 from instituicao_ensino.views import nav_items
 from django.http import FileResponse
+from usuarios.utils import log_audit
 
 # -------------------------------------------------------------------
 # Função utilitária: verifica se o usuário é dono ou staff
@@ -89,6 +90,11 @@ def criar_evento(request):
             os.makedirs(thumb_path, exist_ok=True)
 
             evento.save()
+            # Auditoria: criação de evento
+            try:
+                log_audit(request=request, usuario=usuario, action='create_event', object_type='Evento', object_id=evento.id, description=f'Evento criado: {evento.titulo}')
+            except Exception:
+                pass
             messages.success(request, "Evento criado com sucesso!")
             return redirect('lista_eventos')
     else:
@@ -205,6 +211,10 @@ def meus_eventos(request):
                         ev.criador = evento_selecionado.criador
                         ev.gallery_slug = ev.get_gallery_name()
                         ev.save()
+                        try:
+                            log_audit(request=request, usuario=usuario, action='update_event', object_type='Evento', object_id=ev.id, description=f'Evento atualizado: {ev.titulo}')
+                        except Exception:
+                            pass
                         messages.success(request, 'Evento atualizado com sucesso.')
                         return redirect(f"{reverse('meus_eventos')}?evento={ev.id}")
                 else:
@@ -264,8 +274,15 @@ def gerenciar_evento(request, evento_id):
     if request.method == 'POST':
         for inscr in inscritos:
             key = f'validate_{inscr.id}'
-            inscr.is_validated = key in request.POST
-            inscr.save()
+            try:
+                old = inscr.is_validated
+                inscr.is_validated = key in request.POST
+                inscr.save()
+                if old != inscr.is_validated:
+                    log_audit(request=request, usuario=inscr.inscrito, action='update_inscription', object_type='InscricaoEvento', object_id=inscr.id, description=f'Inscrição {"validada" if inscr.is_validated else "desvalidada"} em evento {inscr.evento.id}')
+            except Exception:
+                # não interrompe o fluxo de atualização por falha na auditoria
+                pass
         messages.success(request, 'Status das inscrições atualizado.')
         return redirect('gerenciar_evento', evento_id=evento.id)
 
@@ -311,6 +328,10 @@ def finalizar_evento(request, evento_id):
                     )
                 except Exception:
                     pass
+        try:
+            log_audit(request=request, usuario=usuario, action='generate_certificates', object_type='Evento', object_id=evento.id, description=f'Certificados gerados: {generated}')
+        except Exception:
+            pass
     except ImportError:
         from usuarios.models import Certificado
         from usuarios.utils import render_and_save_html_certificate, create_user_dirs
@@ -327,6 +348,10 @@ def finalizar_evento(request, evento_id):
                 pass
         logging.error(f'Erro ao gerar certificados na finalização do evento {evento.id}: bibliotecas ausentes')
         messages.error(request, 'Evento finalizado, mas falta biblioteca para geração; placeholders/HTML criados quando possível.')
+        try:
+            log_audit(request=request, usuario=usuario, action='generate_certificates_fallback', object_type='Evento', object_id=evento.id, description='Certificados gerados via fallback na finalização')
+        except Exception:
+            pass
 
 
     return redirect('gerenciar_evento', evento_id=evento.id)
@@ -390,6 +415,10 @@ def pegar_certificado(request, evento_id):
 
     # Se arquivo já existe no disco, abre direto
     if cert and cert.pdf and os.path.exists(cert.pdf.path):
+        try:
+            log_audit(request=request, usuario=usuario, action='download_certificate', object_type='Certificado', object_id=cert.id, description=f'Certificado baixado (existente) para evento {evento.id}')
+        except Exception:
+            pass
         return FileResponse(open(cert.pdf.path, 'rb'), content_type='application/pdf')
 
     # -------------------------------------------------------------------
@@ -400,6 +429,10 @@ def pegar_certificado(request, evento_id):
         generate_certificates_for_event(evento.id)
         cert = Certificado.objects.filter(usuario=usuario, evento=evento).first()
         if cert and cert.pdf and os.path.exists(cert.pdf.path):
+            try:
+                log_audit(request=request, usuario=usuario, action='generate_certificate', object_type='Certificado', object_id=cert.id, description=f'Certificado gerado via generator para evento {evento.id}')
+            except Exception:
+                pass
             return FileResponse(open(cert.pdf.path, 'rb'), content_type='application/pdf')
 
     except Exception:
@@ -420,6 +453,10 @@ def pegar_certificado(request, evento_id):
         if os.path.exists(pdf_path):
             cert.pdf.name = os.path.relpath(pdf_path, settings.MEDIA_ROOT)
             cert.save(update_fields=['pdf'])
+            try:
+                log_audit(request=request, usuario=usuario, action='generate_certificate', object_type='Certificado', object_id=cert.id, description=f'Certificado gerado por fallback para evento {evento.id}')
+            except Exception:
+                pass
             return FileResponse(open(pdf_path, 'rb'), content_type='application/pdf')
 
     # -------------------------------------------------------------------
@@ -540,6 +577,10 @@ def galeria_evento(request, evento_id):
                 
                 upload_ok = True
                 messages.success(request, 'Foto adicionada com sucesso!')
+                try:
+                    log_audit(request=request, usuario=usuario, action='upload_event_photo', object_type='Evento', object_id=evento.id, description=f'Foto enviada para galeria do evento {evento.id}: {file_obj.name}')
+                except Exception:
+                    pass
             else:
                 messages.error(request, 'Nenhuma foto foi enviada.')
 
@@ -553,6 +594,10 @@ def galeria_evento(request, evento_id):
                         os.remove(full_path)
                         delete_ok = True
                         messages.success(request, 'Foto apagada com sucesso!')
+                        try:
+                            log_audit(request=request, usuario=usuario, action='delete_event_photo', object_type='Evento', object_id=evento.id, description=f'Foto apagada: {foto_path}')
+                        except Exception:
+                            pass
                     except Exception as e:
                         messages.error(request, f'Erro ao apagar foto: {e}')
                 else:
@@ -607,6 +652,10 @@ def inscrever_evento(request, evento_id):
     inscr, created = InscricaoEvento.objects.get_or_create(inscrito=usuario, evento=evento)
     if created:
         messages.success(request, f'Inscrição no evento "{evento.titulo}" realizada com sucesso.')
+        try:
+            log_audit(request=request, usuario=usuario, action='create_inscription', object_type='InscricaoEvento', object_id=inscr.id, description=f'Inscrição criada no evento {evento.id}')
+        except Exception:
+            pass
     else:
         messages.info(request, f'Você já está inscrito no evento "{evento.titulo}".')
 
@@ -620,6 +669,10 @@ def cancelar_inscricao(request, evento_id):
     if inscr:
         inscr.delete()
         messages.success(request, f'Inscrição no evento "{evento.titulo}" cancelada.')
+        try:
+            log_audit(request=request, usuario=usuario, action='delete_inscription', object_type='InscricaoEvento', object_id=getattr(inscr, 'id', None), description=f'Inscrição cancelada no evento {evento.id}')
+        except Exception:
+            pass
     else:
         messages.info(request, 'Nenhuma inscrição encontrada para cancelar.')
     return redirect('lista_eventos')
@@ -629,7 +682,7 @@ def cancelar_inscricao(request, evento_id):
 # Debug JSON (somente staff)
 # -------------------------------------------------------------------
 @login_required
-def debug_eventos(request):
+def debug_eventos(request, evento_id=None):
     if not getattr(request.user, 'is_staff', False):
         return HttpResponseForbidden('Acesso negado.')
 
@@ -643,4 +696,67 @@ def debug_eventos(request):
             'inscritos': e.inscricaoevento_set.count(),
             'finalizado': e.finalizado
         })
+    try:
+        log_audit(request=request, django_user=request.user if getattr(request, 'user', None) and request.user.is_authenticated else None, action='api_query_events', object_type='Evento', description='Debug eventos JSON')
+    except Exception:
+        pass
     return JsonResponse({'eventos': debug_list})
+
+
+@login_required
+def auditoria(request):
+    """Tela para superusuários Django consultarem logs de auditoria por data/usuário."""
+    usuario = get_current_usuario(request)
+    # Acesso restrito: somente superusuários Django podem acessar
+    try:
+        if not (request.user and request.user.is_authenticated and request.user.is_superuser):
+            messages.error(request, 'Acesso negado: apenas superusuários podem consultar auditoria.')
+            return redirect('meus_eventos')
+    except Exception:
+        messages.error(request, 'Acesso negado: credenciais inválidas para auditoria.')
+        return redirect('meus_eventos')
+
+    from usuarios.models import AuditLog
+    from django.db.models import Q
+
+    qs = AuditLog.objects.all().order_by('-timestamp')
+    date_str = request.GET.get('date')
+    username = request.GET.get('username', '').strip()
+    
+    if date_str:
+        try:
+            from django.utils.dateparse import parse_date
+            d = parse_date(date_str)
+            if d:
+                qs = qs.filter(timestamp__date=d)
+        except Exception:
+            pass
+
+    if username:
+        try:
+            # Filter by Usuario.nome_usuario or django_user.username
+            qs = qs.filter(
+                Q(usuario__nome_usuario__icontains=username) | 
+                Q(django_user__username__icontains=username)
+            )
+        except Exception:
+            pass
+
+    # Get all unique usernames for autocomplete
+    all_usuarios = Usuario.objects.values_list('nome_usuario', flat=True).distinct()
+    all_django_users = User.objects.values_list('username', flat=True).distinct()
+    all_usernames = sorted(set(list(all_usuarios) + list(all_django_users)))
+
+    paginator = Paginator(qs, 50)
+    page = request.GET.get('page', 1)
+    try:
+        logs = paginator.page(page)
+    except Exception:
+        logs = paginator.page(1)
+
+    return render(request, 'eventos/auditoria.html', {
+        'logs': logs,
+        'usuario': usuario,
+        'nav_items': nav_items,
+        'all_usernames': all_usernames,
+    })

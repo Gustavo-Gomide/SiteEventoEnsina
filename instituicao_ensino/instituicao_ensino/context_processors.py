@@ -39,8 +39,16 @@ def global_nav(request):
         # Acesso rápido a 'Meus Eventos' para qualquer usuário autenticado
         nav_right.append({'label': 'Meus Eventos', 'url': reverse('meus_eventos')})
         nav_right.append({'label': 'Perfil', 'url': reverse('perfil')})
+        # somente superusuários veem a auditoria
         if usuario.tipo.tipo in ['Professor', 'Organizador', 'Funcionario']:
             nav_right.append({'label': 'Criar Evento', 'url': reverse('criar_evento')})
+
+        try:
+            if request.user and request.user.is_authenticated and getattr(request.user, 'is_superuser', False):
+                nav_right.append({'label': 'Auditoria', 'url': reverse('auditoria_eventos')})
+        except Exception:
+            # em caso de qualquer erro ao acessar request.user, não mostrar o link
+            pass
         nav_right.append({'label': 'Logout', 'url': reverse('logout')})
     else:
         nav_right.append({'label': 'Login', 'url': reverse('login')})

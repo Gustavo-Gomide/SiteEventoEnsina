@@ -265,3 +265,40 @@ class Certificado(models.Model):
 
     def __str__(self):
         return f'Certificado {self.nome or self.arquivo.name} de {self.usuario.nome_usuario}'
+
+
+# -----------------------------
+# Registro de Auditoria
+# -----------------------------
+class AuditLog(models.Model):
+    """Armazena ações críticas para rastreabilidade.
+
+    Campos:
+    - timestamp: quando ocorreu
+    - usuario: vínculo com o `usuarios.Usuario` quando aplicável
+    - django_user: vínculo com o `auth.User` quando aplicável
+    - action: string curta identificando a ação (ex: create_event)
+    - object_type: tipo do objeto afetado (ex: Evento, InscricaoEvento)
+    - object_id: id do objeto afetado (string para flexibilidade)
+    - description: descrição legível
+    - ip_address: IP do solicitante quando conhecido
+    - extra: campo JSON para dados adicionais
+    """
+    timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
+    usuario = models.ForeignKey('usuarios.Usuario', on_delete=models.SET_NULL, null=True, blank=True)
+    django_user = models.ForeignKey(
+        'auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='audit_logs'
+    )
+    action = models.CharField(max_length=100)
+    object_type = models.CharField(max_length=100, blank=True, null=True)
+    object_id = models.CharField(max_length=100, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    ip_address = models.CharField(max_length=45, blank=True, null=True)
+    extra = models.JSONField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        who = self.usuario.nome_usuario if self.usuario else (self.django_user.username if self.django_user else 'sistema')
+        return f"[{self.timestamp}] {who} - {self.action} {self.object_type or ''} {self.object_id or ''}"
