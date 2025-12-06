@@ -15,7 +15,7 @@ Important notes:
 
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CadastroUsuarioForm, LoginForm, PerfilForm, UsuarioEditForm
-from .models import Usuario, Perfil, Certificado, Instituicao, TipoUsuario, DDD
+from .models import Usuario, Perfil, Certificado, Instituicao, TipoUsuario
 from instituicao_ensino.views import nav_items
 from django.contrib import messages
 from django.http import HttpResponseForbidden, HttpResponse
@@ -100,8 +100,15 @@ def get_current_usuario(request):
                     from .utils import create_user_dirs
                     tipo, _ = TipoUsuario.objects.get_or_create(tipo='Aluno')
                     inst = None
-                    ddd = None
-                    novo = Usuario.objects.create(nome=request.user.get_full_name() or request.user.username, tipo=tipo, instituicao=inst, ddd=ddd, telefone='', nome_usuario=request.user.username, email=request.user.email, user=request.user)
+                    novo = Usuario.objects.create(
+                        nome=request.user.get_full_name() or request.user.username,
+                        tipo=tipo,
+                        instituicao=inst,
+                        telefone='',
+                        nome_usuario=request.user.username,
+                        email=request.user.email,
+                        user=request.user,
+                    )
                     try:
                         create_user_dirs(novo)
                     except Exception:
@@ -203,9 +210,17 @@ def perfil(request):
             for e in errors:
                 messages.error(request, f'Erro no campo do perfil "{field}": {e}')
     
-    telefone = usuario.telefone.split(usuario.ddd.codigo)[-1]
+    # extrai apenas os dígitos do telefone e isola o número local (sem país/DDD)
+    import re as _re
+    tel_digits = _re.sub(r'\D', '', usuario.telefone or '')
+    # pega sempre os últimos 11 dígitos (DDD + número local) e então o último 9 dígitos
+    if len(tel_digits) >= 11:
+        core = tel_digits[-11:]
+    else:
+        core = tel_digits
+    local = core[-9:]
 
-    return render(request, 'perfil.html', {'usuario': usuario, 'uform': uform, 'pform': pform, 'nav_items': nav_items, 'telefone': telefone})
+    return render(request, 'perfil.html', {'usuario': usuario, 'uform': uform, 'pform': pform, 'nav_items': nav_items, 'telefone': local})
 
 
 

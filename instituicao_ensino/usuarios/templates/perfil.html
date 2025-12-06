@@ -43,56 +43,87 @@
                     {% csrf_token %}
                     <!-- Nome -->
                     <p>
+                        {% if uform.nome.errors %}
+                            <div class="field-error">
+                                <strong>Erro:</strong>
+                                <ul>
+                                    {% for e in uform.nome.errors %}
+                                        <li>{{ e }}</li>
+                                    {% endfor %}
+                                </ul>
+                                <div class="field-example">Exemplo: João da Silva</div>
+                            </div>
+                        {% endif %}
                         <label for="{{ uform.nome.id_for_label }}">Nome</label>
                         {{ uform.nome }}
-                        {% if uform.nome.errors %}
-                            <span class="erro">{{ uform.nome.errors }}</span>
-                        {% endif %}
                     </p>
 
                     <!-- Nome de usuário -->
                     <p>
+                        {% if uform.nome_usuario.errors %}
+                            <div class="field-error">
+                                <strong>Erro:</strong>
+                                <ul>
+                                    {% for e in uform.nome_usuario.errors %}
+                                        <li>{{ e }}</li>
+                                    {% endfor %}
+                                </ul>
+                                <div class="field-example">Exemplo: exemplo_usuario</div>
+                            </div>
+                        {% endif %}
                         <label for="{{ uform.nome_usuario.id_for_label }}">Usuário</label>
                         {{ uform.nome_usuario }}
-                        {% if uform.nome_usuario.errors %}
-                            <span class="erro">{{ uform.nome_usuario.errors }}</span>
-                        {% endif %}
                     </p>
 
-                    <!-- DDD e Telefone lado a lado -->
-                    <div class="telefone-group">
-                        <div class="ddd-container">
-                            <label for="{{ uform.ddd.id_for_label }}" class="ddd-label">DDD</label>
-                            {{ uform.ddd }}
-                            {% if uform.ddd.errors %}
-                                <span class="erro">{{ uform.ddd.errors }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="telefone-main-container">
-                            <label for="{{ uform.telefone.id_for_label }}" class="telefone-label">Telefone</label>
-                            {{ uform.telefone }}
-                            {% if uform.telefone.errors %}
-                                <span class="erro">{{ uform.telefone.errors }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
+                    <!-- Telefone (DDD + número) -->
+                    <p>
+                        {% if uform.telefone.errors %}
+                            <div class="field-error">
+                                <strong>Erro:</strong>
+                                <ul>
+                                    {% for e in uform.telefone.errors %}
+                                        <li>{{ e }}</li>
+                                    {% endfor %}
+                                </ul>
+                                <div class="field-example">Exemplo: (11) 99613-5479</div>
+                            </div>
+                        {% endif %}
+                        <label for="{{ uform.telefone.id_for_label }}">Telefone (DDD + número)</label>
+                        {{ uform.telefone }}
+                    </p>
 
                     <!-- E-mail -->
                     <p>
-                        <label for="{{ uform.email.id_for_label }}">E-mail (opcional)</label>
-                        {{ uform.email }}
                         {% if uform.email.errors %}
-                            <span class="erro">{{ uform.email.errors }}</span>
+                            <div class="field-error">
+                                <strong>Erro:</strong>
+                                <ul>
+                                    {% for e in uform.email.errors %}
+                                        <li>{{ e }}</li>
+                                    {% endfor %}
+                                </ul>
+                                <div class="field-example">Exemplo: voce@exemplo.com</div>
+                            </div>
                         {% endif %}
+                        <label for="{{ uform.email.id_for_label }}">E-mail</label>
+                        {{ uform.email }}
                     </p>
 
                     <!-- Instituição -->
                     <p>
+                        {% if uform.instituicao.errors %}
+                            <div class="field-error">
+                                <strong>Erro:</strong>
+                                <ul>
+                                    {% for e in uform.instituicao.errors %}
+                                        <li>{{ e }}</li>
+                                    {% endfor %}
+                                </ul>
+                                <div class="field-example">Exemplo: Universidade Exemplo</div>
+                            </div>
+                        {% endif %}
                         <label for="{{ uform.instituicao.id_for_label }}">Instituição</label>
                         {{ uform.instituicao }}
-                        {% if uform.instituicao.errors %}
-                            <span class="erro">{{ uform.instituicao.errors }}</span>
-                        {% endif %}
                     </p>
 
                     <!-- Senha com toggle -->
@@ -114,11 +145,19 @@
 
                     <!-- Biografia -->
                     <p>
+                        {% if pform.biografia.errors %}
+                            <div class="field-error">
+                                <strong>Erro:</strong>
+                                <ul>
+                                    {% for e in pform.biografia.errors %}
+                                        <li>{{ e }}</li>
+                                    {% endfor %}
+                                </ul>
+                                <div class="field-example">Exemplo: Sou professor de matemática...</div>
+                            </div>
+                        {% endif %}
                         <label for="{{ pform.biografia.id_for_label }}">Biografia</label>
                         {{ pform.biografia }}
-                        {% if pform.biografia.errors %}
-                            <span class="erro">{{ pform.biografia.errors }}</span>
-                        {% endif %}
                     </p>
 
                     <!-- Upload de foto moderno -->
@@ -173,4 +212,5 @@
 {% block extra_js %}
 <script src="{% static 'scripts/senha.js' %}"></script>
 <script src="{% static 'scripts/upload.js' %}"></script>
+<script src="{% static 'scripts/telefone_mask.js' %}"></script>
 {% endblock %}

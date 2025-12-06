@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from .models import Usuario, DDD, Perfil, Certificado
+from .models import Usuario, Perfil, Certificado, Instituicao
 import re
 
 
@@ -16,22 +16,41 @@ class CadastroUsuarioForm(forms.ModelForm):
     - Sincroniza senha criptografada com o User.
     """
     senha = forms.CharField(widget=forms.PasswordInput)
-
-    # Spinner para selecionar DDD
-    ddd = forms.ModelChoiceField(
-        queryset=DDD.objects.all(),
-        empty_label="DDD",
-        widget=forms.Select(attrs={'class': 'form-select'})
+    # Tornar email e telefone obrigatórios
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Ex: voce@exemplo.com',
+            'class': 'form-control',
+            'maxlength': '254',
+        })
     )
 
-    # Campo telefone, mostra apenas o número local
+    instituicao = forms.ModelChoiceField(
+        queryset=Instituicao.objects.all(),
+        required=True,
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        }),
+        empty_label='Selecione uma instituição'
+    )
+
+    # Campo único para DDD + número (ex: '(11) 99613-5479')
     telefone = forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': 'EX: 996135479', 'class': 'form-control'})
+        required=True,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Ex: (11) 99613-5479',
+            'class': 'form-control telefone-mask',
+            'maxlength': '15',
+            'inputmode': 'numeric',
+            'pattern': r'\(\d{2}\) \d{5}-\d{4}',
+            'title': 'Formato esperado: (AA) NNNNN-NNNN'
+        })
     )
 
     class Meta:
         model = Usuario
-        fields = ['nome', 'tipo', 'instituicao', 'nome_usuario', 'email', 'senha', 'ddd', 'telefone']
+        fields = ['nome', 'tipo', 'instituicao', 'nome_usuario', 'email', 'senha', 'telefone']
 
     def save(self, commit=True):
         """
@@ -54,6 +73,12 @@ class CadastroUsuarioForm(forms.ModelForm):
         # Sincroniza a senha criptografada no campo legacy
         usuario.senha = usuario.user.password
 
+        # Salva o telefone já normalizado pelo `clean_telefone()` (form retorna o formato internacional)
+        tel_input = self.cleaned_data.get('telefone')
+        if tel_input:
+            # o modelo irá normalizar novamente, mas guardamos o valor completo aqui
+            usuario.telefone = tel_input
+
         # Salva o usuário e cria diretórios de mídia
         if commit:
             usuario.save()
@@ -64,6 +89,32 @@ class CadastroUsuarioForm(forms.ModelForm):
                 pass  # não falha se não conseguir criar diretórios
 
         return usuario
+
+    def clean_telefone(self):
+        tel = self.cleaned_data.get('telefone')
+        if not tel:
+            raise ValidationError('Telefone obrigatório. Informe no formato (AA) NNNNN-NNNN ou 11-13 dígitos.')
+        # aceita formatos:
+        #  - +CC (AA) NNNNN-NNNN
+        #  - (AA) NNNNN-NNNN
+        #  - 11..13 dígitos (opcional código do país + DDD + número)
+        intl_pattern = re.compile(r"^\+\d{1,3} \(\d{2}\) \d{5}-\d{4}$")
+        local_pattern = re.compile(r"^\(\d{2}\) \d{5}-\d{4}$")
+        if intl_pattern.fullmatch(tel.strip()):
+            return tel.strip()
+        if local_pattern.fullmatch(tel.strip()):
+            # assume país padrão +55 quando não informado
+            return f"+55 {tel.strip()}"
+
+        digits = re.sub(r'\D', '', tel)
+        if len(digits) >= 11 and len(digits) <= 13:
+            country = digits[:-11] if len(digits) > 11 else '55'
+            core = digits[-11:]
+            area = core[:2]
+            local = core[2:]
+            return f"+{country} ({area}) {local[:5]}-{local[5:]}"
+
+        raise ValidationError('Telefone inválido. Formato exigido: +CC (AA) NNNNN-NNNN, (AA) NNNNN-NNNN ou 11-13 dígitos numéricos.')
 
 
 # ============================================================
@@ -119,15 +170,36 @@ class PerfilForm(forms.ModelForm):
 # FORMULÁRIO DE EDIÇÃO DE USUÁRIO
 # ============================================================
 class UsuarioEditForm(forms.ModelForm):
-    ddd = forms.ModelChoiceField(
-        queryset=DDD.objects.all(),
-        required=False,
-        empty_label="DDD",
-        widget=forms.Select(attrs={'class': 'form-select'})
+    # Tornar email e telefone obrigatórios no formulário de edição
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Ex: voce@exemplo.com',
+            'class': 'form-control',
+            'maxlength': '254',
+        })
     )
+    
+    instituicao = forms.ModelChoiceField(
+        queryset=Instituicao.objects.all(),
+        required=True,
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        }),
+        empty_label='Selecione uma instituição'
+    )
+
+    # Campo único para DDD + número (ex: '(11) 99613-5479' ou '11996135479')
     telefone = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Ex: 996524046', 'class': 'form-control'})
+        required=True,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Ex: (11) 99613-5479 ou 11996135479',
+            'class': 'form-control telefone-mask',
+            'maxlength': '15',
+            'inputmode': 'numeric',
+            'pattern': r'\(\d{2}\) \d{5}-\d{4}',
+            'title': 'Formato esperado: (AA) NNNNN-NNNN'
+        })
     )
     nova_senha = forms.CharField(
         required=False,
@@ -138,17 +210,29 @@ class UsuarioEditForm(forms.ModelForm):
     class Meta:
         model = Usuario
         # remove 'senha' daqui, só campos de dados normais
-        fields = ['nome', 'nome_usuario', 'email', 'instituicao', 'ddd', 'telefone']
+        fields = ['nome', 'nome_usuario', 'email', 'instituicao', 'telefone']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.telefone:
             tel = self.instance.telefone
-            if tel.startswith('+') and self.instance.ddd:
-                ddd_str = self.instance.ddd.codigo
-                self.initial['telefone'] = tel.replace(ddd_str, '', 1)
+            # já armazenamos o telefone no formato +CC (AA) NNNNN-NNNN
+            # Ao editar no perfil, mostramos apenas (AA) NNNNN-NNNN (sem +CC)
+            tel = tel.strip()
+            m = re.match(r'^\+\d{1,3}\s*(\(\d{2}\)\s*\d{5}-\d{4})$', tel)
+            if m:
+                self.initial['telefone'] = m.group(1)
             else:
-                self.initial['telefone'] = tel
+                # se não bater com o padrão internacional, tenta extrair a parte local
+                digits = re.sub(r'\D', '', tel)
+                if len(digits) >= 11:
+                    core = digits[-11:]
+                    area = core[:2]
+                    local = core[2:]
+                    self.initial['telefone'] = f"({area}) {local[:5]}-{local[5:]}"
+                else:
+                    # fallback: exibe o valor como está
+                    self.initial['telefone'] = tel
 
     def clean_nome_usuario(self):
         nome_usuario = self.cleaned_data['nome_usuario']
@@ -166,9 +250,28 @@ class UsuarioEditForm(forms.ModelForm):
             usuario.user.set_password(nova_senha)
             usuario.user.save()
             usuario.senha = usuario.user.password
+        # Salva o telefone completo (clean_telefone retorna formato internacional)
+        tel_input = self.cleaned_data.get('telefone')
+        if tel_input:
+            usuario.telefone = tel_input
+
         if commit:
             usuario.save()
         return usuario
+
+    def clean_telefone(self):
+        tel = self.cleaned_data.get('telefone')
+        if not tel:
+            raise ValidationError('Telefone obrigatório. Informe no formato (AA) NNNNN-NNNN ou 11-13 dígitos.')
+        pattern = re.compile(r"\(\d{2}\) \d{5}-\d{4}")
+        if pattern.fullmatch(tel.strip()):
+            return tel.strip()
+        digits = re.sub(r'\D', '', tel)
+        if len(digits) == 11:
+            area = digits[:2]
+            local = digits[2:]
+            return f"({area}) {local[:5]}-{local[5:]}"
+        raise ValidationError('Telefone inválido. Formato exigido: (AA) NNNNN-NNNN ou somente 11 dígitos numéricos.')
 
 # ============================================================
 # FORMULÁRIO DE UPLOAD DE CERTIFICADO

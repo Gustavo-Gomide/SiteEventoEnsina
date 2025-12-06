@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TipoUsuario, Instituicao, Usuario, Perfil, DDD
+from .models import TipoUsuario, Instituicao, Usuario, Perfil
 
 # Register your models here.
 
@@ -7,7 +7,6 @@ admin.site.register(TipoUsuario)
 admin.site.register(Instituicao)
 admin.site.register(Usuario)
 admin.site.register(Perfil)
-admin.site.register(DDD)
 
 from .models import AuditLog
 

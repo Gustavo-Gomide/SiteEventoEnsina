@@ -19,22 +19,20 @@ decisions:
 import re
 import os
 import shutil
+import hashlib
+import binascii
 from django.db import models
 from django.core.exceptions import ValidationError
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import check_password
 from django.conf import settings
 from .utils import create_user_dirs, resize_image
 
 
 # -----------------------------
-# Tabela de DDD
+# Nota sobre DDD
 # -----------------------------
-class DDD(models.Model):
-    codigo = models.CharField(max_length=5)  # Ex: "55"
-    pais = models.CharField(max_length=50, default='Brasil')
-
-    def __str__(self):
-        return f"{self.codigo} ({self.pais})"
+# A aplicação não armazena mais o DDD em campo separado. O campo `telefone`
+# guarda o número completo em formato internacional: +CC (DD) NNNNN-NNNN.
 
 
 # -----------------------------
@@ -56,7 +54,7 @@ class Instituicao(models.Model):
     estado = models.CharField(max_length=50, blank=True, null=True)
     pais = models.CharField(max_length=50, default='Brasil')
     email = models.EmailField(blank=True, null=True)
-    telefone = models.CharField(max_length=20, blank=True, null=True)
+    telefone = models.CharField(max_length=25, blank=True, null=True)
 
     def __str__(self):
         return self.nome
@@ -67,8 +65,8 @@ class Instituicao(models.Model):
 # -----------------------------
 class Usuario(models.Model):
     nome = models.CharField(max_length=150)
-    ddd = models.ForeignKey(DDD, on_delete=models.SET_NULL, null=True, blank=True)
-    telefone = models.CharField(max_length=15, blank=True, null=True)
+    # armazenamos o telefone completo em formato internacional: +CC (AA) NNNNN-NNNN
+    telefone = models.CharField(max_length=32, blank=True, null=True)
     instituicao = models.ForeignKey(Instituicao, on_delete=models.SET_NULL, null=True, blank=True)
     tipo = models.ForeignKey(TipoUsuario, on_delete=models.CASCADE)
     nome_usuario = models.CharField(max_length=50, unique=True)
@@ -84,27 +82,45 @@ class Usuario(models.Model):
 
         if self.telefone:
             numero = re.sub(r'\D', '', self.telefone)
-            ddd_num = self.ddd.codigo if self.ddd else ''
-            # remove DDD do começo antes de validar
-            if numero.startswith(ddd_num):
-                numero_local = numero[len(ddd_num):]
-            else:
-                numero_local = numero
-
-            if not re.match(r'^\d{8,9}$', numero_local):
-                raise ValidationError("Telefone inválido. Exemplo aceito: 996135479")
+            # Esperamos ao menos 11 dígitos (DDD 2 + número local 9). Pode haver
+            # prefixo de país (1-3 dígitos) antes dos 11 dígitos.
+            if len(numero) < 11:
+                raise ValidationError("Telefone inválido. Informe pelo menos 11 dígitos: DDD + número local")
+            if len(numero) > 13:
+                raise ValidationError("Telefone inválido. Máximo esperado: código do país (até 3 dígitos) + DDD + número local")
 
     def save(self, *args, **kwargs):
-        if self.senha and not self.senha.startswith('pbkdf2_'):
-            self.senha = make_password(self.senha)
+        # Hash de senha: usamos PBKDF2 via hashlib para reforçar criptografia.
+        # Mantemos compatibilidade com hashes do Django (prefixo 'pbkdf2_').
+        if self.senha and not (self.senha.startswith('pbkdf2_') or self.senha.startswith('pbkdf2_custom$')):
+            # implementação PBKDF2-SHA256 (iterações elevadas)
+            try:
+                iterations = 200000
+                salt = binascii.hexlify(os.urandom(16)).decode()
+                dk = hashlib.pbkdf2_hmac('sha256', self.senha.encode(), salt.encode(), iterations)
+                hashed = binascii.hexlify(dk).decode()
+                # formato: pbkdf2_custom$sha256$<iterations>$<salt>$<hash>
+                self.senha = f"pbkdf2_custom$sha256${iterations}${salt}${hashed}"
+            except Exception:
+                pass
 
-        if self.ddd and self.telefone:
+        # Normaliza o telefone para o padrão internacional +CC (DD) NNNNN-NNNN
+        if self.telefone:
             numero = re.sub(r'\D', '', self.telefone)
-            ddd_num = self.ddd.codigo.lstrip('+')
-            if not self.telefone.startswith('+'):
-                self.telefone = f"+{ddd_num}{numero}"
+            # separa código do país (tudo antes dos últimos 11 dígitos)
+            if len(numero) > 11:
+                country = numero[:-11]
             else:
-                self.telefone = f"+{numero}"
+                country = '55'  # padrão Brasil quando país não informado
+
+            core = numero[-11:]
+            area = core[:2]
+            local = core[2:]
+
+            if len(local) == 9 and area:
+                part1 = local[:5]
+                part2 = local[5:]
+                self.telefone = f"+{country} ({area}) {part1}-{part2}"
 
         nome_clean = str(self.nome_usuario).replace(' ', '_')
         instituicao = self.instituicao.nome if self.instituicao else 'sem_instituicao'
@@ -162,6 +178,16 @@ class Usuario(models.Model):
         super().save(*args, **kwargs)
 
     def check_senha(self, senha):
+        # Suporta nosso formato customizado `pbkdf2_custom$sha256$<iter>$<salt>$<hash>`.
+        if self.senha and self.senha.startswith('pbkdf2_custom$'):
+            try:
+                _prefix, alg, iterations, salt, stored_hash = self.senha.split('$')
+                iterations = int(iterations)
+                dk = hashlib.pbkdf2_hmac('sha256', senha.encode(), salt.encode(), iterations)
+                return binascii.hexlify(dk).decode() == stored_hash
+            except Exception:
+                return False
+
         return check_password(senha, self.senha)
 
     def __str__(self):

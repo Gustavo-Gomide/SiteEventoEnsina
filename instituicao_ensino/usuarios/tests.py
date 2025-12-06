@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import Usuario, TipoUsuario, Instituicao, DDD, Certificado
+from .models import Usuario, TipoUsuario, Instituicao, Certificado
 from eventos.models import Evento, TipoEvento, InscricaoEvento
 from django.utils import timezone
 
@@ -10,9 +10,9 @@ class CertificateGenerationTests(TestCase):
         tipo_aluno, _ = TipoUsuario.objects.get_or_create(tipo='Aluno')
         tipo_ev, _ = TipoEvento.objects.get_or_create(tipo='Palestra')
         inst, _ = Instituicao.objects.get_or_create(nome='Uni Teste')
-        ddd, _ = DDD.objects.get_or_create(codigo='+55')
-        self.usuario = Usuario.objects.create(nome='Aluno Teste', tipo=tipo_aluno, instituicao=inst, ddd=ddd, telefone='999999999', nome_usuario='aluno_teste')
-        self.organizador = Usuario.objects.create(nome='Prof Teste', tipo=TipoUsuario.objects.get_or_create(tipo='Professor')[0], instituicao=inst, ddd=ddd, telefone='999999999', nome_usuario='prof_teste')
+        # armazenamos apenas o DDD local como string (ex: '11')
+        self.usuario = Usuario.objects.create(nome='Aluno Teste', tipo=tipo_aluno, instituicao=inst, ddd='11', telefone='999999999', nome_usuario='aluno_teste')
+        self.organizador = Usuario.objects.create(nome='Prof Teste', tipo=TipoUsuario.objects.get_or_create(tipo='Professor')[0], instituicao=inst, ddd='11', telefone='999999999', nome_usuario='prof_teste')
         self.evento = Evento.objects.create(titulo='Evento Teste', tipo=tipo_ev, modalidade='online', data_inicio=timezone.now().date(), data_fim=timezone.now().date(), horario=timezone.now().time(), criador=self.organizador, finalizado=True)
         InscricaoEvento.objects.create(evento=self.evento, aluno=self.usuario, is_validated=True)
 

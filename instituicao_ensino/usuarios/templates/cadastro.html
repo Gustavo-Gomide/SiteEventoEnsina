@@ -16,66 +16,105 @@
 
         <!-- Nome -->
         <p>
+            {% if form.nome.errors %}
+                <div class="field-error">
+                    <strong>Erro:</strong>
+                    <ul>
+                        {% for e in form.nome.errors %}
+                            <li>{{ e }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="field-example">Exemplo: João da Silva</div>
+                </div>
+            {% endif %}
             <label for="{{ form.nome.id_for_label }}">Nome</label>
             {{ form.nome }}
-            {% if form.nome.errors %}
-                <span class="erro">{{ form.nome.errors }}</span>
-            {% endif %}
         </p>
 
-        <!-- DDD e Telefone lado a lado COM ALINHAMENTO CORRETO -->
-        <div class="telefone-group">
-            <div class="ddd-container">
-                <label for="{{ form.ddd.id_for_label }}" class="ddd-label">DDD</label>
-                {{ form.ddd }}
-                {% if form.ddd.errors %}
-                    <span class="erro">{{ form.ddd.errors }}</span>
-                {% endif %}
-            </div>
-            <div class="telefone-main-container">
-                <label for="{{ form.telefone.id_for_label }}" class="telefone-label">Telefone</label>
-                {{ form.telefone }}
-                {% if form.telefone.errors %}
-                    <span class="erro">{{ form.telefone.errors }}</span>
-                {% endif %}
-            </div>
-        </div>
+        <!-- Telefone (DDD + número) -->
+        <p>
+            {% if form.telefone.errors %}
+                <div class="field-error">
+                    <strong>Erro:</strong>
+                    <ul>
+                        {% for e in form.telefone.errors %}
+                            <li>{{ e }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="field-example">Exemplo: (11) 99613-5479</div>
+                </div>
+            {% endif %}
+            <label for="{{ form.telefone.id_for_label }}">Telefone (DDD + número)</label>
+            {{ form.telefone }}
+        </p>
 
         <!-- Resto do formulário permanece igual -->
         <!-- Tipo de usuário -->
         <p>
+            {% if form.tipo.errors %}
+                <div class="field-error">
+                    <strong>Erro:</strong>
+                    <ul>
+                        {% for e in form.tipo.errors %}
+                            <li>{{ e }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="field-example">Exemplo: Aluno</div>
+                </div>
+            {% endif %}
             <label for="{{ form.tipo.id_for_label }}">Tipo</label>
             {{ form.tipo }}
-            {% if form.tipo.errors %}
-                <span class="erro">{{ form.tipo.errors }}</span>
-            {% endif %}
         </p>
 
         <!-- Instituição -->
         <p>
+            {% if form.instituicao.errors %}
+                <div class="field-error">
+                    <strong>Erro:</strong>
+                    <ul>
+                        {% for e in form.instituicao.errors %}
+                            <li>{{ e }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="field-example">Exemplo: Universidade Exemplo</div>
+                </div>
+            {% endif %}
             <label for="{{ form.instituicao.id_for_label }}">Instituição</label>
             {{ form.instituicao }}
-            {% if form.instituicao.errors %}
-                <span class="erro">{{ form.instituicao.errors }}</span>
-            {% endif %}
         </p>
 
         <!-- Nome de usuário -->
         <p>
+            {% if form.nome_usuario.errors %}
+                <div class="field-error">
+                    <strong>Erro:</strong>
+                    <ul>
+                        {% for e in form.nome_usuario.errors %}
+                            <li>{{ e }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="field-example">Exemplo: exemplo_usuario</div>
+                </div>
+            {% endif %}
             <label for="{{ form.nome_usuario.id_for_label }}">Usuário</label>
             {{ form.nome_usuario }}
-            {% if form.nome_usuario.errors %}
-                <span class="erro">{{ form.nome_usuario.errors }}</span>
-            {% endif %}
         </p>
 
-        <!-- E-mail (opcional) -->
+        <!-- E-mail -->
         <p>
-            <label for="{{ form.email.id_for_label }}">E-mail (opcional)</label>
-            {{ form.email }}
             {% if form.email.errors %}
-                <span class="erro">{{ form.email.errors }}</span>
+                <div class="field-error">
+                    <strong>Erro:</strong>
+                    <ul>
+                        {% for e in form.email.errors %}
+                            <li>{{ e }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="field-example">Exemplo: voce@exemplo.com</div>
+                </div>
             {% endif %}
+            <label for="{{ form.email.id_for_label }}">E-mail</label>
+            {{ form.email }}
         </p>
 
         <!-- Senha com toggle -->
@@ -106,4 +145,5 @@
 
 {% block extra_js %}
 <script src="{% static 'scripts/senha.js' %}"></script>
+<script src="{% static 'scripts/telefone_mask.js' %}"></script>
 {% endblock %}
