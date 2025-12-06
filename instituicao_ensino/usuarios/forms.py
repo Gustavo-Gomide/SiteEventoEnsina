@@ -16,6 +16,7 @@ class CadastroUsuarioForm(forms.ModelForm):
     - Sincroniza senha criptografada com o User.
     """
     senha = forms.CharField(widget=forms.PasswordInput)
+    senha_confirm = forms.CharField(widget=forms.PasswordInput, label='Confirme a senha')
     # Tornar email e telefone obrigatórios
     email = forms.EmailField(
         required=True,
@@ -89,6 +90,34 @@ class CadastroUsuarioForm(forms.ModelForm):
                 pass  # não falha se não conseguir criar diretórios
 
         return usuario
+
+    def clean(self):
+        cleaned = super().clean()
+        senha = cleaned.get('senha')
+        senha_confirm = cleaned.get('senha_confirm')
+
+        # check presence
+        if not senha:
+            raise ValidationError({'senha': 'Senha obrigatória.'})
+
+        if senha_confirm is None:
+            raise ValidationError({'senha_confirm': 'Confirmação de senha obrigatória.'})
+
+        # check match
+        if senha != senha_confirm:
+            raise ValidationError({'senha_confirm': 'As senhas informadas não coincidem.'})
+
+        # password complexity: min 8 chars, letters, digits and special char
+        if len(senha) < 8:
+            raise ValidationError({'senha': 'A senha deve ter no mínimo 8 caracteres.'})
+        if not re.search(r'[A-Za-z]', senha):
+            raise ValidationError({'senha': 'A senha deve conter ao menos uma letra.'})
+        if not re.search(r'\d', senha):
+            raise ValidationError({'senha': 'A senha deve conter ao menos um número.'})
+        if not re.search(r'[^A-Za-z0-9]', senha):
+            raise ValidationError({'senha': 'A senha deve conter ao menos um caractere especial.'})
+
+        return cleaned
 
     def clean_telefone(self):
         tel = self.cleaned_data.get('telefone')
@@ -272,6 +301,21 @@ class UsuarioEditForm(forms.ModelForm):
             local = digits[2:]
             return f"({area}) {local[:5]}-{local[5:]}"
         raise ValidationError('Telefone inválido. Formato exigido: (AA) NNNNN-NNNN ou somente 11 dígitos numéricos.')
+
+    def clean_nova_senha(self):
+        nova = self.cleaned_data.get('nova_senha')
+        if not nova:
+            return nova
+        # enforce complexity: min 8 chars, letter, digit, special
+        if len(nova) < 8:
+            raise ValidationError('A nova senha deve ter no mínimo 8 caracteres.')
+        if not re.search(r'[A-Za-z]', nova):
+            raise ValidationError('A nova senha deve conter ao menos uma letra.')
+        if not re.search(r'\d', nova):
+            raise ValidationError('A nova senha deve conter ao menos um número.')
+        if not re.search(r'[^A-Za-z0-9]', nova):
+            raise ValidationError('A nova senha deve conter ao menos um caractere especial.')
+        return nova
 
 # ============================================================
 # FORMULÁRIO DE UPLOAD DE CERTIFICADO

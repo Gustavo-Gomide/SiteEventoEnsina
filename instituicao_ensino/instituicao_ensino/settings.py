@@ -43,7 +43,7 @@ except Exception:
 SECRET_KEY = "django-insecure-@iaeholp9_yn05zfxj%kluqxz!&-1kbf#gd0_s5g-v-c8#d3-r"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 

@@ -134,6 +134,26 @@
             {% endif %}
         </p>
 
+        <!-- Instruções fixas de senha -->
+        <div class="password-requirements" aria-live="polite">
+            <strong>Requisitos de senha:</strong>
+            <ul>
+                <li>Mínimo de 8 caracteres</li>
+                <li>Ao menos uma letra (a–z ou A–Z)</li>
+                <li>Ao menos um número (0–9)</li>
+                <li>Ao menos um caractere especial (ex: !@#$%^&*)</li>
+            </ul>
+        </div>
+
+        <!-- Confirmação de senha -->
+        <p>
+            <label for="{{ form.senha_confirm.id_for_label }}">Confirme a senha</label>
+            {{ form.senha_confirm }}
+            {% if form.senha_confirm.errors %}
+                <span class="erro">{{ form.senha_confirm.errors }}</span>
+            {% endif %}
+        </p>
+
         <button type="submit">Cadastrar</button>
     </form>
 
