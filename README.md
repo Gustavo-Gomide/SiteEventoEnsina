@@ -10,7 +10,7 @@ O projeto foi estruturado para ser didático e modular, facilitando manutenção
 ### 1. Clonar o Repositório
 
 ```bash
-git clone https://github.com/SEU_USUARIO/SiteEventoEnsina.git
+git clone https://github.com/Gustavo-Gomide/SiteEventoEnsina.git
 cd SiteEventoEnsina/instituicao_ensino
 ```
 
@@ -95,7 +95,7 @@ segurança) e para orientar execução e testes locais.
 1. Clone o repositório e entre na pasta do projeto:
 
 ```powershell
-git clone https://github.com/SEU_USUARIO/SiteEventoEnsina.git
+git clone https://github.com/Gustavo-Gomide/SiteEventoEnsina.git
 cd SiteEventoEnsina/instituicao_ensino
 ```
 
