@@ -30,6 +30,7 @@ urlpatterns = [
     path("", main, name='main'),
     path('usuarios/', include('usuarios.urls')),
     path('eventos/', include('eventos.urls')),
+    path('api/', include('eventos.urls_api')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
