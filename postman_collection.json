@@ -1,0 +1,110 @@
+{
+  "info": {
+    "_postman_id": "6f9a9c1a-0000-4a2b-9f5e-xxxxxxxxxxxx",
+    "name": "SiteEventoEnsina API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0",
+    "description": "Coleção para testar a API REST de eventos (token auth, listar eventos, inscrever)."
+  },
+  "item": [
+    {
+      "name": "1 - Obter token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "username", "value": "", "type": "text" },
+            { "key": "password", "value": "", "type": "text" }
+          ]
+        },
+        "url": "{{base_url}}/auth/token/",
+        "description": "Envie username e password como form data. Resposta: { \"token\": \"...\" }"
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Extrai token da resposta e salva em variável de ambiente 'token'",
+              "if (pm.response.code === 200) {",
+              "    try {",
+              "        var json = pm.response.json();",
+              "        if (json.token) { pm.environment.set('token', json.token); pm.test('token salvo', function(){pm.expect(json.token).to.be.a('string')}); }",
+              "        else { pm.test('token ausente', function(){pm.expect(json).to.have.property('token')}); }",
+              "    } catch (e) { pm.test('response json parse', function(){throw e}); }",
+              "} else { pm.test('status 200 esperado', function(){pm.expect(pm.response.code).to.eql(200)}); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - Listar eventos",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Token {{token}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/events/",
+        "description": "Lista eventos. Requer header Authorization: Token {{token}}"
+      },
+      "response": []
+    },
+    {
+      "name": "3 - Inscrever em evento",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Token {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"evento_id\": 1\n}",
+        "options": {
+          "raw": {
+            "language": "json"
+          }
+        }
+        },
+        "url": "{{base_url}}/events/register/",
+        "description": "Inscreve o usuário autenticado no evento (substituir evento_id no body)."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

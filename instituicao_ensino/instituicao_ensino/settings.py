@@ -86,9 +86,26 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'usuarios',
     'eventos',
+    'rest_framework',
+    'rest_framework.authtoken',
     'instituicao_ensino',
     'notifications',
 ]
+
+# Django REST Framework settings (API authentication + throttling)
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    # Throttle rates are referenced by scope names in custom throttles
+    'DEFAULT_THROTTLE_RATES': {
+        'event_list': '20/day',
+        'event_register': '50/day',
+    }
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
