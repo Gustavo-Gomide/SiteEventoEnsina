@@ -10,7 +10,7 @@ O projeto foi estruturado para ser didático e modular, facilitando manutenção
 ### 1. Clonar o Repositório
 
 ```bash
-git clone https://github.com/SEU_USUARIO/SiteEventoEnsina.git
+git clone https://github.com/Gustavo-Gomide/SiteEventoEnsina.git
 cd SiteEventoEnsina/instituicao_ensino
 ```
 
