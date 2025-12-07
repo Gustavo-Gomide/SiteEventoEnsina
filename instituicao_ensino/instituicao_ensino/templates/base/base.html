@@ -45,7 +45,7 @@
                         {% elif item.label == 'Perfil' %}
                             <a class="nav-link" href="{{ item.url }}">
                                 {% if item.foto and item.foto.name %}
-                                    <img src="{{ MEDIA_URL }}{{ item.foto.url }}" alt="Foto de Perfil" class="rounded-circle">
+                                    <img src="{{ item.foto.url }}" alt="Foto de Perfil" class="rounded-circle">
                                 {% else %}
                                     <img src="{% static 'images/unknown.png' %}" alt="Foto de Perfil" class="rounded-circle">
                                 {% endif %}
@@ -102,12 +102,12 @@
                 <div class="col-md-4 footer-section">
                     <h5>Contato</h5>
                     <div class="contact-info">
-                        <p><i class="fas fa-envelope"></i> contato@eventoensina.com</p>
-                        <p><i class="fas fa-phone"></i> (11) 99999-9999</p>
+                        <p><i class="fas fa-envelope"></i> <a href="mailto:eventoensina@gmail.com" target="_blank" rel="noopener noreferrer">eventoensina@gmail.com</a></p>
+                        <p><i class="fas fa-phone"></i> <a href="https://wa.me/5561999999999" target="_blank" rel="noopener noreferrer">+55 (61) 99999-9999</a></p>
                         <div class="social-links">
-                            <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-                            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                            <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                            <a href="https://www.facebook.com/" target="_blank" class="social-link"><i class="fab fa-facebook"></i></a>
+                            <a href="https://www.instagram.com/" target="_blank" class="social-link"><i class="fab fa-instagram"></i></a>
+                            <a href="https://www.linkedin.com/" target="_blank" class="social-link"><i class="fab fa-linkedin"></i></a>
                         </div>
                     </div>
                 </div>
@@ -119,8 +119,8 @@
                         <p>&copy; 2024 EventoEnsina. Todos os direitos reservados.</p>
                     </div>
                     <div class="col-md-6 text-md-end">
-                        <a href="#" class="footer-link">Política de Privacidade</a>
-                        <a href="#" class="footer-link">Termos de Uso</a>
+                        <a href="{% url 'politica_privacidade' %}" target="_blank" class="footer-link">Política de Privacidade</a>
+                        <a href="{% url 'termos_uso' %}" target="_blank" class="footer-link">Termos de Uso</a>
                     </div>
                 </div>
             </div>

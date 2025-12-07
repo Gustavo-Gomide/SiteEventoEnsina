@@ -333,7 +333,9 @@ def perfil(request):
         core = tel_digits
     local = core[-9:]
 
-    return render(request, 'perfil.html', {'usuario': usuario, 'uform': uform, 'pform': pform, 'nav_items': nav_items, 'telefone': local})
+    whatsapp_link = f"https://wa.me/{usuario.telefone.replace('+', '').replace('(', '').replace(')', '').replace(' ', '').replace('-', '')}" if usuario.telefone else None
+
+    return render(request, 'perfil.html', {'usuario': usuario, 'uform': uform, 'pform': pform, 'nav_items': nav_items, 'telefone': local, 'whatsapp_link': whatsapp_link})
 
 
 
@@ -372,11 +374,12 @@ def perfil_publico(request, nome_usuario):
         usuario = Usuario.objects.select_related('instituicao').get(nome_usuario=nome_usuario)
     except Usuario.DoesNotExist:
         raise Http404('Usuário não encontrado')
+    
+    whatsapp_link = f"https://wa.me/{usuario.telefone.replace('+', '').replace('(', '').replace(')', '').replace(' ', '').replace('-', '')}" if usuario.telefone else None
 
     # garantir que exista um objeto Perfil (para foto/biografia)
     perfil_obj, _ = Perfil.objects.get_or_create(usuario=usuario)
-    return render(request, 'perfil_publico.html', {'usuario': usuario, 'perfil': perfil_obj, 'nav_items': nav_items})
-
+    return render(request, 'perfil_publico.html', {'usuario': usuario, 'perfil': perfil_obj, 'nav_items': nav_items, 'whatsapp_link': whatsapp_link})
 
 def instituicao_publica(request, instituicao_id):
     """Página pública para instituições."""

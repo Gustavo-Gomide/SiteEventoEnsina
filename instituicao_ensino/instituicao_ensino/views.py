@@ -56,3 +56,9 @@ def main(request):
     }
 
     return render(request, 'main.html', context)
+
+def politica_privacidade(request):
+    return render(request, 'politica_privacidade.html', {'nav_items': nav_items})
+
+def termos_uso(request):
+    return render(request, 'termos_uso.html', {'nav_items': nav_items})

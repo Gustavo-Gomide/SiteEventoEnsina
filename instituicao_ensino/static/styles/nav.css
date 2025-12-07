@@ -286,6 +286,8 @@ nav img {
     }
 }
 
-nav img:hover {
-    filter: drop-shadow(0 0 4px rgb(207, 2, 2));
+nav a:hover {
+    img {
+        filter: drop-shadow(0 0 4px rgb(207, 2, 2));
+    }
 }

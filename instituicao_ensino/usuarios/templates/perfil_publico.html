@@ -41,7 +41,7 @@
           <p><strong>E-mail:</strong> <a href="mailto:{{ usuario.email }}">{{ usuario.email }}</a></p>
           {% endif %}
           {% if usuario.perfil.mostrar_telefone and usuario.telefone %}
-          <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
+          <p><strong>Telefone:</strong> <a href="{{ whatsapp_link }}" target="_blank" rel="noopener noreferrer">{{ usuario.telefone }}</a></p>
           {% endif %}
         </div>
       </div>

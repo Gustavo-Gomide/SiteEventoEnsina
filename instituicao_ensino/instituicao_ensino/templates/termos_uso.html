@@ -1,0 +1,115 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Termos de Uso{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/main.css' %}">
+<style>
+	.terms-page h2 { margin-top: 1rem; }
+	.terms-page h3 { margin-top: 2rem; }
+	.terms-page p, .terms-page li { line-height: 1.7; }
+	.terms-page .section { margin-bottom: 1.5rem; }
+	.terms-page .card { border: none; box-shadow: 0 0.5rem 1rem rgba(0,0,0,.1); }
+	.terms-page .badge { font-size: .85rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container terms-page mt-4">
+	<div class="card p-4">
+		<div class="d-flex align-items-center justify-content-between mb-3">
+			<h2 class="mb-0">Termos de Uso</h2>
+			<span class="badge bg-secondary">Versão acadêmica</span>
+		</div>
+
+		<div class="section">
+			<p>
+				Estes Termos de Uso regulam a utilização do site de eventos acadêmicos. O
+				projeto é voltado a fins educacionais e não está em produção comercial. Ao
+				utilizar o site, você concorda com os presentes termos.
+			</p>
+		</div>
+
+		<div class="section">
+			<h3>Cadastro e contas</h3>
+			<ul>
+				<li>Você é responsável por manter a confidencialidade de sua senha.</li>
+				<li>Não compartilhe credenciais; o uso é pessoal e intransferível.</li>
+				<li>Informações devem ser verdadeiras e atualizadas para emissão de certificados.</li>
+				<li>Contas podem ser suspensas em caso de uso indevido ou violação destes termos.</li>
+			</ul>
+		</div>
+
+		<div class="section">
+			<h3>Participação em eventos</h3>
+			<ul>
+				<li>Inscrições estão sujeitas a disponibilidade de vagas e critérios definidos pelo organizador.</li>
+				<li>A presença pode ser verificada por registro ou validação no sistema.</li>
+				<li>Cancelamentos e listas de espera seguem regras informadas na página do evento.</li>
+				<li>O organizador pode alterar data, local ou formato (presencial/online) conforme necessidade acadêmica.</li>
+			</ul>
+		</div>
+
+		<div class="section">
+			<h3>Certificados e comprovações</h3>
+			<ul>
+				<li>Certificados são emitidos conforme critérios do evento (presença, avaliação, etc.).</li>
+				<li>Dados do certificado (nome, carga horária, título do evento) vêm do seu perfil e do evento.</li>
+				<li>Eventuais correções devem ser solicitadas com documentação comprobatória.</li>
+			</ul>
+		</div>
+
+		<div class="section">
+			<h3>Conteúdos e direitos</h3>
+			<ul>
+				<li>Evite publicar materiais que violem direitos autorais, privacidade ou normas institucionais.</li>
+				<li>Imagens e textos enviados podem ser exibidos nas páginas públicas do evento.</li>
+				<li>O site não reivindica propriedade sobre seus conteúdos, mas pode armazená-los para fins acadêmicos.</li>
+			</ul>
+		</div>
+
+		<div class="section">
+			<h3>Conduta e uso permitido</h3>
+			<ul>
+				<li>Não tente burlar, explorar ou comprometer a segurança do sistema.</li>
+				<li>Respeite organizadores e participantes; mantenha comunicação cordial e acadêmica.</li>
+				<li>É proibido utilizar o site para fins comerciais, spam ou divulgação indevida.</li>
+			</ul>
+		</div>
+
+		<div class="section">
+			<h3>Disponibilidade e responsabilidades</h3>
+			<p>
+				Como projeto acadêmico, o site pode apresentar instabilidades, interrupções ou
+				atualizações frequentes. Não há garantias de disponibilidade contínua. O uso é
+				por sua conta e risco, sem geração de obrigações comerciais.
+			</p>
+		</div>
+
+		<div class="section">
+			<h3>Privacidade</h3>
+			<p>
+				O tratamento de dados pessoais segue a <a href="{% url 'politica_privacidade' %}">Política de Privacidade</a> do
+				projeto acadêmico, que detalha coletados, finalidades e direitos.
+			</p>
+		</div>
+
+		<div class="section">
+			<h3>Alterações destes termos</h3>
+			<p>
+				Podemos atualizar os termos para refletir melhorias e ajustes do projeto
+				acadêmico. Alterações relevantes serão comunicadas por avisos no site.
+			</p>
+		</div>
+
+		<div class="section">
+			<h3>Contato</h3>
+			<p>
+				Para dúvidas ou comunicações, utilize o e-mail institucional indicado nas
+				páginas de evento ou o canal de suporte fornecido aos participantes.
+			</p>
+		</div>
+	</div>
+</div>
+{% endblock %}

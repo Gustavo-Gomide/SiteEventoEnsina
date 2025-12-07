@@ -101,7 +101,7 @@
                                 /{{ evento_selecionado.quantidade_participantes }}
                                 {% endif %}
                             </p>
-                            <p class="card-text"><strong>Organizador:</strong> <a href="{% url 'perfil_publico' evento_selecionado.organizador %}">{{ evento_selecionado.criador }}</a></p>
+                            <p class="card-text"><strong>Organizador:</strong> <a href="{% url 'perfil_publico' evento_selecionado.organizador %}" target="_blank">{{ evento_selecionado.criador }}</a></p>
                             <p class="card-text"><strong>Horas:</strong> {{ evento_selecionado.horas }}</p>
 
                             {% if evento_selecionado.finalizado %}

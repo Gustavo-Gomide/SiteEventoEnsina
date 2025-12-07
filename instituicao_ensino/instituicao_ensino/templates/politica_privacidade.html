@@ -1,0 +1,133 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Política de Privacidade{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/main.css' %}">
+<style>
+	.policy-page h2 { margin-top: 1rem; }
+	.policy-page h3 { margin-top: 2rem; }
+	.policy-page p, .policy-page li { line-height: 1.7; }
+	.policy-page .section { margin-bottom: 1.5rem; }
+	.policy-page .card { border: none; box-shadow: 0 0.5rem 1rem rgba(0,0,0,.1); }
+	.policy-page .badge { font-size: .85rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container policy-page mt-4">
+	<div class="card p-4">
+		<div class="d-flex align-items-center justify-content-between mb-3">
+			<h2 class="mb-0">Política de Privacidade</h2>
+			<span class="badge bg-secondary">Versão acadêmica</span>
+		</div>
+
+		<div class="section">
+			<p>
+				Esta Política de Privacidade descreve como o site acadêmico coleta, utiliza e
+				protege dados pessoais no contexto de eventos educacionais. O projeto é
+				destinado a fins de estudo e não está em produção. Ainda assim, tratamos seus
+				dados com seriedade e buscamos boas práticas.
+			</p>
+		</div>
+
+		<div class="section">
+			<h3>Dados coletados</h3>
+			<ul>
+				<li>Identificação básica: nome completo, e-mail e, quando aplicável, instituição.</li>
+				<li>Dados de participação: inscrições, presença, emissão de certificados.</li>
+				<li>Conteúdos enviados: imagens, descrições de eventos, comentários.</li>
+				<li>Dados técnicos: endereço IP, logs de acesso, cookies estritamente necessários.</li>
+			</ul>
+		</div>
+
+		<div class="section">
+			<h3>Finalidades do uso</h3>
+			<ul>
+				<li>Gerenciar inscrições e participação em eventos acadêmicos.</li>
+				<li>Emitir certificados e comprovações de participação.</li>
+				<li>Comunicar informações sobre eventos (confirmações, atualizações e alertas).</li>
+				<li>Manter a segurança, integridade e auditoria do ambiente.</li>
+			</ul>
+		</div>
+
+		<div class="section">
+			<h3>Base legal</h3>
+			<p>
+				O tratamento é realizado com consentimento do usuário e para execução de
+				procedimentos relacionados a atividades acadêmicas. Como projeto acadêmico,
+				não há finalidade comercial nem compartilhamento com terceiros além do que for
+				estritamente necessário ao funcionamento do sistema.
+			</p>
+		</div>
+
+		<div class="section">
+			<h3>Cookies e tecnologias similares</h3>
+			<p>
+				Utilizamos cookies essenciais ao funcionamento do site (autenticação, manutenção
+				de sessão e preferências). Cookies de terceiros e marketing não são utilizados.
+				Você pode gerenciar cookies pelo seu navegador, ciente de que a desativação de
+				cookies essenciais pode afetar funcionalidades.
+			</p>
+		</div>
+
+		<div class="section">
+			<h3>Compartilhamento de dados</h3>
+			<p>
+				Os dados não são vendidos nem utilizados para fins comerciais. O acesso é
+				restrito a administradores acadêmicos e organizadores de eventos conforme
+				permissões do sistema. Conteúdos públicos (como páginas de eventos) podem
+				exibir informações básicas do evento e do organizador.
+			</p>
+		</div>
+
+		<div class="section">
+			<h3>Segurança da informação</h3>
+			<p>
+				Adotamos controles técnicos e organizacionais adequados ao escopo acadêmico:
+				autenticação, registro de atividades e revisão de permissões. Apesar de boas
+				práticas, nenhum sistema é totalmente isento de riscos; use senhas fortes e não
+				compartilhe suas credenciais.
+			</p>
+		</div>
+
+		<div class="section">
+			<h3>Direitos dos titulares</h3>
+			<ul>
+				<li>Acesso aos seus dados e às informações de tratamento.</li>
+				<li>Correção de dados incompletos ou desatualizados.</li>
+				<li>Exclusão de dados quando aplicável ao contexto acadêmico.</li>
+				<li>Revogação do consentimento, com impacto limitado às funcionalidades.</li>
+			</ul>
+			<p>Para exercer direitos, utilize o canal de contato indicado abaixo.</p>
+		</div>
+
+		<div class="section">
+			<h3>Retenção</h3>
+			<p>
+				Os dados são mantidos pelo tempo necessário à gestão dos eventos e emissão de
+				certificados. Em ambiente acadêmico, logs e registros podem ser preservados para
+				fins de auditoria e pesquisa limitada.
+			</p>
+		</div>
+
+		<div class="section">
+			<h3>Alterações desta política</h3>
+			<p>
+				Esta política pode ser atualizada para refletir melhorias no projeto acadêmico.
+				Quando mudanças relevantes ocorrerem, informaremos por avisos no site.
+			</p>
+		</div>
+
+		<div class="section">
+			<h3>Contato</h3>
+			<p>
+				Em caso de dúvidas, solicitações ou exercício de direitos, entre em contato
+				com o responsável acadêmico pelo e-mail institucional informado nas páginas de
+				evento ou pelo canal de suporte disponibilizado aos participantes.
+			</p>
+		</div>
+	</div>
+</div>
+{% endblock %}

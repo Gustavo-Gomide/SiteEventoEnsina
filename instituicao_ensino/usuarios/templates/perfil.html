@@ -15,25 +15,28 @@
         <!-- Lateral esquerda: foto, dados e certificados -->
         <div class="col-md-4 perfil-left">
             {% if usuario.perfil.foto %}
-                <img src="{{ usuario.perfil.foto.url }}" alt="Foto de {{ usuario.nome }}" class="img-fluid rounded" style="max-width:200px; margin-bottom: 5px; filter: drop-shadow(0 0 4px var(--primary-gold));"/>
+            <img src="{{ usuario.perfil.foto.url }}" alt="Foto de {{ usuario.nome }}" class="img-fluid rounded"
+                style="max-width:200px; margin-bottom: 5px; filter: drop-shadow(0 0 4px var(--primary-gold));" />
             {% else %}
-                <img src="{% static 'images/unknown.svg' %}" alt="Sem foto" class="img-fluid rounded" style="max-width:200px;"/>
+            <img src="{% static 'images/unknown.svg' %}" alt="Sem foto" class="img-fluid rounded"
+                style="max-width:200px;" />
             {% endif %}
 
             <p><strong>Usuário:</strong> {{ usuario.nome_usuario }}</p>
             <p><strong>Tipo:</strong> {{ usuario.tipo.tipo }}</p>
             <p><strong>Instituição:</strong>
                 {% if usuario.instituicao %}
-                    <a href="{% url 'instituicao_publica' usuario.instituicao.id %}">{{ usuario.instituicao.nome }}</a>
+                <a href="{% url 'instituicao_publica' usuario.instituicao.id %}">{{ usuario.instituicao.nome }}</a>
                 {% else %}
-                    -
+                -
                 {% endif %}
             </p>
             <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
             <p><strong>Email:</strong> {{ usuario.email }}</p>
 
             <h3 class="mt-4">Certificados</h3>
-            <a href="{% url 'perfil_certificados' usuario.nome_usuario %}" class="btn btn-success mt-2">Ver todos os certificados</a>
+            <a href="{% url 'perfil_certificados' usuario.nome_usuario %}" class="btn btn-success mt-2">Ver todos os
+                certificados</a>
         </div>
 
         <!-- Lateral direita: formulário de edição -->
@@ -45,137 +48,158 @@
                     <!-- Nome -->
                     <p>
                         {% if uform.nome.errors %}
-                            <div class="field-error">
-                                <strong>Erro:</strong>
-                                <ul>
-                                    {% for e in uform.nome.errors %}
-                                        <li>{{ e }}</li>
-                                    {% endfor %}
-                                </ul>
-                                <div class="field-example">Exemplo: João da Silva</div>
-                            </div>
-                        {% endif %}
-                        <label for="{{ uform.nome.id_for_label }}">Nome</label>
-                        {{ uform.nome }}
+                    <div class="field-error">
+                        <strong>Erro:</strong>
+                        <ul>
+                            {% for e in uform.nome.errors %}
+                            <li>{{ e }}</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="field-example">Exemplo: João da Silva</div>
+                    </div>
+                    {% endif %}
+                    <label for="{{ uform.nome.id_for_label }}">Nome</label>
+                    {{ uform.nome }}
                     </p>
 
                     <!-- Nome de usuário -->
                     <p>
                         {% if uform.nome_usuario.errors %}
-                            <div class="field-error">
-                                <strong>Erro:</strong>
-                                <ul>
-                                    {% for e in uform.nome_usuario.errors %}
-                                        <li>{{ e }}</li>
-                                    {% endfor %}
-                                </ul>
-                                <div class="field-example">Exemplo: exemplo_usuario</div>
-                            </div>
-                        {% endif %}
-                        <label for="{{ uform.nome_usuario.id_for_label }}">Usuário</label>
-                        {{ uform.nome_usuario }}
+                    <div class="field-error">
+                        <strong>Erro:</strong>
+                        <ul>
+                            {% for e in uform.nome_usuario.errors %}
+                            <li>{{ e }}</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="field-example">Exemplo: exemplo_usuario</div>
+                    </div>
+                    {% endif %}
+                    <label for="{{ uform.nome_usuario.id_for_label }}">Usuário</label>
+                    {{ uform.nome_usuario }}
                     </p>
 
                     <!-- Telefone (DDD + número) -->
                     <p>
                         {% if uform.telefone.errors %}
-                            <div class="field-error">
-                                <strong>Erro:</strong>
-                                <ul>
-                                    {% for e in uform.telefone.errors %}
-                                        <li>{{ e }}</li>
-                                    {% endfor %}
-                                </ul>
-                                <div class="field-example">Exemplo: (11) 99613-5479</div>
-                            </div>
-                        {% endif %}
-                        <label for="{{ uform.telefone.id_for_label }}">Telefone (DDD + número)</label>
-                        {{ uform.telefone }}
+                    <div class="field-error">
+                        <strong>Erro:</strong>
+                        <ul>
+                            {% for e in uform.telefone.errors %}
+                            <li>{{ e }}</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="field-example">Exemplo: (11) 99613-5479</div>
+                    </div>
+                    {% endif %}
+                    <label for="{{ uform.telefone.id_for_label }}">Telefone (DDD + número)</label>
+                    {{ uform.telefone }}
                     </p>
 
                     <!-- E-mail -->
                     <p>
                         {% if uform.email.errors %}
-                            <div class="field-error">
-                                <strong>Erro:</strong>
-                                <ul>
-                                    {% for e in uform.email.errors %}
-                                        <li>{{ e }}</li>
-                                    {% endfor %}
-                                </ul>
-                                <div class="field-example">Exemplo: voce@exemplo.com</div>
-                            </div>
-                        {% endif %}
-                        <label for="{{ uform.email.id_for_label }}">E-mail</label>
-                        {{ uform.email }}
+                    <div class="field-error">
+                        <strong>Erro:</strong>
+                        <ul>
+                            {% for e in uform.email.errors %}
+                            <li>{{ e }}</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="field-example">Exemplo: voce@exemplo.com</div>
+                    </div>
+                    {% endif %}
+                    <label for="{{ uform.email.id_for_label }}">E-mail</label>
+                    {{ uform.email }}
                     </p>
 
                     <!-- Instituição -->
                     <p>
                         {% if uform.instituicao.errors %}
-                            <div class="field-error">
-                                <strong>Erro:</strong>
-                                <ul>
-                                    {% for e in uform.instituicao.errors %}
-                                        <li>{{ e }}</li>
-                                    {% endfor %}
-                                </ul>
-                                <div class="field-example">Exemplo: Universidade Exemplo</div>
-                            </div>
-                        {% endif %}
-                        <label for="{{ uform.instituicao.id_for_label }}">Instituição</label>
-                        {{ uform.instituicao }}
+                    <div class="field-error">
+                        <strong>Erro:</strong>
+                        <ul>
+                            {% for e in uform.instituicao.errors %}
+                            <li>{{ e }}</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="field-example">Exemplo: Universidade Exemplo</div>
+                    </div>
+                    {% endif %}
+                    <label for="{{ uform.instituicao.id_for_label }}">Instituição</label>
+                    {{ uform.instituicao }}
                     </p>
 
                     <!-- Senha com toggle -->
                     <p class="senha-container">
                         <label for="{{ uform.nova_senha.id_for_label }}">Nova senha</label>
                         {{ uform.nova_senha }}
-                        <button type="button" class="toggle-senha" data-target="{{ uform.nova_senha.id_for_label }}" title="Mostrar/ocultar senha">
-                            <svg class="icon-show active" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5m0 11a3.5 3.5 0 1 1 0-7a3.5 3.5 0 0 1 0 7"/>
+                        <button type="button" class="toggle-senha" data-target="{{ uform.nova_senha.id_for_label }}"
+                            title="Mostrar/ocultar senha">
+                            <svg class="icon-show active" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                viewBox="0 0 24 24">
+                                <path fill="currentColor"
+                                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5m0 11a3.5 3.5 0 1 1 0-7a3.5 3.5 0 0 1 0 7" />
                             </svg>
-                            <svg class="icon-hide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M12 6a9.77 9.77 0 0 1 9 6a9.6 9.6 0 0 1-1.72 2.82l1.42 1.42A11.85 11.85 0 0 0 23 12a11.77 11.77 0 0 0-11-7a11.43 11.43 0 0 0-3.93.73l1.53 1.53A9.43 9.43 0 0 1 12 6m-9.9.68l2.23 2.23A11.66 11.66 0 0 0 1 12a11.85 11.85 0 0 0 11 7a11.43 11.43 0 0 0 3.93-.73l2.3 2.3l1.27-1.27L4.37 5.41zm9.9 11.82A9.77 9.77 0 0 1 3 12a9.6 9.6 0 0 1 1.72-2.82l1.47 1.47a7.5 7.5 0 0 0 9.12 9.12l1.47 1.47A11.43 11.43 0 0 1 12 18.5M9 12a3 3 0 0 1 3-3a3 3 0 0 1 2.82 2.1L9.9 15a3 3 0 0 1-.9-3"/>
+                            <svg class="icon-hide" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                viewBox="0 0 24 24">
+                                <path fill="currentColor"
+                                    d="M12 6a9.77 9.77 0 0 1 9 6a9.6 9.6 0 0 1-1.72 2.82l1.42 1.42A11.85 11.85 0 0 0 23 12a11.77 11.77 0 0 0-11-7a11.43 11.43 0 0 0-3.93.73l1.53 1.53A9.43 9.43 0 0 1 12 6m-9.9.68l2.23 2.23A11.66 11.66 0 0 0 1 12a11.85 11.85 0 0 0 11 7a11.43 11.43 0 0 0 3.93-.73l2.3 2.3l1.27-1.27L4.37 5.41zm9.9 11.82A9.77 9.77 0 0 1 3 12a9.6 9.6 0 0 1 1.72-2.82l1.47 1.47a7.5 7.5 0 0 0 9.12 9.12l1.47 1.47A11.43 11.43 0 0 1 12 18.5M9 12a3 3 0 0 1 3-3a3 3 0 0 1 2.82 2.1L9.9 15a3 3 0 0 1-.9-3" />
                             </svg>
                         </button>
                         {% if uform.nova_senha.errors %}
-                            <span class="erro">{{ uform.nova_senha.errors }}</span>
+                        <span class="erro">{{ uform.nova_senha.errors }}</span>
                         {% endif %}
                     </p>
+
+                    <!-- Instruções fixas de senha -->
+                    <div class="password-requirements" aria-live="polite">
+                        <strong>Requisitos de senha:</strong>
+                        <ul>
+                            <li>Mínimo de 8 caracteres</li>
+                            <li>Ao menos uma letra (a–z ou A–Z)</li>
+                            <li>Ao menos um número (0–9)</li>
+                            <li>Ao menos um caractere especial (ex: !@#$%^&*)</li>
+                        </ul>
+                    </div>
 
                     <!-- Confirmação da nova senha -->
                     <p class="senha-container">
                         <label for="{{ uform.nova_senha_confirm.id_for_label }}">Confirme a nova senha</label>
                         {{ uform.nova_senha_confirm }}
-                        <button type="button" class="toggle-senha" data-target="{{ uform.nova_senha_confirm.id_for_label }}" title="Mostrar/ocultar senha">
-                            <svg class="icon-show active" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5m0 11a3.5 3.5 0 1 1 0-7a3.5 3.5 0 0 1 0 7"/>
+                        <button type="button" class="toggle-senha"
+                            data-target="{{ uform.nova_senha_confirm.id_for_label }}" title="Mostrar/ocultar senha">
+                            <svg class="icon-show active" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                viewBox="0 0 24 24">
+                                <path fill="currentColor"
+                                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5m0 11a3.5 3.5 0 1 1 0-7a3.5 3.5 0 0 1 0 7" />
                             </svg>
-                            <svg class="icon-hide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M12 6a9.77 9.77 0 0 1 9 6a9.6 9.6 0 0 1-1.72 2.82l1.42 1.42A11.85 11.85 0 0 0 23 12a11.77 11.77 0 0 0-11-7a11.43 11.43 0 0 0-3.93.73l1.53 1.53A9.43 9.43 0 0 1 12 6m-9.9.68l2.23 2.23A11.66 11.66 0 0 0 1 12a11.85 11.85 0 0 0 11 7a11.43 11.43 0 0 0 3.93-.73l2.3 2.3l1.27-1.27L4.37 5.41zm9.9 11.82A9.77 9.77 0 0 1 3 12a9.6 9.6 0 0 1 1.72-2.82l1.47 1.47a7.5 7.5 0 0 0 9.12 9.12l1.47 1.47A11.43 11.43 0 0 1 12 18.5M9 12a3 3 0 0 1 3-3a3 3 0 0 1 2.82 2.1L9.9 15a3 3 0 0 1-.9-3"/>
+                            <svg class="icon-hide" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                viewBox="0 0 24 24">
+                                <path fill="currentColor"
+                                    d="M12 6a9.77 9.77 0 0 1 9 6a9.6 9.6 0 0 1-1.72 2.82l1.42 1.42A11.85 11.85 0 0 0 23 12a11.77 11.77 0 0 0-11-7a11.43 11.43 0 0 0-3.93.73l1.53 1.53A9.43 9.43 0 0 1 12 6m-9.9.68l2.23 2.23A11.66 11.66 0 0 0 1 12a11.85 11.85 0 0 0 11 7a11.43 11.43 0 0 0 3.93-.73l2.3 2.3l1.27-1.27L4.37 5.41zm9.9 11.82A9.77 9.77 0 0 1 3 12a9.6 9.6 0 0 1 1.72-2.82l1.47 1.47a7.5 7.5 0 0 0 9.12 9.12l1.47 1.47A11.43 11.43 0 0 1 12 18.5M9 12a3 3 0 0 1 3-3a3 3 0 0 1 2.82 2.1L9.9 15a3 3 0 0 1-.9-3" />
                             </svg>
                         </button>
                         {% if uform.nova_senha_confirm.errors %}
-                            <span class="erro">{{ uform.nova_senha_confirm.errors }}</span>
+                        <span class="erro">{{ uform.nova_senha_confirm.errors }}</span>
                         {% endif %}
                     </p>
 
                     <!-- Biografia -->
                     <p>
                         {% if pform.biografia.errors %}
-                            <div class="field-error">
-                                <strong>Erro:</strong>
-                                <ul>
-                                    {% for e in pform.biografia.errors %}
-                                        <li>{{ e }}</li>
-                                    {% endfor %}
-                                </ul>
-                                <div class="field-example">Exemplo: Sou professor de matemática...</div>
-                            </div>
-                        {% endif %}
-                        <label for="{{ pform.biografia.id_for_label }}">Biografia</label>
-                        {{ pform.biografia }}
+                    <div class="field-error">
+                        <strong>Erro:</strong>
+                        <ul>
+                            {% for e in pform.biografia.errors %}
+                            <li>{{ e }}</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="field-example">Exemplo: Sou professor de matemática...</div>
+                    </div>
+                    {% endif %}
+                    <label for="{{ pform.biografia.id_for_label }}">Biografia</label>
+                    {{ pform.biografia }}
                     </p>
 
                     <!-- Upload de foto moderno -->
@@ -183,12 +207,14 @@
                         <label for="{{ pform.foto.id_for_label }}">Foto de perfil</label>
                         <div class="upload-area" id="uploadArea">
                             <div class="upload-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/>
-                                    <line x1="16" y1="5" x2="22" y2="5"/>
-                                    <line x1="19" y1="2" x2="19" y2="8"/>
-                                    <circle cx="9" cy="9" r="2"/>
-                                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" />
+                                    <line x1="16" y1="5" x2="22" y2="5" />
+                                    <line x1="19" y1="2" x2="19" y2="8" />
+                                    <circle cx="9" cy="9" r="2" />
+                                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                                 </svg>
                             </div>
                             <div class="upload-text">Clique para fazer upload da foto</div>
@@ -196,7 +222,7 @@
                             <button type="button" class="upload-btn">Selecionar arquivo</button>
                             {{ pform.foto }}
                             {% if pform.foto.errors %}
-                                <span class="erro">{{ pform.foto.errors }}</span>
+                            <span class="erro">{{ pform.foto.errors }}</span>
                             {% endif %}
                         </div>
                         <div class="upload-preview" id="uploadPreview">

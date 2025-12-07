@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import main
+from .views import main, politica_privacidade, termos_uso
 
 from django.conf.urls import handler404
 from django.shortcuts import redirect
@@ -28,6 +28,8 @@ from django.contrib import messages
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", main, name='main'),
+    path('politica-privacidade/', politica_privacidade, name='politica_privacidade'),
+    path('termos-uso/', termos_uso, name='termos_uso'),
     path('usuarios/', include('usuarios.urls')),
     path('eventos/', include('eventos.urls')),
     path('api/', include('eventos.urls_api')),
