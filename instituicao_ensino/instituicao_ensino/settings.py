@@ -16,6 +16,33 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# -------------------------------------------------------------------
+# Simple .env loader (key=value per line) for local dev convenience
+# Looks for .env in project folder and repository root (next to README.md)
+# -------------------------------------------------------------------
+def _load_env_file(path):
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                if '=' in line:
+                    k, v = line.split('=', 1)
+                    os.environ.setdefault(k.strip(), v.strip())
+    except Exception:
+        # ignore env file parse errors silently for dev
+        pass
+
+env_candidates = [
+    os.path.join(BASE_DIR, '.env'),            # project folder
+    os.path.join(BASE_DIR.parent, '.env'),     # repo root (next to README.md)
+]
+for env_path in env_candidates:
+    if os.path.exists(env_path):
+        _load_env_file(env_path)
+        break
+
 
 MEDIA_URL = '/media/'
 # Ensure MEDIA_ROOT is a string path and create the directory at startup so
@@ -60,6 +87,7 @@ INSTALLED_APPS = [
     'usuarios',
     'eventos',
     'instituicao_ensino',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -152,3 +180,17 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# -------------------------------------------------------------------
+# Email configuration
+# -------------------------------------------------------------------
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'true').lower() in ('1', 'true', 'yes')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'SGEA <no-reply@sgea.local>')
+
+# Public site URL used in emails and QR codes (set in .env for prod)
+SITE_URL = os.environ.get('SITE_URL', '')

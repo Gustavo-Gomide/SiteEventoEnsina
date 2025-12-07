@@ -312,22 +312,21 @@ def finalizar_evento(request, evento_id):
         generated = generate_certificates_for_event(evento.id)
         messages.success(request, f'Evento finalizado e certificados gerados: {generated}.')
 
-        # Notificar participantes por email
-        from django.core.mail import send_mail
+        # Notificar participantes por email (fila de notificações)
         inscricoes_all = evento.inscricaoevento_set.select_related('inscrito')
-        for ins in inscricoes_all:
-            email = getattr(ins.inscrito, 'email', None)
-            if email:
+        try:
+            from notifications.services import queue_certificate_ready_email
+            from usuarios.models import Certificado
+            for ins in inscricoes_all:
                 try:
-                    send_mail(
-                        subject=f'Certificado disponível: {evento.titulo}',
-                        message=f'Olá {ins.inscrito.nome}, seu certificado do evento "{evento.titulo}" está disponível.',
-                        from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', None),
-                        recipient_list=[email],
-                        fail_silently=True
-                    )
+                    cert = Certificado.objects.filter(usuario=ins.inscrito, evento=evento).first()
+                    if cert:
+                        queue_certificate_ready_email(ins.inscrito, cert, evento, send_now=True)
                 except Exception:
-                    pass
+                    continue
+        except Exception:
+            # fallback silencioso se serviço de notificações indisponível
+            pass
         try:
             log_audit(request=request, usuario=usuario, action='generate_certificates', object_type='Evento', object_id=evento.id, description=f'Certificados gerados: {generated}')
         except Exception:
@@ -433,6 +432,12 @@ def pegar_certificado(request, evento_id):
                 log_audit(request=request, usuario=usuario, action='generate_certificate', object_type='Certificado', object_id=cert.id, description=f'Certificado gerado via generator para evento {evento.id}')
             except Exception:
                 pass
+            # Enfileira e-mail de certificado pronto para este usuário
+            try:
+                from notifications.services import queue_certificate_ready_email
+                queue_certificate_ready_email(usuario, cert, evento, send_now=True)
+            except Exception:
+                pass
             return FileResponse(open(cert.pdf.path, 'rb'), content_type='application/pdf')
 
     except Exception:
@@ -455,6 +460,12 @@ def pegar_certificado(request, evento_id):
             cert.save(update_fields=['pdf'])
             try:
                 log_audit(request=request, usuario=usuario, action='generate_certificate', object_type='Certificado', object_id=cert.id, description=f'Certificado gerado por fallback para evento {evento.id}')
+            except Exception:
+                pass
+            # Enfileira e-mail de certificado pronto para este usuário
+            try:
+                from notifications.services import queue_certificate_ready_email
+                queue_certificate_ready_email(usuario, cert, evento, send_now=True)
             except Exception:
                 pass
             return FileResponse(open(pdf_path, 'rb'), content_type='application/pdf')

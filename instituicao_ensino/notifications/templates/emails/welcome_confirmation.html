@@ -1,0 +1,442 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Confirme seu cadastro - SGEA</title>
+    <style>
+      @media only screen and (max-width: 600px) {
+        .container {
+          width: 100% !important;
+        }
+        .content {
+          padding: 20px !important;
+        }
+        .header-img {
+          height: 80px !important;
+        }
+        .title {
+          font-size: 24px !important;
+        }
+        .message {
+          font-size: 16px !important;
+        }
+        .btn {
+          padding: 12px 24px !important;
+          font-size: 16px !important;
+        }
+      }
+    </style>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #200303 0%, #350505 100%) no-repeat
+        fixed;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      line-height: 1.6;
+      color: #fff7d9;
+    "
+  >
+    <!-- Pre-header text -->
+    <div
+      style="
+        display: none;
+        font-size: 1px;
+        line-height: 1px;
+        max-height: 0;
+        max-width: 0;
+        opacity: 0;
+        overflow: hidden;
+      "
+    >
+      Confirme seu cadastro no SGEA para ativar sua conta
+    </div>
+
+    <!-- Main container -->
+    <table
+      role="presentation"
+      width="100%"
+      border="0"
+      cellspacing="0"
+      cellpadding="0"
+      style="background-color: transparent; padding: 40px 0"
+    >
+      <tr>
+        <td align="center">
+          <!-- Content container -->
+          <table
+            role="presentation"
+            class="container"
+            width="600"
+            border="0"
+            cellspacing="0"
+            cellpadding="0"
+            style="
+              background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+              border: 2px solid #d4af37;
+            "
+          >
+            <!-- Header with gradient -->
+            <tr>
+              <td
+                style="
+                  background: linear-gradient(135deg, #8b0000 0%, #a00000 100%);
+                  padding: 32px 26px 22px;
+                  border-bottom: 3px solid #d4af37;
+                "
+              >
+                <table
+                  role="presentation"
+                  width="100%"
+                  border="0"
+                  cellspacing="0"
+                  cellpadding="0"
+                >
+                  <tr>
+                    <td align="center">
+                      <img
+                        src="https://github.com/Gustavo-Gomide/SiteEventoEnsina/blob/master/instituicao_ensino/static/favicon.png?raw=true"
+                        alt="Logo"
+                        class="header-img"
+                        width="120"
+                        height="auto"
+                        style="
+                          max-width: 120px;
+                          height: auto;
+                          margin-bottom: 10px;
+                          display: block;
+                          filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4));
+                        "
+                      />
+                      <div style="margin-bottom: 10px">
+                        <a
+                          href="{{ site_url }}"
+                          target="_blank"
+                          style="
+                            color: #ff7f16;
+                            text-decoration: none;
+                            font-weight: 700;
+                            font-size: 15px;
+                          "
+                          >EventoEnsina</a
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center">
+                      <h1
+                        style="
+                          margin: 0;
+                          color: #ffeaa7;
+                          font-size: 32px;
+                          font-weight: 700;
+                          letter-spacing: -0.3px;
+                          text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+                        "
+                      >
+                        Confirmação de Cadastro
+                      </h1>
+                      <div
+                        style="
+                          height: 3px;
+                          width: 64px;
+                          background-color: #d4af37;
+                          margin: 14px auto 0;
+                        "
+                      ></div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Greeting -->
+            <tr>
+              <td class="content" style="padding: 24px 28px 18px">
+                <h2
+                  style="
+                    margin: 0 0 16px 0;
+                    color: #ffeaa7;
+                    font-size: 26px;
+                    font-weight: 700;
+                  "
+                >
+                  Olá, {{ usuario.nome|default:usuario.nome_usuario }}!
+                </h2>
+
+                <!-- Welcome message -->
+                <p style="margin: 0 0 20px 0; color: #fffbe6; font-size: 16px">
+                  Seja muito bem-vindo(a) ao
+                  <strong style="color: #d4af37"
+                    >{{ system_name|default:'EventoEnsina' }}</strong
+                  >! Estamos felizes em tê-lo(a) conosco.
+                </p>
+
+                <p style="margin: 0 0 20px 0; color: #fffbe6; font-size: 16px">
+                  Para começar a utilizar todas as funcionalidades do sistema, é
+                  necessário confirmar seu cadastro. Este passo garante a
+                  segurança da sua conta e libera seu acesso completo.
+                </p>
+
+                <!-- Important notice -->
+                <table
+                  role="presentation"
+                  width="100%"
+                  border="0"
+                  cellspacing="0"
+                  cellpadding="0"
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      rgba(212, 175, 55, 0.1) 0%,
+                      rgba(180, 150, 50, 0.2) 100%
+                    );
+                    border-radius: 8px;
+                    padding: 16px;
+                    margin: 18px 0;
+                    border-left: 4px solid #d4af37;
+                  "
+                >
+                  <tr>
+                    <td>
+                      <p
+                        style="
+                          margin: 0 0 8px 0;
+                          color: #ffeaa7;
+                          font-weight: 700;
+                          font-size: 14px;
+                        "
+                      >
+                        ATENÇÃO IMPORTANTE
+                      </p>
+                      <p style="margin: 0; color: #fff7d9; font-size: 14px">
+                        <strong
+                          >Novos usuários só poderão acessar as funcionalidades
+                          do sistema após a confirmação do cadastro.</strong
+                        >
+                        Clique no botão abaixo para ativar sua conta.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- CTA Button -->
+            {% if confirm_url %}
+            <tr>
+              <td align="center" style="padding: 0 32px 26px">
+                <table
+                  role="presentation"
+                  border="0"
+                  cellspacing="0"
+                  cellpadding="0"
+                >
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        border-radius: 6px;
+                        background: #8b0000;
+                        border: 2px solid transparent;
+                      "
+                    >
+                      <a
+                        href="{{ confirm_url }}"
+                        style="
+                          font-size: 16px;
+                          font-weight: 600;
+                          color: #fffbe6;
+                          text-decoration: none;
+                          padding: 14px 28px;
+                          display: inline-block;
+                          letter-spacing: 0.3px;
+                          border-radius: 6px;
+                        "
+                      >
+                        ✅ CONFIRMAR CADASTRO
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+                <p
+                  style="
+                    color: #ff7f16;
+                    font-size: 14px;
+                    margin: 12px 0 0;
+                    text-align: center;
+                  "
+                >
+                  Este link expira em 24 horas por motivos de segurança
+                </p>
+              </td>
+            </tr>
+            {% endif %}
+
+            
+
+            <!-- Next steps -->
+            <tr>
+              <td style="padding: 0 28px 28px">
+                <div
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      #2d1b1b 0%,
+                      #3d2424 100%
+                    );
+                    border-radius: 12px;
+                    padding: 16px;
+                    border: 2px solid #d4af37;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+                  "
+                >
+                  <p
+                    style="
+                      margin: 0 0 12px 0;
+                      color: #ffeaa7;
+                      font-weight: 700;
+                      font-size: 14px;
+                    "
+                  >
+                    🚀 Após a confirmação, você poderá:
+                  </p>
+                  <ul
+                    style="
+                      margin: 0;
+                      padding-left: 20px;
+                      color: #fff7d9;
+                      font-size: 14px;
+                    "
+                  >
+                    <li style="margin-bottom: 8px">
+                      Acessar todas as funcionalidades do sistema
+                    </li>
+                    <li style="margin-bottom: 8px">
+                      Participar de eventos e atividades
+                    </li>
+                    <li style="margin-bottom: 8px">
+                      Emitir certificados de participação
+                    </li>
+                    <li>Gerenciar seu perfil completo</li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
+                  padding: 24px 28px;
+                  border-top: 3px solid #d4af37;
+                "
+              >
+                <table
+                  role="presentation"
+                  width="100%"
+                  border="0"
+                  cellspacing="0"
+                  cellpadding="0"
+                >
+                  <tr>
+                    <td align="center">
+                      <img
+                        src="https://github.com/Gustavo-Gomide/SiteEventoEnsina/blob/master/instituicao_ensino/static/favicon.png?raw=true"
+                        alt="{{ system_name|default:'SGEA' }}"
+                        width="60"
+                        height="auto"
+                        style="
+                          max-width: 60px;
+                          height: auto;
+                          margin-bottom: 12px;
+                          opacity: 0.9;
+                          filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+                        "
+                      />
+                      <p
+                        style="
+                          margin: 0 0 8px 0;
+                          color: #ffeaa7;
+                          font-size: 14px;
+                          font-weight: 700;
+                        "
+                      >
+                        {{ system_name|default:'EventoEnsina' }}
+                      </p>
+                      <p style="margin: 0; color: #fff7d9; font-size: 13px">
+                        Sistema de Gestão de Eventos Acadêmicos
+                      </p>
+                      <p
+                        style="
+                          margin: 10px 0 0 0;
+                          color: #fff7d9;
+                          font-size: 12px;
+                        "
+                      >
+                        Este é um e-mail automático de confirmação de cadastro.
+                      </p>
+                      <p
+                        style="
+                          margin: 10px 0 0 0;
+                          color: #fff7d9;
+                          font-size: 12px;
+                        "
+                      >
+                        Se você não realizou este cadastro, ignore este e-mail.
+                      </p>
+                      <p
+                        style="
+                          margin: 10px 0 0 0;
+                          color: #fff7d9;
+                          font-size: 12px;
+                        "
+                      >
+                        © {% now "Y" %} {{ system_name|default:'SGEA' }}. Todos
+                        os direitos reservados.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Support text below email -->
+          <table
+            role="presentation"
+            width="600"
+            border="0"
+            cellspacing="0"
+            cellpadding="0"
+            style="margin-top: 30px"
+          >
+            <tr>
+              <td align="center">
+                <p
+                  style="
+                    margin: 0;
+                    color: #7f8c8d;
+                    font-size: 12px;
+                    line-height: 1.5;
+                  "
+                >
+                  Em caso de problemas com a confirmação ou dúvidas sobre o
+                  sistema, entre em contato com nossa equipe de suporte.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

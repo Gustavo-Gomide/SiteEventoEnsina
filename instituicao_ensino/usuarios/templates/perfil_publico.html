@@ -10,13 +10,17 @@
       <div class="card">
         <div class="card-body text-center">
           {% if usuario.perfil.foto %}
-            <img src="{{ usuario.perfil.foto.url }}" class="img-fluid rounded mb-2" alt="Foto de {{ usuario.nome }}">
+          <img src="{{ usuario.perfil.foto.url }}" class="img-fluid rounded mb-2" alt="Foto de {{ usuario.nome }}">
           {% else %}
-            <img src="{% static 'images/unknown.svg' %}" class="img-fluid rounded mb-2" alt="Sem foto">
+          <img src="{% static 'images/unknown.svg' %}" class="img-fluid rounded mb-2" alt="Sem foto">
           {% endif %}
           <h4 class="card-title">{{ usuario.nome }}</h4>
           <p class="text-muted">@{{ usuario.nome_usuario }}</p>
-          <a href="{% url 'perfil_certificados' usuario.nome_usuario %}" class="btn btn-outline-primary btn-sm mt-2" target="_blank">Ver certificados</a>
+          {% if usuario.certificados.count > 0 %}
+          <p><strong>Certificados:</strong> {{ usuario.certificados.count }}</p>
+          <a href="{% url 'perfil_certificados' usuario.nome_usuario %}" class="btn btn-outline-primary btn-sm mt-2"
+            target="_blank">Ver certificados</a>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -25,16 +29,19 @@
         <div class="card-body">
           <p><strong>Instituição:</strong>
             {% if usuario.instituicao %}
-              <a href="{% url 'instituicao_publica' usuario.instituicao.id %}" target="_blank" rel="noopener noreferrer">{{ usuario.instituicao.nome }}</a>
+            <a href="{% url 'instituicao_publica' usuario.instituicao.id %}" target="_blank"
+              rel="noopener noreferrer">{{ usuario.instituicao.nome }}</a>
             {% else %}-{% endif %}
           </p>
           <h5>Sobre</h5>
-          <p>{{ usuario.perfil.biografia|default:'Sem biografia.' }}</p>
+          <div class="descricao">
+            <p>{{ usuario.perfil.biografia|default:'Sem biografia.' }}</p>
+          </div>
           {% if usuario.perfil.mostrar_email and usuario.email %}
-            <p><strong>E-mail:</strong> <a href="mailto:{{ usuario.email }}">{{ usuario.email }}</a></p>
+          <p><strong>E-mail:</strong> <a href="mailto:{{ usuario.email }}">{{ usuario.email }}</a></p>
           {% endif %}
           {% if usuario.perfil.mostrar_telefone and usuario.telefone %}
-            <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
+          <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
           {% endif %}
         </div>
       </div>

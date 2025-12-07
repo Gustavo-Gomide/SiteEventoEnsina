@@ -15,7 +15,7 @@
         <!-- Lateral esquerda: foto, dados e certificados -->
         <div class="col-md-4 perfil-left">
             {% if usuario.perfil.foto %}
-                <img src="{{ usuario.perfil.foto.url }}" alt="Foto de {{ usuario.nome }}" class="img-fluid rounded" style="max-width:200px;"/>
+                <img src="{{ usuario.perfil.foto.url }}" alt="Foto de {{ usuario.nome }}" class="img-fluid rounded" style="max-width:200px; margin-bottom: 5px; filter: drop-shadow(0 0 4px var(--primary-gold));"/>
             {% else %}
                 <img src="{% static 'images/unknown.svg' %}" alt="Sem foto" class="img-fluid rounded" style="max-width:200px;"/>
             {% endif %}
@@ -30,6 +30,7 @@
                 {% endif %}
             </p>
             <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
+            <p><strong>Email:</strong> {{ usuario.email }}</p>
 
             <h3 class="mt-4">Certificados</h3>
             <a href="{% url 'perfil_certificados' usuario.nome_usuario %}" class="btn btn-success mt-2">Ver todos os certificados</a>

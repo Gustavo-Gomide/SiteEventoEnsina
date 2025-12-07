@@ -25,15 +25,74 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.decorators import login_required
 from functools import wraps
 from django.shortcuts import Http404
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import get_user_model
 
 
 def cadastro(request):
     if request.method == 'POST':
         form = CadastroUsuarioForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Cadastro realizado com sucesso. Faça login.')
+            # Persistência explícita: cria Usuario primeiro, depois auth.User e linka
+            from django.db import transaction
+            try:
+                with transaction.atomic():
+                    cleaned = form.cleaned_data
+                    tipo = cleaned.get('tipo')
+                    instituicao = cleaned.get('instituicao')
+                    nome = cleaned.get('nome')
+                    nome_usuario = cleaned.get('nome_usuario')
+                    email = cleaned.get('email')
+                    telefone = cleaned.get('telefone')
+                    senha = cleaned.get('senha')
+
+                    # Cria Usuario principal
+                    usuario = Usuario.objects.create(
+                        nome=nome,
+                        tipo=tipo,
+                        instituicao=instituicao,
+                        nome_usuario=nome_usuario,
+                        email=email,
+                        telefone=telefone,
+                    )
+
+                    # Cria Django User e vincula
+                    from django.contrib.auth.models import User as AuthUser
+                    auth_user = AuthUser.objects.create_user(username=nome_usuario, password=senha, email=email)
+                    # Usuário fica inativo até confirmar por e-mail
+                    auth_user.is_active = False
+                    try:
+                        auth_user.first_name = (nome or '').split(' ')[0]
+                        auth_user.last_name = ' '.join((nome or '').split(' ')[1:])
+                    except Exception:
+                        pass
+                    auth_user.save()
+                    usuario.user = auth_user
+                    usuario.save(update_fields=['user'])
+
+            except Exception as e:
+                from django.contrib import messages as _messages
+                _messages.error(request, f'Erro ao salvar cadastro: {e}')
+                return render(request, 'cadastro.html', {'form': form, 'nav_items': nav_items})
+
+            # Enfileira e-mail de confirmação (assíncrono via socket/worker)
+            try:
+                from notifications.services import queue_welcome_confirmation_email
+                queue_welcome_confirmation_email(user=usuario.user, usuario=usuario, send_now=True)
+            except Exception:
+                pass
+
+            # Orienta confirmação antes do login
+            messages.success(request, 'Cadastro realizado. Verifique seu e-mail para confirmar antes de fazer login.')
             return redirect('login')
+        else:
+            # Exibe erros do formulário de forma clara
+            from django.contrib import messages as _messages
+            for field, errors in form.errors.items():
+                for e in errors:
+                    _messages.error(request, f'Erro em "{field}": {e}')
+            return render(request, 'cadastro.html', {'form': form, 'nav_items': nav_items})
     else:
         form = CadastroUsuarioForm()
     return render(request, 'cadastro.html', {'form': form, 'nav_items': nav_items})
@@ -49,6 +108,10 @@ def login_usuario(request):
             # usar autenticação do Django
             user = authenticate(request, username=nome_usuario, password=senha)
             if user is not None:
+                # Bloqueia login de usuários não confirmados e mostra mensagem clara
+                if not getattr(user, 'is_active', True):
+                    mensagem = 'Sua conta ainda não foi ativada. Verifique seu e-mail e clique no link de confirmação para acessar.'
+                    return render(request, 'login.html', {'form': form, 'mensagem': mensagem, 'nav_items': nav_items})
                 auth_login(request, user)
                 # vincular também na session legacy para compatibilidade
                 try:
@@ -63,7 +126,16 @@ def login_usuario(request):
                 messages.success(request, f'Bem-vindo, {user.username}!')
                 return redirect('lista_eventos')
             else:
-                mensagem = 'Usuário ou senha inválidos'
+                # Se não autenticou, pode ser usuário inativo (Django não autentica usuários inativos)
+                try:
+                    User = get_user_model()
+                    maybe_user = User.objects.filter(username=nome_usuario).first()
+                    if maybe_user and not getattr(maybe_user, 'is_active', True) and maybe_user.check_password(senha):
+                        mensagem = 'Sua conta ainda não foi ativada. Verifique seu e-mail e clique no link de confirmação para acessar.'
+                    else:
+                        mensagem = 'Usuário ou senha inválidos'
+                except Exception:
+                    mensagem = 'Usuário ou senha inválidos'
     else:
         form = LoginForm()
     return render(request, 'login.html', {'form': form, 'mensagem': mensagem, 'nav_items': nav_items})
@@ -75,6 +147,41 @@ def logout_usuario(request):
     request.session.pop('usuario_id', None)
     messages.info(request, 'Você saiu da sessão.')
     return redirect('login')
+
+
+def confirmar_email(request, uidb64, token):
+    """Ativa a conta do usuário após confirmação por e-mail."""
+    User = get_user_model()
+    user = None
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except Exception:
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        if not user.is_active:
+            user.is_active = True
+            user.save(update_fields=['is_active'])
+        # Autentica e loga imediatamente após confirmar
+        try:
+            auth_login(request, user)
+        except Exception:
+            pass
+        # Link legacy session if we can find the Usuario
+        try:
+            perfil = Usuario.objects.filter(user=user).first() or Usuario.objects.filter(nome_usuario=user.username).first()
+            if perfil:
+                request.session['usuario_id'] = perfil.id
+                messages.success(request, 'E-mail confirmado! Você já está conectado.')
+            else:
+                messages.success(request, 'E-mail confirmado! Você já está conectado.')
+        except Exception:
+            messages.success(request, 'E-mail confirmado!')
+        return redirect('lista_eventos')
+    else:
+        messages.error(request, 'Link de confirmação inválido ou expirado.')
+        return redirect('login')
 
 
 def get_current_usuario(request):
@@ -111,6 +218,12 @@ def get_current_usuario(request):
                     )
                     try:
                         create_user_dirs(novo)
+                    except Exception:
+                        pass
+                    # Garantir Perfil associado
+                    try:
+                        from .models import Perfil as PerfilModel
+                        PerfilModel.objects.get_or_create(usuario=novo)
                     except Exception:
                         pass
                     request.session['usuario_id'] = novo.id

@@ -23,7 +23,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark custom-navbar">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'main' %}">
-                <img src="{% static 'favicon.png' %}" alt="Logo" width="32" height="32" class="d-inline-block align-text-top">
+                <img src="{% static 'favicon.png' %}" alt="Logo" width="32" height="32" class="d-inline-block">
                 EventoEnsina
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,16 +42,19 @@
                     <li class="nav-item">
                         {% if item.label == 'Criar Evento' %}
                             <a class="nav-link btn btn-cta" href="{{ item.url }}">{{ item.label }}</a>
+                        {% elif item.label == 'Perfil' %}
+                            <a class="nav-link" href="{{ item.url }}">
+                                {% if item.foto and item.foto.name %}
+                                    <img src="{{ MEDIA_URL }}{{ item.foto.url }}" alt="Foto de Perfil" class="rounded-circle">
+                                {% else %}
+                                    <img src="{% static 'images/unknown.png' %}" alt="Foto de Perfil" class="rounded-circle">
+                                {% endif %}
+                            </a>
                         {% else %}
                             <a class="nav-link" href="{{ item.url }}">{{ item.label }}</a>
                         {% endif %}
                     </li>
                     {% endfor %}
-                    {% if current_usuario %}
-                    <li class="nav-item">
-                        <span class="navbar-text text-light">Olá, {{ current_usuario.nome }}</span>
-                    </li>
-                    {% endif %}
                 </ul>
             </div>
         </div>

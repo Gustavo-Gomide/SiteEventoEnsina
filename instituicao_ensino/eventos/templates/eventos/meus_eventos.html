@@ -136,6 +136,7 @@
                     {% if form %}
                     <form method="post" enctype="multipart/form-data" class="form-evento">
                     {% csrf_token %}
+                    <input type="hidden" name="edited_evento" value="{{ evento_selecionado.id }}">
 
                     <div class="form-group">
                         <label for="{{ form.titulo.id_for_label }}">Título do evento</label>

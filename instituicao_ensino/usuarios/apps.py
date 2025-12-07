@@ -11,15 +11,20 @@ class UsuariosConfig(AppConfig):
             from . import signals  # noqa: F401
         except Exception:
             pass
-        # Garante que exista um usuário Django chamado 'admin' com a senha '123456'.
-        # Envolvemos em try/except para evitar problemas durante migrações ou quando o DB
-        # ainda não estiver pronto (testes e comandos manage.py podem rodar antes).
+        # Evita acessar DB durante inicialização/migração; usa get_user_model após registro.
         try:
-            from django.contrib.auth.models import User
+            import sys
+            from django.contrib.auth import get_user_model
             from django.db import ProgrammingError, OperationalError
 
-            if not User.objects.filter(username='admin').exists():
-                User.objects.create_superuser(username='admin', email='', password='123456')
+            # Não execute durante migrações, testes ou coletstatic
+            argv = sys.argv if hasattr(sys, 'argv') else []
+            if any(cmd in argv for cmd in ('migrate', 'makemigrations', 'collectstatic', 'test')):
+                return
+
+            UserModel = get_user_model()
+            if not UserModel.objects.filter(username='admin').exists():
+                UserModel.objects.create_superuser(username='admin', email='', password='123456')
         except (ProgrammingError, OperationalError):
             # DB não está pronto; ignora criação automática
             pass

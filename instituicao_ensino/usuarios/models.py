@@ -22,6 +22,8 @@ import shutil
 import hashlib
 import binascii
 from django.db import models
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import check_password
 from django.conf import settings

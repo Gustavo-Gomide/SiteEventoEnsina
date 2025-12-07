@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from .models import Usuario, Perfil, Certificado, Instituicao
 import re
 
@@ -55,39 +55,67 @@ class CadastroUsuarioForm(forms.ModelForm):
 
     def save(self, commit=True):
         """
-        Salva o usuário e o objeto User do Django, garantindo criação de pastas de mídia.
+        Cria apenas o Django User como fonte de verdade e vincula o perfil legado.
         """
+        User = get_user_model()
         usuario = super().save(commit=False)
         senha = self.cleaned_data.get('senha')
         username = self.cleaned_data.get('nome_usuario')
+        email = self.cleaned_data.get('email')
+        nome = self.cleaned_data.get('nome')
 
-        # Cria User do Django se não existir
-        if not usuario.user:
-            user = User.objects.create_user(username=username, password=senha)
-            usuario.user = user
-        else:
-            # Atualiza senha caso informada
-            if senha:
-                usuario.user.set_password(senha)
-                usuario.user.save()
-
-        # Sincroniza a senha criptografada no campo legacy
-        usuario.senha = usuario.user.password
-
-        # Salva o telefone já normalizado pelo `clean_telefone()` (form retorna o formato internacional)
+        # Salva telefone normalizado pelo form
         tel_input = self.cleaned_data.get('telefone')
         if tel_input:
-            # o modelo irá normalizar novamente, mas guardamos o valor completo aqui
             usuario.telefone = tel_input
 
-        # Salva o usuário e cria diretórios de mídia
+        # Cria o auth.User como fonte de verdade
+        if not usuario.user:
+            user = User.objects.create_user(username=username, password=senha or '')
+            user.email = email or ''
+            try:
+                full_name = nome or ''
+                user.first_name = (full_name or '').split(' ')[0]
+                user.last_name = ' '.join((full_name or '').split(' ')[1:])
+            except Exception:
+                pass
+            # Bloqueia até confirmação (view cuidará da ativação)
+            try:
+                user.is_active = False
+            except Exception:
+                pass
+            user.save()
+            usuario.user = user
+        else:
+            # Atualiza somente o User, não espelha para Usuario
+            u = usuario.user
+            if username and u.username != username:
+                u.username = username
+            if email is not None and u.email != email:
+                u.email = email
+            try:
+                full_name = nome or ''
+                first = (full_name or '').split(' ')[0]
+                last = ' '.join((full_name or '').split(' ')[1:])
+                if u.first_name != first:
+                    u.first_name = first
+                if u.last_name != last:
+                    u.last_name = last
+            except Exception:
+                pass
+            if senha:
+                u.set_password(senha)
+            u.save()
+
+        # Não duplicar senha/email/nome no modelo legado
+        # Mantém apenas campos de domínio (instituicao, tipo, telefone, nome_usuario)
         if commit:
             usuario.save()
             try:
                 from .utils import create_user_dirs
                 create_user_dirs(usuario)
             except Exception:
-                pass  # não falha se não conseguir criar diretórios
+                pass
 
         return usuario
 
@@ -283,6 +311,28 @@ class UsuarioEditForm(forms.ModelForm):
         tel_input = self.cleaned_data.get('telefone')
         if tel_input:
             usuario.telefone = tel_input
+
+        # Espelha campos editados para o auth.User
+        if usuario.user:
+            u = usuario.user
+            # username
+            if usuario.nome_usuario and u.username != usuario.nome_usuario:
+                u.username = usuario.nome_usuario
+            # email
+            if usuario.email and u.email != usuario.email:
+                u.email = usuario.email
+            # names from Usuario.nome
+            try:
+                full_name = usuario.nome or ''
+                first = (full_name or '').split(' ')[0]
+                last = ' '.join((full_name or '').split(' ')[1:])
+                if u.first_name != first:
+                    u.first_name = first
+                if u.last_name != last:
+                    u.last_name = last
+            except Exception:
+                pass
+            u.save()
 
         if commit:
             usuario.save()

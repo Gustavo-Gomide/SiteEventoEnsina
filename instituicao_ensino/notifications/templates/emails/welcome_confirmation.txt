@@ -1,0 +1,23 @@
+Bem-vindo(a), {{ usuario.nome }}!
+
+É com grande satisfação que damos as boas-vindas ao {{ system_name }} - Sistema de Gestão de Eventos Acadêmicos.
+
+Para ativar sua conta e acessar todas as funcionalidades do sistema, é necessário confirmar seu cadastro.
+
+CONFIRME SEU CADASTRO:
+{{ confirm_url }}
+
+IMPORTANTE:
+• Este link expira em 24 horas por motivos de segurança
+• Novos usuários só poderão acessar as demais funcionalidades do sistema após a confirmação
+• Após confirmar, você poderá participar de eventos, emitir certificados e gerenciar seu perfil
+
+SE O LINK NÃO FUNCIONAR:
+Copie e cole o link acima diretamente no seu navegador.
+
+---
+
+{{ system_name }} - Sistema de Gestão de Eventos Acadêmicos
+Este é um e-mail automático de confirmação de cadastro.
+Se você não realizou este cadastro, ignore este e-mail.
+© {% now "Y" %} {{ system_name }}. Todos os direitos reservados.

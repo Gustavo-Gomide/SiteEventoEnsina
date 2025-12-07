@@ -19,7 +19,7 @@
 
 .event-card-wrapper {
     perspective: 1000px;
-    height: 550px;
+    height: 600px;
     transition: all 0.3s ease;
 }
 

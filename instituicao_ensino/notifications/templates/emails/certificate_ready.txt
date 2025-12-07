@@ -1,0 +1,20 @@
+Olá, {{ usuario.nome|default:usuario.nome_usuario }}!
+
+{% if evento %}Seu certificado do evento "{{ evento.titulo }}" está disponível.{% else %}Seu certificado está disponível.{% endif %}
+
+INFORMAÇÕES DO CERTIFICADO
+{% if evento %}Evento: {{ evento.titulo }}{% endif %}
+Status: Disponibilizado
+Data de emissão: {% now "d/m/Y" %}
+
+{% if cert_url %}Acesse seu certificado pelo link: {{ cert_url }}{% endif %}
+
+Para sua conveniência, anexamos uma cópia em PDF deste certificado a este e-mail (quando disponível).
+
+Recomendamos salvar o certificado em um local seguro para referência futura.
+
+---
+
+{{ system_name|default:'SGEA' }} - Sistema de Gestão de Eventos Acadêmicos
+Este é um e-mail automático. Por favor, não responda a esta mensagem.
+© {% now "Y" %} {{ system_name|default:'SGEA' }}. Todos os direitos reservados.

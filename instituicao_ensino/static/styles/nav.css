@@ -192,8 +192,8 @@
     
     /* Brand image maior */
     .navbar-brand img {
-        width: 45px !important;
-        height: 45px !important;
+        width: 60px !important;
+        height: 60px !important;
         margin-right: 12px !important;
     }
     
@@ -266,15 +266,26 @@
 
 /* Brand image size for Bootstrap navbar */
 .navbar-brand img {
-    width: 32px;
-    height: 32px;
+    width: 60px;
+    height: 60px;
     object-fit: contain;
     margin-right: 8px;
     filter: drop-shadow(0 0 2px var(--primary-gold));
+}
+
+nav img {
+    filter: drop-shadow(0 0 2px var(--primary-gold));
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
 }
 
 .navbar-brand:hover {
     img {
         filter: drop-shadow(0 0 4px rgb(207, 2, 2));
     }
+}
+
+nav img:hover {
+    filter: drop-shadow(0 0 4px rgb(207, 2, 2));
 }
