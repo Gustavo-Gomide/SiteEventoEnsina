@@ -270,4 +270,11 @@
     height: 32px;
     object-fit: contain;
     margin-right: 8px;
+    filter: drop-shadow(0 0 2px var(--primary-gold));
+}
+
+.navbar-brand:hover {
+    img {
+        filter: drop-shadow(0 0 4px rgb(207, 2, 2));
+    }
 }

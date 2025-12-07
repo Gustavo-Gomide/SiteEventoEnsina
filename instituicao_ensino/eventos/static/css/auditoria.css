@@ -7,7 +7,7 @@
 }
 
 .audit-header {
-  background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
+  background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%) !important;
   border: 2px solid #d4af37;
   border-radius: 16px;
   padding: 2rem;
@@ -16,7 +16,7 @@
 }
 
 .audit-header h1 {
-  color: #f8d568;
+  color: #f8d568 !important;
   margin-bottom: 1.5rem;
   font-size: 2rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -39,7 +39,7 @@
 }
 
 .filter-group label {
-  color: #f8d568;
+  color: #f8d568 !important;
   font-weight: 600;
   font-size: 1rem;
 }
@@ -47,10 +47,10 @@
 .filter-group input,
 .filter-group select {
   padding: 0.75rem;
-  border: 2px solid #d4af37;
+  border: 2px solid #d4af37 !important;
   border-radius: 8px;
-  background: rgba(26, 15, 15, 0.8);
-  color: #fff7d9;
+  background: rgba(26, 15, 15, 0.8) !important;
+  color: #fff7d9 !important;
   font-size: 1rem;
   transition: all 0.3s ease;
 }
@@ -58,15 +58,15 @@
 .filter-group input:focus,
 .filter-group select:focus {
   outline: none;
-  border-color: #f8d568;
+  border-color: #f8d568 !important;
   box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
-  background: rgba(26, 15, 15, 1);
+  background: rgba(26, 15, 15, 1) !important;
 }
 
 .btn-filter {
   padding: 0.75rem 2rem;
-  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
-  color: #2d1b1b;
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%) !important;
+  color: #2d1b1b !important;
   border: none;
   border-radius: 8px;
   font-weight: 700;
@@ -77,14 +77,14 @@
 }
 
 .btn-filter:hover {
-  background: linear-gradient(135deg, #f8d568 0%, #d4af37 100%);
+  background: linear-gradient(135deg, #f8d568 0%, #d4af37 100%) !important;
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(212, 175, 55, 0.4);
 }
 
 .audit-table-container {
-  background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
-  border: 2px solid #d4af37;
+  background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%) !important;
+  border: 2px solid #d4af37 !important;
   border-radius: 16px;
   padding: 2rem;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
@@ -96,14 +96,14 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  background: transparent;
+  background: transparent !important;
   border-radius: 12px;
   overflow: auto;
 }
 
 #auditTable thead {
-  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
-  border-bottom: 2px solid #d4af37;
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%) !important;
+  border-bottom: 2px solid #d4af37 !important;
 }
 
 #auditTable th {
@@ -111,7 +111,7 @@
   padding: 1rem;
   text-align: left;
   font-weight: 600;
-  border-bottom: 2px solid #8b0000;
+  border-bottom: 2px solid #8b0000 !important;
   background-color: transparent !important;
 }
 
@@ -126,7 +126,7 @@
 #auditTable td {
   color: #fff7d9 !important;
   padding: 0.8rem 1rem;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2) !important;
   background-color: transparent !important;
 }
 
@@ -169,11 +169,11 @@
 
 .pagination a {
   padding: 0.8rem 1.5rem;
-  background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%);
-  color: #f8d568;
+  background: linear-gradient(135deg, #2d1b1b 0%, #3d2424 100%) !important;
+  color: #f8d568 !important;
   text-decoration: none;
   border-radius: 10px;
-  border: 2px solid #d4af37;
+  border: 2px solid #d4af37 !important;
   font-weight: 700;
   transition: all 0.3s ease;
   font-size: 1rem;
@@ -186,14 +186,14 @@
 }
 
 .pagination a:hover {
-  background: #d4af37;
-  color: #2d1b1b;
+  background: #d4af37 !important;
+  color: #2d1b1b !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(212, 175, 55, 0.4);
 }
 
 .pagination span {
-  color: #f8d568;
+  color: #f8d568 !important;
   font-weight: 700;
   font-size: 1.1rem;
   padding: 0 1rem;
@@ -202,7 +202,7 @@
 
 /* DataTables Custom Styling */
 .dataTables_wrapper {
-  color: #f8d568;
+  color: #f8d568 !important;
   padding: 0.5rem 0;
 }
 
