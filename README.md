@@ -212,6 +212,43 @@ Resumo das alterações implementadas:
   Mensagens de erro aparecem no formulário quando regras não são cumpridas.
 - Campo `senha_confirm` adicionado ao formulário de cadastro (`usuarios/forms.py`) e template
   `usuarios/templates/cadastro.html` atualizado com instruções fixas de senha.
+- Campo `senha_confirm` adicionado ao formulário de cadastro (`usuarios/forms.py`) e template
+  `usuarios/templates/cadastro.html` atualizado com instruções fixas de senha.
+- Confirmação de senha no perfil: foi adicionado o campo `nova_senha_confirm` em
+  `usuarios/forms.py` para a edição de perfil (`UsuarioEditForm`) e o template
+  `usuarios/templates/perfil.html` foi atualizado para renderizar o campo de confirmação.
+  O comportamento do botão "mostrar/ocultar" senha foi generalizado para suportar múltiplos
+  campos usando `class="toggle-senha"` e `data-target`, e o script atualizado está em
+  `instituicao_ensino/staticfiles/scripts/senha.js` (e também há versão em
+  `instituicao_ensino/static/scripts/senha.js`).
+
+  Arquivos principais alterados para essa melhoria:
+  - `instituicao_ensino/usuarios/forms.py` — adição de `nova_senha_confirm` e validação de
+    igualdade quando o usuário informa `nova_senha`.
+  - `instituicao_ensino/usuarios/templates/perfil.html` — inclusão do campo de confirmação e
+    botões `toggle-senha` para ambos os campos de senha.
+  - `instituicao_ensino/staticfiles/scripts/senha.js` — handler genérico para toggles.
+
+  Observações e testes rápidos:
+  - Não é necessário rodar migrações para essa alteração (somente mudança em formulários,
+    templates e JS).
+  - Para testar localmente:
+
+    1. Rode o servidor localmente:
+
+```powershell
+python manage.py runserver
+```
+
+    2. Acesse `http://127.0.0.1:8000/perfil/` (ou a rota onde o perfil está disponível),
+       preencha `Nova senha` sem preencher a confirmação → deve ver erro pedindo confirmação.
+    3. Preencha `Nova senha` e `Confirme a nova senha` com valores diferentes → erro de
+       não coincidência.
+    4. Preencha com senhas que atendam aos requisitos de complexidade (mínimo 8, letra,
+       número, caractere especial) e iguais → o formulário deverá salvar a nova senha.
+
+  - Se os botões de mostrar/ocultar não atualizarem os ícones, limpe cache do navegador ou
+    recarregue os arquivos estáticos; em ambiente de produção, rode `collectstatic`.
 - Normalização de telefone no modelo `usuarios.Usuario` e validação no formulário: formato
   armazenado como `+CC (DD) NNNNN-NNNN` (padrão Brasil `+55` quando país não informado). Há máscara
   JS no front (`telefone_mask.js`) e validação server-side.

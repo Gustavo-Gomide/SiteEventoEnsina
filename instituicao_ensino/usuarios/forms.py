@@ -15,8 +15,8 @@ class CadastroUsuarioForm(forms.ModelForm):
     - Permite DDD separado do telefone.
     - Sincroniza senha criptografada com o User.
     """
-    senha = forms.CharField(widget=forms.PasswordInput)
-    senha_confirm = forms.CharField(widget=forms.PasswordInput, label='Confirme a senha')
+    senha = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'id': 'id_senha'}))
+    senha_confirm = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'id': 'id_senha_confirm'}), label='Confirme a senha')
     # Tornar email e telefone obrigatórios
     email = forms.EmailField(
         required=True,
@@ -260,8 +260,13 @@ class UsuarioEditForm(forms.ModelForm):
     )
     nova_senha = forms.CharField(
         required=False,
-        widget=forms.PasswordInput(attrs={'placeholder': 'Digite nova senha', 'class': 'form-control', 'id': 'id_senha'}),
+        widget=forms.PasswordInput(attrs={'placeholder': 'Digite nova senha', 'class': 'form-control', 'id': 'id_nova_senha'}),
         label="Nova senha"
+    )
+    nova_senha_confirm = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={'placeholder': 'Confirme a nova senha', 'class': 'form-control', 'id': 'id_nova_senha_confirm'}),
+        label="Confirme a nova senha"
     )
 
     class Meta:
@@ -366,6 +371,20 @@ class UsuarioEditForm(forms.ModelForm):
         if not re.search(r'[^A-Za-z0-9]', nova):
             raise ValidationError('A nova senha deve conter ao menos um caractere especial.')
         return nova
+
+    def clean(self):
+        cleaned = super().clean()
+        nova = cleaned.get('nova_senha')
+        confirm = cleaned.get('nova_senha_confirm')
+
+        # If user wants to change password, require confirmation and match
+        if nova:
+            if not confirm:
+                raise ValidationError({'nova_senha_confirm': 'Confirme a nova senha.'})
+            if nova != confirm:
+                raise ValidationError({'nova_senha_confirm': 'As senhas não coincidem.'})
+
+        return cleaned
 
 # ============================================================
 # FORMULÁRIO DE UPLOAD DE CERTIFICADO

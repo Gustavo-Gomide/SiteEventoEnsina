@@ -179,6 +179,86 @@
     display: block;
 }
 
+/* estilos para o botão de confirmação de senha (mesmos do toggle original) */
+#toggleSenhaConfirm {
+    position: absolute;
+    right: 10px;
+    top: 70%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #d4af37;
+    padding: 0.3rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+#toggleSenhaConfirm:hover {
+    color: #f8d568;
+    background: rgba(139, 0, 0, 0.3);
+}
+
+#iconShowConfirm,
+#iconHideConfirm {
+    display: none;
+    width: 20px;
+    height: 20px;
+}
+
+#iconShowConfirm.active,
+#iconHideConfirm.active {
+    display: block;
+}
+
+/* generic toggle styles to match original button */
+.toggle-senha {
+    position: absolute;
+    right: 10px;
+    top: 70%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #d4af37;
+    padding: 0.3rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.toggle-senha:hover {
+    color: #f8d568;
+    background: rgba(139, 0, 0, 0.3);
+}
+
+.toggle-senha .icon-show,
+.toggle-senha .icon-hide {
+    display: none;
+    width: 20px;
+    height: 20px;
+}
+
+.toggle-senha .icon-show.active,
+.toggle-senha .icon-hide.active {
+    display: block;
+}
+
+/* Hide native browser password reveal controls (Edge/IE/Chrome) so our custom button is unique */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none !important;
+}
+/* Some WebKit engines may use this pseudo-element */
+input[type="password"]::-webkit-textfield-decoration-container {
+    display: none !important;
+}
+
 /* Botão de submit */
 .form-container button[type="submit"] {
     width: 100%;
