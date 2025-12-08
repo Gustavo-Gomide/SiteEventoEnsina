@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.views import obtain_auth_token
 from . import api_views
 
@@ -6,7 +7,7 @@ app_name = 'eventos_api'
 
 urlpatterns = [
     # Login to obtain token
-    path('auth/token/', obtain_auth_token, name='api_token_auth'),
+    path('auth/token/', csrf_exempt(api_views.api_obtain_auth_token), name='api_token_auth'),
 
     # Events list
     path('events/', api_views.EventoListAPIView.as_view(), name='events-list'),

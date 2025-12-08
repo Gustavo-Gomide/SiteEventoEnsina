@@ -8,6 +8,10 @@ from .models import Evento, InscricaoEvento
 from .serializers import EventoSerializer, InscricaoCreateSerializer
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import AllowAny
 
 
 class EventListThrottle(SimpleRateThrottle):
@@ -76,3 +80,15 @@ class InscricaoAPIView(APIView):
 
         inscricao = InscricaoEvento.objects.create(evento=evento, inscrito=perfil)
         return Response(serializer.to_representation(inscricao), status=status.HTTP_201_CREATED)
+
+
+# Public token obtain endpoint (AllowAny) — not subject to global IsAuthenticated
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@authentication_classes([])
+def api_obtain_auth_token(request):
+    serializer = AuthTokenSerializer(data=request.data, context={'request': request})
+    serializer.is_valid(raise_exception=True)
+    user = serializer.validated_data['user']
+    token, created = Token.objects.get_or_create(user=user)
+    return Response({'token': token.key})
