@@ -1,5 +1,6 @@
 from django import forms
 from .models import Evento, TipoEvento
+from django.utils import timezone
 
 class EventoForm(forms.ModelForm):
     tipo = forms.ModelChoiceField(
@@ -31,6 +32,12 @@ class EventoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # força valor inicial dos campos de data/hora para compatibilidade com HTML
+        # também define o mínimo permitido para datas como a data atual
+        today_str = timezone.localdate().strftime('%Y-%m-%d')
+        if 'min' not in self.fields['data_inicio'].widget.attrs:
+            self.fields['data_inicio'].widget.attrs['min'] = today_str
+        if 'min' not in self.fields['data_fim'].widget.attrs:
+            self.fields['data_fim'].widget.attrs['min'] = today_str
         if self.instance and self.instance.pk:
             if self.instance.data_inicio:
                 self.fields['data_inicio'].initial = self.instance.data_inicio.strftime('%Y-%m-%d')
@@ -38,6 +45,12 @@ class EventoForm(forms.ModelForm):
                 self.fields['data_fim'].initial = self.instance.data_fim.strftime('%Y-%m-%d')
             if self.instance.horario:
                 self.fields['horario'].initial = self.instance.horario.strftime('%H:%M')
+
+    def clean_data_inicio(self):
+        data_inicio = self.cleaned_data.get('data_inicio')
+        if data_inicio and data_inicio < timezone.localdate():
+            raise forms.ValidationError("A data de início não pode ser anterior à data atual.")
+        return data_inicio
 
     def clean_data_fim(self):
         data_inicio = self.cleaned_data.get('data_inicio')
