@@ -309,12 +309,4 @@ Observações sobre inscrição via API:
 
 ## Autor
 
-Desenvolvido por **Gustavo Gomide**.
-
----
-
-Se quiser, eu também:
-- gero um `postman_environment.json` com `base_url` e `token` para importar;
-- crio um pequeno script `scripts/api_check.py` que executa token → list → register localmente e
-  imprime os resultados.
-Diga qual prefere que eu adicione ao repositório.
+Desenvolvido por **Gustavo Gomide**, **Victor Ribeiro** e **Matheus Queiroz**.
