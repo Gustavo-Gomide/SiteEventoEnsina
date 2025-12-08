@@ -6,6 +6,8 @@ urlpatterns = [
     path('login/', views.login_usuario, name='login'),
     path('logout/', views.logout_usuario, name='logout'),
     path('confirmar/<str:uidb64>/<str:token>/', views.confirmar_email, name='confirmar_email'),
+    path('esqueci-senha/', views.esqueci_senha, name='esqueci_senha'),
+    path('auto-login/<str:uidb64>/<str:token>/', views.auto_login, name='auto_login'),
     path('perfil/', views.perfil, name='perfil'),
     path('perfil/inscritos/<int:evento_id>/', views.lista_inscritos_evento, name='lista_inscritos_evento'),
     # Public profile URLs

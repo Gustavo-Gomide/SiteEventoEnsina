@@ -12,10 +12,12 @@ def enqueue_email(to_email: str, subject: str, *, text_body: str = None, html_bo
     """Add a new email to the queue. A background worker (same process) will send it."""
     # If immediate send requested, send synchronously to avoid duplicate processing
     if send_now:
+        # Ensure a valid sender to avoid SMTP rejection
+        sender = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or getattr(settings, 'SERVER_EMAIL', None)
         msg = EmailMultiAlternatives(
             subject=subject,
             body=text_body or '',
-            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', None),
+            from_email=sender,
             to=[to_email],
         )
         if html_body:
@@ -44,7 +46,15 @@ def enqueue_email(to_email: str, subject: str, *, text_body: str = None, html_bo
                     msg.attach(name, data, ctype)
             except Exception:
                 continue
-        msg.send(fail_silently=False)
+        # Send and log any failure with context
+        try:
+            msg.send(fail_silently=False)
+        except Exception as e:
+            import logging, traceback
+            logger = logging.getLogger(__name__)
+            logger.error("Email send failed: subject=%s to=%s error=%s\n%s", subject, to_email, e, traceback.format_exc())
+            # Re-raise to surface the error to caller flows (so UI can show message)
+            raise
         return None
 
     job = EmailJob.objects.create(
@@ -150,7 +160,7 @@ def queue_certificate_ready_email(usuario, cert, evento=None, *, send_now: bool 
         'evento': evento,
         'cert_url': cert_url,
         'site_url': site_url,
-        'system_name': 'SGEA',
+        'system_name': 'EventoEnsina',
         'logo_url': logo_url,
     }
     subject = f"Seu certificado está disponível{f' - {evento.titulo}' if evento else ''}"
@@ -168,3 +178,48 @@ def queue_certificate_ready_email(usuario, cert, evento=None, *, send_now: bool 
         pass
 
     return enqueue_email(usuario.email, subject, text_body=text, html_body=html, attachments=attachments, send_now=True)
+
+
+def queue_password_recovery_email(user, usuario=None, *, login_url: str = None, send_now: bool = False):
+    """Send password recovery email with a direct login link to profile.
+
+    Uses a one-time token to authenticate, then the user can change the password.
+    """
+    to_email = None
+    if usuario and getattr(usuario, 'email', None):
+        to_email = usuario.email
+    elif getattr(user, 'email', None):
+        to_email = user.email
+    if not to_email or not login_url:
+        return None
+
+    site_url = getattr(settings, 'SITE_URL', '').rstrip('/')
+    # Compute a friendly first name for greeting
+    def _first_name():
+        try:
+            if getattr(user, 'first_name', None):
+                return user.first_name
+            if usuario and getattr(usuario, 'nome', None):
+                return (usuario.nome or '').split(' ')[0]
+        except Exception:
+            pass
+        return getattr(user, 'username', '')
+
+    ctx = {
+        'usuario': usuario,
+        'user': user,
+        'first_name': _first_name(),
+        'login_url': login_url,
+        'site_url': site_url,
+        'system_name': 'EventoEnsina',
+    }
+    subject = 'Recuperação de acesso — EventoEnsina'
+    text = render_to_string('emails/recuperar_senha.txt', ctx)
+    html = render_to_string('emails/recuperar_senha.html', ctx)
+    attachments = []
+    try:
+        favicon_path = settings.BASE_DIR / 'instituicao_ensino' / 'static' / 'favicon.png'
+        attachments.append({'path': str(favicon_path), 'name': 'favicon.png', 'mimetype': 'image/png', 'cid': 'sg-logo'})
+    except Exception:
+        pass
+    return enqueue_email(to_email, subject, text_body=text, html_body=html, attachments=attachments, send_now=True)

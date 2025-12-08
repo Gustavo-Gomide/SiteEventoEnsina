@@ -28,6 +28,8 @@ from django.shortcuts import Http404
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 
 def cadastro(request):
@@ -182,6 +184,86 @@ def confirmar_email(request, uidb64, token):
     else:
         messages.error(request, 'Link de confirmação inválido ou expirado.')
         return redirect('login')
+
+
+def esqueci_senha(request):
+    """Recebe o nome de usuário, envia e-mail com link de acesso direto.
+
+    O link usa `default_token_generator` e `uidb64` para validar e realizar
+    login automático, redirecionando para `perfil` para o usuário alterar a senha.
+    """
+    mensagem = ''
+    if request.method == 'POST':
+        nome_usuario = (request.POST.get('nome_usuario') or '').strip()
+        if not nome_usuario:
+            mensagem = 'Informe o nome de usuário.'
+        else:
+            User = get_user_model()
+            user = User.objects.filter(username=nome_usuario).first()
+            if not user:
+                mensagem = 'Usuário não encontrado.'
+            else:
+                # Precisa estar ativo para permitir login
+                if not getattr(user, 'is_active', True):
+                    mensagem = 'Sua conta ainda não está ativa. Confirme seu e-mail primeiro.'
+                else:
+                    try:
+                        uid = urlsafe_base64_encode(force_bytes(user.pk))
+                        token = default_token_generator.make_token(user)
+                        from django.urls import reverse
+                        path = reverse('auto_login', kwargs={'uidb64': uid, 'token': token})
+                        from django.conf import settings
+                        site_url = getattr(settings, 'SITE_URL', '').rstrip('/')
+                        login_url = f"{site_url}{path}" if site_url else path
+
+                        # localizar perfil Usuario (email obrigatório no seu fluxo)
+                        usuario = Usuario.objects.filter(user=user).first() or Usuario.objects.filter(nome_usuario=user.username).first()
+                        if not usuario or not usuario.email:
+                            mensagem = 'Usuário sem e-mail cadastrado no perfil. Contate o administrador.'
+                        else:
+                            try:
+                                from notifications.services import queue_password_recovery_email
+                                queue_password_recovery_email(user=user, usuario=usuario, login_url=login_url, send_now=True)
+                                messages.success(request, 'Enviamos um e-mail com o link de acesso ao seu perfil.')
+                                return redirect('login')
+                            except Exception as e:
+                                import logging
+                                logging.getLogger(__name__).error(f"Falha no envio de recuperação para {usuario.email}: {e}")
+                                mensagem = 'Falha ao enviar o e-mail de recuperação. Verifique seu e-mail e tente novamente.'
+                    except Exception as e:
+                        import logging
+                        logging.getLogger(__name__).error(f"Erro ao preparar link de recuperação para {nome_usuario}: {e}")
+                        mensagem = 'Erro ao preparar o link de recuperação.'
+    return render(request, 'esqueci_senha.html', {'mensagem': mensagem, 'nav_items': nav_items})
+
+
+def auto_login(request, uidb64, token):
+    """Valida token, efetua login e redireciona para perfil para troca de senha."""
+    User = get_user_model()
+    user = None
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except Exception:
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        try:
+            auth_login(request, user)
+            # vincular sessão legacy
+            try:
+                perfil = Usuario.objects.filter(user=user).first() or Usuario.objects.filter(nome_usuario=user.username).first()
+                if perfil:
+                    request.session['usuario_id'] = perfil.id
+            except Exception:
+                pass
+            messages.info(request, 'Acesso realizado. Você pode alterar sua senha no perfil.')
+            return redirect('perfil')
+        except Exception:
+            messages.error(request, 'Não foi possível completar o login.')
+            return redirect('login')
+    messages.error(request, 'Link inválido ou expirado.')
+    return redirect('login')
 
 
 def get_current_usuario(request):

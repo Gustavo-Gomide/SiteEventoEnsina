@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recuperação de acesso - EventoEnsina</title>
+    <style>
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+            }
+
+            .content {
+                padding: 20px !important;
+            }
+
+            .header-img {
+                height: 80px !important;
+            }
+
+            .title {
+                font-size: 24px !important;
+            }
+
+            .message {
+                font-size: 16px !important;
+            }
+
+            .btn {
+                padding: 12px 24px !important;
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+
+<body
+    style="margin:0;padding:0;background:linear-gradient(135deg,#200303 0%,#350505 100%) no-repeat fixed;font-family:'Georgia','Times New Roman',serif;line-height:1.6;color:#fff7d9;">
+    <!-- Pre-header -->
+    <div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
+        Acesse seu perfil para alterar a senha
+    </div>
+
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0"
+        style="background-color:transparent;padding:40px 0;">
+        <tr>
+            <td align="center">
+                <table role="presentation" class="container" width="600" border="0" cellspacing="0" cellpadding="0"
+                    style="background:linear-gradient(135deg,#2d1b1b 0%,#3d2424 100%);border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,.3);border:2px solid #d4af37;">
+                    <!-- Header -->
+                    <tr>
+                        <td
+                            style="background:linear-gradient(135deg,#8b0000 0%,#b22222 100%);padding:32px 26px 22px;border-bottom:3px solid #d4af37;">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center">
+                                        <img src="https://github.com/Gustavo-Gomide/SiteEventoEnsina/blob/master/instituicao_ensino/static/favicon.png?raw=true"
+                                            alt="Logo" class="header-img" width="120" height="auto"
+                                            style="max-width:120px;height:auto;margin-bottom:10px;display:block;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));" />
+                                        <div style="margin-bottom:10px">
+                                            <a href="{{ site_url }}" target="_blank"
+                                                style="color:#ff7f16;text-decoration:none;font-weight:700;font-size:15px;">EventoEnsina</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <h1
+                                            style="margin:0;color:#ffeaa7;font-size:32px;font-weight:700;letter-spacing:-.3px;text-shadow:0 1px 0 rgba(0,0,0,.4);">
+                                            Recuperação de Acesso</h1>
+                                        <div
+                                            style="height:3px;width:64px;background-color:#d4af37;margin:14px auto 0;">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Greeting & message -->
+                    <tr>
+                        <td class="content" style="padding:24px 28px 18px">
+                            <h2 style="margin:0 0 16px 0;color:#ffeaa7;font-size:26px;font-weight:700;">Olá, {% if first_name %}{{ first_name }}{% else %}{{ user.username }}{% endif %}!</h2>
+                            <p style="margin:0 0 20px 0;color:#fffbe6;font-size:16px;">
+                                Recebemos uma solicitação para recuperar seu acesso ao
+                                <strong style="color:#d4af37">{% if system_name %}{{ system_name }}{% else %}EventoEnsina{% endif %}</strong>.
+                                Clique no botão abaixo para acessar sua área de perfil e alterar sua senha.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- CTA Button -->
+                    <tr>
+                        <td align="center" style="padding:0 32px 26px">
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" style="
+                                            border-radius: 6px;
+                                            background: #8b0000;
+                                            border: 2px solid transparent;
+                                        ">
+                                        <a href="{{ login_url }}" style="
+                                            font-size: 16px;
+                                            font-weight: 600;
+                                            color: #fffbe6;
+                                            text-decoration: none;
+                                            padding: 14px 28px;
+                                            display: inline-block;
+                                            letter-spacing: 0.3px;
+                                            border-radius: 6px;
+                                            ">
+                                            🔒 ACESSAR MEU PERFIL
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="color:#ff7f16;font-size:14px;margin:12px 0 0;text-align:center;">Este link é único
+                                e pode expirar após o uso</p>
+                        </td>
+                    </tr>
+
+                    <!-- Info box -->
+                    <tr>
+                        <td style="padding:0 28px 28px">
+                            <div
+                                style="background:linear-gradient(135deg,rgba(212,175,55,.1) 0%,rgba(180,150,50,.2) 100%);border-radius:8px;padding:16px;margin:0;border-left:4px solid #d4af37;">
+                                <p style="margin:0;color:#ffeaa7;font-weight:700;font-size:14px;">Dicas de segurança</p>
+                                <ul style="margin:8px 0 0 18px;color:#fff7d9;font-size:14px;">
+                                    <li>Não compartilhe este link com outras pessoas.</li>
+                                    <li>Após alterar a senha, mantenha-a em local seguro.</li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td
+                            style="background:linear-gradient(135deg,#2d1b1b 0%,#3d2424 100%);padding:24px 28px;border-top:3px solid #d4af37;">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center">
+                                        <img src="https://github.com/Gustavo-Gomide/SiteEventoEnsina/blob/master/instituicao_ensino/static/favicon.png?raw=true"
+                                            alt="{{ system_name|default:'EventoEnsina' }}" width="60" height="auto"
+                                            style="max-width:60px;height:auto;margin-bottom:12px;opacity:.9;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4));" />
+                                        <p style="margin:0 0 8px 0;color:#ffeaa7;font-size:14px;font-weight:700;">{% if system_name %}{{ system_name }}{% else %}EventoEnsina{% endif %}</p>
+                                        <p style="margin:0;color:#fff7d9;font-size:13px">Sistema de Gestão de Eventos
+                                            Acadêmicos</p>
+                                        <p style="margin:10px 0 0 0;color:#fff7d9;font-size:12px">Se você não solicitou
+                                            esta recuperação, ignore este e-mail.</p>
+                                        <p style="margin:10px 0 0 0;color:#fff7d9;font-size:12px">© {% now "Y" %} {% if system_name %}{{ system_name }}{% else %}EventoEnsina{% endif %}. Todos os direitos reservados.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Support note -->
+                <table role="presentation" width="600" border="0" cellspacing="0" cellpadding="0"
+                    style="margin-top:30px">
+                    <tr>
+                        <td align="center">
+                            <p style="margin:0;color:#7f8c8d;font-size:12px;line-height:1.5;">Em caso de dúvidas, entre
+                                em contato com nossa equipe de suporte.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

@@ -1,0 +1,31 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Recuperar Acesso{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/forms.css' %}">
+<style>
+  .form-container { max-width: 480px; margin: 2rem auto; }
+  .hint { color:#666; font-size: .95rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <h1>Recuperar Acesso</h1>
+  {% if mensagem %}
+    <p class="mensagem">{{ mensagem }}</p>
+  {% endif %}
+  <p class="hint">Informe seu nome de usuário. Enviaremos um e-mail com um link de acesso direto ao seu perfil, onde você poderá alterar a senha.</p>
+  <form method="post">
+    {% csrf_token %}
+    <p>
+      <label for="id_nome_usuario">Usuário:</label>
+      <input type="text" name="nome_usuario" id="id_nome_usuario" required />
+    </p>
+    <button type="submit">Enviar e-mail</button>
+  </form>
+  <p class="cadastro-link"><a href="{% url 'login' %}">Voltar ao login</a></p>
+</div>
+{% endblock %}

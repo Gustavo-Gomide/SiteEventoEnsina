@@ -1,0 +1,13 @@
+Recuperação de acesso
+
+Olá{% if usuario %} {{ usuario.nome }}{% endif %},
+
+Recebemos uma solicitação para recuperar seu acesso ao {{ system_name }}.
+Use o link abaixo para acessar sua área de perfil e alterar sua senha:
+
+{{ login_url }}
+
+Este link é único e pode expirar após o uso.
+Se você não solicitou, ignore esta mensagem.
+
+{{ site_url }}
