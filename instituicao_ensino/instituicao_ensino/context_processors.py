@@ -1,14 +1,25 @@
+
+"""
+Context processors customizados para injetar navegação global e usuário atual nos templates.
+"""
+
 from django.urls import reverse
 from usuarios.models import Usuario
 
 
 def global_nav(request):
-    """Context processor que injeta duas listas: nav_left e nav_right, e current_usuario.
+    """
+    Context processor que injeta listas de navegação (nav_left, nav_right) e o usuário atual (current_usuario) nos templates.
+
+    - nav_left: links sempre visíveis (pode ser customizado conforme necessidade).
+    - nav_right: links dinâmicos conforme autenticação, tipo de usuário e permissões.
+    - current_usuario: objeto Usuario autenticado, se houver.
 
     Usar reverse() evita hardcoding e erros de rota.
     """
     usuario = None
     perfil = None
+    # Recupera o usuário autenticado, se houver
     if request.user.is_authenticated:
         try:
             usuario = Usuario.objects.get(user=request.user)
@@ -32,11 +43,12 @@ def global_nav(request):
             except Usuario.DoesNotExist:
                 usuario = None
 
-    # left: sempre visíveis
+    # nav_left: links sempre visíveis (pode ser customizado)
     nav_left = [
-
+        # Exemplo: {'label': 'Home', 'url': reverse('main')},
     ]
 
+    # nav_right: links dinâmicos conforme autenticação e permissões
     nav_right = [
         {'label': 'Galeria', 'url': reverse('galeria')},
         {'label': 'Eventos', 'url': reverse('lista_eventos_root')},

@@ -1,3 +1,10 @@
+
+"""
+Worker de envio de emails em background para a aplicação.
+
+Gerencia fila de jobs de email, threads de envio, socket para push e reenvio automático em caso de falha.
+"""
+
 import threading
 import time
 import mimetypes
@@ -17,7 +24,10 @@ _socket_port = int(getattr(settings, 'EMAIL_QUEUE_PORT', 9099))
 
 
 def _send_job(job: EmailJob):
-    """Send a single EmailJob, updating its status accordingly."""
+    """
+    Envia um único EmailJob, atualizando o status conforme sucesso ou falha.
+    Reagenda o job em caso de erro, com backoff exponencial.
+    """
     try:
         # job should already be in 'sending' state
         msg = EmailMultiAlternatives(
@@ -52,7 +62,10 @@ def _send_job(job: EmailJob):
 
 
 def _try_claim_one_pending():
-    """Atomically claim one pending job by switching status to 'sending'. Return the claimed job or None."""
+    """
+    Busca e marca atomicamente um job pendente como 'sending'.
+    Retorna o job reclamado ou None se não houver disponível.
+    """
     try:
         now = timezone.now()
         job = EmailJob.objects.filter(status='pending', scheduled_at__lte=now).order_by('scheduled_at').first()
@@ -67,7 +80,9 @@ def _try_claim_one_pending():
 
 
 def push_job(job_id: int):
-    """Push a job id into the global socket queue for immediate consumption."""
+    """
+    Adiciona o ID do job na fila global de socket para consumo imediato pelo worker.
+    """
     global _socket_queue
     if _socket_queue is None:
         return False
@@ -79,7 +94,10 @@ def push_job(job_id: int):
 
 
 def start_background_worker(interval_seconds: int = 5, num_cert_threads: int = 2):
-    """Start background processing with multiple worker threads polling DB and sending emails."""
+    """
+    Inicia o processamento em background com múltiplas threads para envio de emails.
+    Inclui servidor socket para push e polling periódico do banco de dados.
+    """
     global _worker_started
     if _worker_started:
         return
@@ -162,6 +180,9 @@ def start_background_worker(interval_seconds: int = 5, num_cert_threads: int = 2
 
 
 def send_job_now(job_id: int):
+    """
+    Força o envio imediato de um job de email, tentando push via socket e fallback direto.
+    """
     try:
         job = EmailJob.objects.get(pk=job_id)
     except EmailJob.DoesNotExist:

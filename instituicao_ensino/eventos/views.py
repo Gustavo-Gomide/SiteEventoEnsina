@@ -1,11 +1,12 @@
+
 """
-Event views: criação, gerenciamento, galeria e fluxos de certificados.
+Views para criação, gerenciamento, inscrição, galeria e certificados de eventos.
 
 Responsabilidades principais:
-- Permitir que organizadores criem e gerenciem eventos (`criar_evento`,
-  `meus_eventos`, `gerenciar_evento`).
-- Gerar certificados web-only, com fallback para HTML se bibliotecas faltarem.
-- Fornecer galeria de fotos em MEDIA_ROOT/galeria/<gallery_slug>/.
+- Permitir que organizadores criem e gerenciem eventos.
+- Gerar certificados (PDF/HTML) para participantes.
+- Fornecer galeria de fotos dos eventos.
+- Gerenciar inscrições e auditoria de ações.
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -34,8 +35,8 @@ from usuarios.utils import log_audit
 # -------------------------------------------------------------------
 def _is_event_owner(request, usuario_obj, ev):
     """
-    Retorna True se o usuário for o criador (organizador) do evento,
-    ou se for staff. Professores que não criaram o evento não têm acesso.
+    Verifica se o usuário é o criador do evento ou staff.
+    Professores que não criaram o evento não têm acesso de gerenciamento.
     """
     try:
         # Organizador/dono do evento
@@ -60,6 +61,11 @@ def _is_event_owner(request, usuario_obj, ev):
 # -------------------------------------------------------------------
 @login_required
 def criar_evento(request):
+    """
+    View para criação de um novo evento.
+    Apenas usuários do tipo Professor, Funcionario ou Organizador podem criar eventos.
+    Cria as pastas necessárias para galeria e thumb, salva o evento e registra auditoria.
+    """
     usuario = get_current_usuario(request)
     if not usuario or usuario.tipo.tipo not in ['Professor', 'Funcionario', 'Organizador']:
         messages.error(request, 'Acesso negado: é necessário estar logado como criador de eventos.')
@@ -111,6 +117,10 @@ def criar_evento(request):
 # Lista de eventos para inscrição - OTIMIZADA COM PAGINAÇÃO
 # -------------------------------------------------------------------
 def lista_eventos(request):
+    """
+    Lista todos os eventos disponíveis para inscrição, com paginação e calendário.
+    Mostra também os eventos em que o usuário já está inscrito.
+    """
     usuario = get_current_usuario(request)
     
     # 1. BUSCA TODOS OS EVENTOS (passados, presentes e futuros)
@@ -174,6 +184,10 @@ def lista_eventos(request):
 # -------------------------------------------------------------------
 @login_required
 def meus_eventos(request):
+    """
+    Exibe os eventos criados pelo usuário (se organizador) ou os eventos em que está inscrito (participante).
+    Permite edição de eventos para organizadores e visualização de inscrições.
+    """
     usuario = get_current_usuario(request)  # pega usuário completo
 
     if not usuario:
@@ -262,6 +276,10 @@ def meus_eventos(request):
 # -------------------------------------------------------------------
 @login_required
 def gerenciar_evento(request, evento_id):
+    """
+    Permite ao organizador validar inscrições dos participantes de um evento.
+    Apenas o organizador pode acessar esta view.
+    """
     usuario = get_current_usuario(request)
     evento = get_object_or_404(Evento, pk=evento_id)
 
@@ -298,6 +316,11 @@ def gerenciar_evento(request, evento_id):
 # -------------------------------------------------------------------
 @login_required
 def finalizar_evento(request, evento_id):
+    """
+    Finaliza o evento, gera certificados para os participantes e notifica por e-mail.
+    Utiliza fallback HTML se bibliotecas de geração de PDF/PNG não estiverem disponíveis.
+    Apenas o organizador pode finalizar.
+    """
     usuario = get_current_usuario(request)
     evento = get_object_or_404(Evento, pk=evento_id)
     if not _is_event_owner(request, usuario, evento):
@@ -361,6 +384,10 @@ def finalizar_evento(request, evento_id):
 # -------------------------------------------------------------------
 @login_required
 def pegar_certificado(request, evento_id):
+    """
+    Gera ou retorna o certificado PDF/PNG de um usuário para um evento.
+    Verifica inscrição, aprovação e finalização do evento antes de liberar o certificado.
+    """
     """
     Gera ou retorna o certificado PDF/PNG de um usuário para um evento.
     Lógica:
@@ -481,6 +508,9 @@ def pegar_certificado(request, evento_id):
 # Detalhe público do evento
 # -------------------------------------------------------------------
 def detalhe_evento_publico(request, evento_id):
+    """
+    Exibe o detalhe público de um evento, mostrando informações e status de inscrição do usuário.
+    """
     evento = get_object_or_404(Evento, pk=evento_id)
     usuario = get_current_usuario(request)
     inscrito = evento.inscricaoevento_set.filter(inscrito=usuario).exists() if usuario else False
@@ -495,6 +525,9 @@ def detalhe_evento_publico(request, evento_id):
 # Galeria de fotos (visualização)
 # -------------------------------------------------------------------
 def galeria(request):
+    """
+    Exibe todos os eventos que possuem ao menos uma imagem na galeria ou thumb válida.
+    """
     """
     Exibe todos os eventos que possuem ao menos 1 imagem na galeria
     (ou thumb válida).
@@ -520,8 +553,8 @@ def galeria(request):
 # -------------------------------------------------------------------
 def galeria_evento(request, evento_id):
     """
-    Mostra a galeria de fotos do evento e permite upload e exclusão de fotos pelo organizador.
-    SEM BANCO DE DADOS - usa apenas sistema de arquivos.
+    Mostra a galeria de fotos do evento e permite upload/exclusão de fotos pelo organizador.
+    Não utiliza banco de dados para as imagens, apenas o sistema de arquivos.
     """
 
     # Pega o usuário atual
@@ -646,6 +679,10 @@ def galeria_evento(request, evento_id):
 # -------------------------------------------------------------------
 @login_required
 def inscrever_evento(request, evento_id):
+    """
+    Permite que alunos e professores se inscrevam em eventos, respeitando o limite de vagas.
+    Cria a inscrição e registra auditoria.
+    """
     usuario = get_current_usuario(request)
     evento = get_object_or_404(Evento, pk=evento_id)
 
@@ -674,6 +711,9 @@ def inscrever_evento(request, evento_id):
 
 @login_required
 def cancelar_inscricao(request, evento_id):
+    """
+    Permite ao usuário cancelar sua inscrição em um evento e registra auditoria.
+    """
     usuario = get_current_usuario(request)
     evento = get_object_or_404(Evento, pk=evento_id)
     inscr = InscricaoEvento.objects.filter(inscrito=usuario, evento=evento).first()
@@ -694,6 +734,9 @@ def cancelar_inscricao(request, evento_id):
 # -------------------------------------------------------------------
 @login_required
 def debug_eventos(request, evento_id=None):
+    """
+    View de depuração para staff: retorna JSON com dados resumidos dos eventos.
+    """
     if not getattr(request.user, 'is_staff', False):
         return HttpResponseForbidden('Acesso negado.')
 
@@ -716,7 +759,10 @@ def debug_eventos(request, evento_id=None):
 
 @login_required
 def auditoria(request):
-    """Tela para superusuários Django consultarem logs de auditoria por data/usuário."""
+    """
+    Tela para superusuários Django consultarem logs de auditoria por data/usuário.
+    Permite filtrar por data e nome de usuário.
+    """
     usuario = get_current_usuario(request)
     # Acesso restrito: somente superusuários Django podem acessar
     try:

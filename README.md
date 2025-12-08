@@ -1,312 +1,312 @@
-# 🎓 SiteEventoEnsina
+---
 
-O **SiteEventoEnsina** é uma aplicação web desenvolvida em **Django**, voltada para instituições de ensino que desejam **gerenciar eventos**, **inscrições de usuários**, e **interações entre participantes** de forma centralizada.
-O projeto foi estruturado para ser didático e modular, facilitando manutenção e expansão.
+## Como Funciona o Projeto (por requisito do PDF)
+
+Esta seção explica como cada funcionalidade do projeto atende aos requisitos do PDF e como testar cada uma delas:
+
+### 1. Cadastro e autenticação de usuários
+- O usuário pode se cadastrar pelo site, informando nome, e-mail, telefone e senha (com confirmação e validação de força).
+- Após cadastro, recebe e-mail de confirmação (se configurado SMTP).
+- Login pelo site ou via API (obtenção de token).
+
+**Testar:**
+1. Acesse `/usuarios/cadastro/` e preencha o formulário.
+2. Confirme o e-mail (verifique caixa de entrada, se SMTP configurado).
+3. Faça login pelo site ou obtenha token via API.
+
+### 2. Gerenciamento de eventos
+- Usuários autenticados podem visualizar eventos disponíveis, detalhes e se inscrever.
+- Admins podem criar, editar e excluir eventos pelo Django Admin (`/admin/`).
+
+**Testar:**
+1. Acesse `/eventos/` para listar eventos.
+2. Entre como admin em `/admin/` para gerenciar eventos.
+
+### 3. Inscrição em eventos
+- Usuário autenticado pode se inscrever em eventos via site ou API.
+- Inscrição impede duplicidade e respeita limite de vagas.
+
+**Testar:**
+1. Faça login.
+2. Clique em "Inscrever-se" em um evento ou use o endpoint `POST /api/events/register/`.
+
+### 4. Edição de perfil e upload de foto
+- Usuário pode editar dados pessoais e enviar foto de perfil.
+- Máscara e validação de telefone no formulário.
+
+**Testar:**
+1. Acesse `/perfil/` após login.
+2. Edite dados, envie foto e salve.
+
+### 5. Emissão de certificados
+- Após participação em evento, o usuário pode baixar certificado (PDF) se disponível.
+
+**Testar:**
+1. Após evento concluído, acesse área de certificados no perfil.
+
+### 6. API REST para integração
+- Endpoints para autenticação, listagem de eventos e inscrição.
+- Throttling limita uso abusivo.
+
+**Testar:**
+1. Siga as instruções da seção "API REST e Testes com Postman".
+
+### 7. Painel administrativo
+- Acesse `/admin/` com usuário staff/superuser para gerenciar usuários, eventos, inscrições e certificados.
+
+### 8. Notificações e fila de e-mails
+- Sistema envia e-mails de confirmação, lembretes e notificações de inscrição.
+- Fila de e-mails pode ser processada em background (ver `notifications/worker.py`).
+
+**Testar:**
+1. Realize ações que disparam e-mails (cadastro, inscrição, etc).
+2. Verifique envio no e-mail configurado.
+
+### 9. Segurança e validações
+- Senhas validadas por força (mínimo, letra, número, especial).
+- Telefone validado e normalizado.
+- Proteção contra inscrições duplicadas e acesso não autorizado.
+
+**Testar:**
+1. Tente cadastrar senha fraca ou telefone inválido.
+2. Tente se inscrever duas vezes no mesmo evento.
+
+---
+---
+
+## API REST e Testes com Postman
+
+O projeto possui uma API REST documentada e uma coleção pronta para o Postman (`postman_collection.json`).
+
+### Fluxo de uso da API
+
+1. **Obter token de autenticação**
+   - Endpoint: `POST /api/auth/token/`
+   - Body (x-www-form-urlencoded):
+     - `username`: seu usuário
+     - `password`: sua senha
+   - Exemplo cURL:
+     ```bash
+     curl -X POST http://127.0.0.1:8000/api/auth/token/ -d "username=seu_usuario" -d "password=sua_senha"
+     ```
+   - Resposta esperada:
+     ```json
+     { "token": "<seu_token>" }
+     ```
+
+2. **Listar eventos**
+   - Endpoint: `GET /api/events/`
+   - Header:
+     - `Authorization: Token <seu_token>`
+   - Exemplo cURL:
+     ```bash
+     curl -H "Authorization: Token <seu_token>" http://127.0.0.1:8000/api/events/
+     ```
+   - Resposta esperada: lista de eventos em JSON.
+
+3. **Inscrever-se em evento**
+   - Endpoint: `POST /api/events/register/`
+   - Header:
+     - `Authorization: Token <seu_token>`
+   - Body (JSON):
+     ```json
+     { "evento_id": <id_do_evento> }
+     ```
+   - Exemplo cURL:
+     ```bash
+     curl -X POST http://127.0.0.1:8000/api/events/register/ \
+       -H "Authorization: Token <seu_token>" \
+       -H "Content-Type: application/json" \
+       -d '{"evento_id": 1}'
+     ```
+   - Resposta esperada: dados da inscrição ou mensagem de erro.
+
+### Como importar e usar a coleção Postman
+
+1. Abra o Postman e importe o arquivo `postman_collection.json` (raiz do projeto).
+2. Configure a variável `base_url` como `http://127.0.0.1:8000/api`.
+3. Siga a ordem das requisições:
+   - `1 - Obter token`: preencha username e password no body (x-www-form-urlencoded). O token será salvo automaticamente na variável `{{token}}`.
+   - `2 - Listar eventos`: já usa o token salvo no header.
+   - `3 - Inscrever em evento`: envie o `evento_id` desejado no body JSON.
+
+**Atenção:**
+- Se receber erro de autenticação, confira se o token está correto e não expirou.
+- Os endpoints possuem limites diários de uso (throttling): 20 requisições/dia para listar eventos, 50/dia para inscrição.
 
 ---
 
-## 🚀 Instalação e Configuração
-
-### 1. Clonar o Repositório
-
-```bash
-git clone https://github.com/Gustavo-Gomide/SiteEventoEnsina.git
-cd SiteEventoEnsina/instituicao_ensino
-```
-
-### 2. Criar e Ativar um Ambiente Virtual
-
-```bash
-# Criar ambiente virtual
-python -m venv venv
-
-# Ativar (Windows)
-venv\Scripts\activate
-
-# Ativar (Linux/Mac)
-source venv/bin/activate
-```
-
-### 3. Instalar Dependências
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Aplicar Migrações e Executar o Servidor
-
-```bash
-python manage.py migrate
-python manage.py runserver
-```
-
-O servidor será iniciado em `http://127.0.0.1:8000/`.
-
----
-
-## 🧠 Estrutura do Projeto
-
-```
-instituicao_ensino/
-│
-├── manage.py                # Script principal para rodar comandos Django
-├── requirements.txt         # Dependências do projeto
-│
-├── instituicao_ensino/      # Diretório raiz do projeto (configurações principais)
-│   ├── settings.py          # Configurações globais: apps, banco, paths, etc.
-│   ├── urls.py              # Rotas principais do sistema
-│   ├── templates/           # Templates base do projeto
-│   │   └── base/            # Templates de layout e estrutura HTML
-│   ├── static/              # Arquivos CSS/JS compartilhados
-│   └── ...
-│
-├── eventos/                 # App responsável pelo gerenciamento de eventos
-│   ├── models.py            # Modelos (Event, Categoria, Inscrição...)
-│   ├── views.py             # Lógica das páginas (criação, edição, listagem)
-"""
-SiteEventoEnsina - README
-
-Este arquivo documenta a instalação, execução e as alterações recentes deste projeto
-(API REST, validações de senha/telefone, máscara no front e mecanismos de segurança).
-
-"""
 
 # 🎓 SiteEventoEnsina
 
-Aplicação web em Django para gerenciar eventos, inscrições e perfis de usuários. Este README foi
-atualizado para documentar as alterações recentes (API REST, validações, máscaras e melhorias de
-segurança) e para orientar execução e testes locais.
+Plataforma Django para gestão de eventos, inscrições, perfis e emissão de certificados para instituições de ensino.
 
 ---
 
 ## Sumário
 
-- [Instalação rápida](#instalação-rápida)
-- [Execução e migrações](#execução-e-migrações)
-- [API REST (DRF)](#api-rest-drf)
-- [Testes com Postman](#testes-com-postman)
-- [Mudanças e validações importantes](#mudanças-e-validações-importantes)
-- [Notas de segurança e implantação](#notas-de-segurança-e-implantação)
+- [Visão Geral](#visão-geral)
+- [Instalação e Configuração](#instalação-e-configuração)
+- [Como Funciona o Projeto (por requisito)](#como-funciona-o-projeto-por-requisito)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [API REST e Testes com Postman](#api-rest-e-testes-com-postman)
+- [Dicas, Observações e Segurança](#dicas-observações-e-segurança)
+- [Autores](#autores)
 
 ---
 
-## Instalação rápida
+## Visão Geral
 
-1. Clone o repositório e entre na pasta do projeto:
-
-```powershell
-git clone https://github.com/Gustavo-Gomide/SiteEventoEnsina.git
-cd SiteEventoEnsina/instituicao_ensino
-```
-
-2. Crie e ative um ambiente virtual (Windows PowerShell):
-
-```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-```
-
-3. Instale as dependências:
-
-```powershell
-python -m pip install --upgrade pip setuptools wheel
-python -m pip install -r requirements.txt
-```
-
-4. Aplique migrações e crie um superuser (opcional):
-
-```powershell
-python manage.py migrate
-python manage.py createsuperuser
-```
-
-5. Inicie o servidor:
-
-```powershell
-python manage.py runserver
-```
-
-A aplicação estará disponível em `http://127.0.0.1:8000/`.
+O SiteEventoEnsina é um sistema web completo para:
+- Cadastro e autenticação de usuários (com confirmação por e-mail)
+- Gerenciamento de eventos, inscrições e certificados
+- Edição de perfil, upload de foto, máscara e validação de telefone
+- API REST para integração externa
+- Painel administrativo (Django Admin)
+- Fila de e-mails assíncrona para notificações
 
 ---
 
-## Execução e migrações
+## Instalação e Configuração
 
-- Rode `python manage.py migrate` sempre que alterar modelos.
-- Para criar dados de teste, use o admin em `http://127.0.0.1:8000/admin/`.
+1. **Clone o repositório:**
+  ```bash
+  git clone https://github.com/Gustavo-Gomide/SiteEventoEnsina.git
+  cd SiteEventoEnsina/instituicao_ensino
+  ```
+
+2. **Crie e ative um ambiente virtual:**
+  ```bash
+  python -m venv venv
+  # Windows:
+  venv\Scripts\activate
+  # Linux/Mac:
+  source venv/bin/activate
+  ```
+
+3. **Instale as dependências:**
+  ```bash
+  python -m pip install --upgrade pip setuptools wheel
+  pip install -r requirements.txt
+  ```
+
+4. **Configure variáveis de ambiente:**
+  - Copie `env.example` para `.env` e preencha com seus dados (e-mail SMTP, SITE_URL, etc).
+
+5. **Aplique migrações e crie um superusuário:**
+  ```bash
+  python manage.py migrate
+  python manage.py createsuperuser
+  ```
+
+6. **Inicie o servidor:**
+  ```bash
+  python manage.py runserver
+  ```
+  Acesse: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+
+---
+## 🗂️ Estrutura do Projeto
+
+```
+instituicao_ensino/
+├── manage.py
+├── requirements.txt
+├── env.example / .env
+├── instituicao_ensino/   # Configurações globais, templates, static, settings
+├── eventos/              # App de eventos (modelos, views, API, admin)
+├── usuarios/             # App de usuários (cadastro, login, perfil, certificados)
+├── notifications/        # Sistema de notificações e fila de e-mails
+├── static/               # CSS, JS, imagens
+├── media/                # Uploads de usuários e certificados
+└── ...
+```
 
 ---
 
-## API REST (DRF)
+## 🔑 Configuração de Ambiente
 
-O projeto inclui uma API REST construída com Django REST Framework para consulta de eventos e
-inscrição de participantes.
+1. **Variáveis sensíveis:**
+   - Configure `.env` com dados SMTP, SITE_URL, etc. Nunca suba senhas ou chaves para o repositório.
+2. **Banco de dados:**
+   - Por padrão usa SQLite (`db.sqlite3`). Para produção, configure outro banco em `settings.py`.
+3. **E-mail:**
+   - SMTP Brevo (Sendinblue) já configurado no exemplo. Use sua API Key.
 
-Base URL (local): `http://127.0.0.1:8000/api/`
+---
 
-Endpoints principais:
+## 🧑‍💻 Funcionalidades Principais
 
-- `POST /api/auth/token/` — obtém token por `username` e `password` (form data) — retorna
-  `{ "token": "..." }`.
-- `GET  /api/events/` — lista eventos (requer header `Authorization: Token <token>`). Limitado a
-  20 requisições por dia por usuário.
-- `POST /api/events/register/` — inscreve o usuário autenticado em evento; body JSON:
-  `{ "evento_id": <id> }`. Limitado a 50 requisições por dia por usuário.
+- Cadastro e autenticação de usuários (com confirmação por e-mail)
+- Gerenciamento de eventos, inscrições e certificados
+- Edição de perfil, upload de foto, máscara e validação de telefone
+- API REST (Django REST Framework) para integração externa
+- Sistema de throttling (limite de requisições por usuário)
+- Painel administrativo completo (Django Admin)
+- Fila de e-mails assíncrona para notificações
 
-Autenticação e permissões:
+---
 
-- A API usa `TokenAuthentication` (DRF). Gere um token via `POST /api/auth/token/` ou pelo admin.
-- As views exigem autenticação (`IsAuthenticated`). O endpoint de token é público (exige
-  credenciais para gerar token).
+## 🛠️ Comandos Úteis
 
-Throttling (limites):
+- `python manage.py migrate` — aplica migrações do banco
+- `python manage.py createsuperuser` — cria usuário admin
+- `python manage.py runserver` — inicia o servidor local
+- `python manage.py collectstatic` — coleta arquivos estáticos para produção
 
-- `event_list` (GET /api/events/) → `20/day` por usuário.
-- `event_register` (POST /api/events/register/) → `50/day` por usuário.
+---
 
-Como obter token (exemplo cURL):
+## 🔗 API REST (DRF)
 
+Base: `http://127.0.0.1:8000/api/`
+
+### Endpoints principais
+
+- `POST /api/auth/token/` — obtém token de autenticação
+- `GET /api/events/` — lista eventos (requer token)
+- `POST /api/events/register/` — inscreve usuário autenticado em evento
+
+**Autenticação:**
+- Use o token retornado no header: `Authorization: Token <seu_token>`
+
+**Throttling:**
+- Limite de 20 requisições/dia para listar eventos
+- Limite de 50 requisições/dia para inscrição em eventos
+
+**Exemplo cURL:**
 ```bash
-curl -X POST http://127.0.0.1:8000/api/auth/token/ \
-  -d "username=seu_usuario" -d "password=sua_senha"
-```
-
-Usar token nas chamadas subsequentes:
-
-```
-Authorization: Token <SEU_TOKEN>
+curl -X POST http://127.0.0.1:8000/api/auth/token/ -d "username=seu_usuario" -d "password=sua_senha"
 ```
 
 ---
 
-## Testes com Postman
+## 🧪 Testes com Postman
 
-Uma coleção Postman foi adicionada ao repositório: `postman_collection.json`.
-
-Instruções:
-
-1. Abra Postman → `File → Import` → selecione `postman_collection.json` na raiz do projeto.
-2. Defina o Environment `base_url` como `http://127.0.0.1:8000/api`.
-3. Execute as requisições na sequência:
-   - `1 - Obter token` (preencha username e password no body urlencoded). O teste salva
-     `{{token}}` automaticamente.
-   - `2 - Listar eventos` (usa `Authorization: Token {{token}}`).
-   - `3 - Inscrever em evento` (ajuste `evento_id` no body JSON).
-
-Também há exemplos cURL nas descrições das requisições.
+1. Importe `postman_collection.json` no Postman
+2. Configure o `base_url` como `http://127.0.0.1:8000/api`
+3. Siga a ordem: obter token → listar eventos → inscrever em evento
 
 ---
 
-## Mudanças e validações importantes
+## 📝 Dicas e Observações
 
-Resumo das alterações implementadas:
-
-- API REST com DRF e `rest_framework.authtoken` para autenticação por token.
-- Coleção Postman pronta (`postman_collection.json`).
-- Throttling configurado em `settings.py` (20/day e 50/day).
-- Validação de senha no formulário de cadastro e edição:
-  - Mínimo 8 caracteres
-  - Ao menos uma letra
-  - Ao menos um número
-  - Ao menos um caractere especial
-  Mensagens de erro aparecem no formulário quando regras não são cumpridas.
-- Campo `senha_confirm` adicionado ao formulário de cadastro (`usuarios/forms.py`) e template
-  `usuarios/templates/cadastro.html` atualizado com instruções fixas de senha.
-- Campo `senha_confirm` adicionado ao formulário de cadastro (`usuarios/forms.py`) e template
-  `usuarios/templates/cadastro.html` atualizado com instruções fixas de senha.
-- Confirmação de senha no perfil: foi adicionado o campo `nova_senha_confirm` em
-  `usuarios/forms.py` para a edição de perfil (`UsuarioEditForm`) e o template
-  `usuarios/templates/perfil.html` foi atualizado para renderizar o campo de confirmação.
-  O comportamento do botão "mostrar/ocultar" senha foi generalizado para suportar múltiplos
-  campos usando `class="toggle-senha"` e `data-target`, e o script atualizado está em
-  `instituicao_ensino/staticfiles/scripts/senha.js` (e também há versão em
-  `instituicao_ensino/static/scripts/senha.js`).
-
-  Arquivos principais alterados para essa melhoria:
-  - `instituicao_ensino/usuarios/forms.py` — adição de `nova_senha_confirm` e validação de
-    igualdade quando o usuário informa `nova_senha`.
-  - `instituicao_ensino/usuarios/templates/perfil.html` — inclusão do campo de confirmação e
-    botões `toggle-senha` para ambos os campos de senha.
-  - `instituicao_ensino/staticfiles/scripts/senha.js` — handler genérico para toggles.
-
-  Observações e testes rápidos:
-  - Não é necessário rodar migrações para essa alteração (somente mudança em formulários,
-    templates e JS).
-  - Para testar localmente:
-
-    1. Rode o servidor localmente:
-
-```powershell
-python manage.py runserver
-```
-
-    2. Acesse `http://127.0.0.1:8000/perfil/` (ou a rota onde o perfil está disponível),
-       preencha `Nova senha` sem preencher a confirmação → deve ver erro pedindo confirmação.
-    3. Preencha `Nova senha` e `Confirme a nova senha` com valores diferentes → erro de
-       não coincidência.
-    4. Preencha com senhas que atendam aos requisitos de complexidade (mínimo 8, letra,
-       número, caractere especial) e iguais → o formulário deverá salvar a nova senha.
-
-  - Se os botões de mostrar/ocultar não atualizarem os ícones, limpe cache do navegador ou
-    recarregue os arquivos estáticos; em ambiente de produção, rode `collectstatic`.
-- Normalização de telefone no modelo `usuarios.Usuario` e validação no formulário: formato
-  armazenado como `+CC (DD) NNNNN-NNNN` (padrão Brasil `+55` quando país não informado). Há máscara
-  JS no front (`telefone_mask.js`) e validação server-side.
-- Hash de senha: PBKDF2-SHA256 customizado para reforçar a criptografia (mantendo compatibilidade
-  com hashes Django antigos). Ver função de hashing em `usuarios/models.py`.
-- Fluxo de confirmação de e-mail (quando ativado): geração de token de confirmação com expiração
-  curta (2 minutos) e templates em `usuarios/templates/emails/`.
-
-Observações sobre inscrição via API:
-
-- A inscrição (`InscricaoEvento`) exige que o usuário Django autenticado possua um `Usuario`
-  vinculado via `User.profile` (campo `Usuario.user` com `related_name='profile'`). Se não houver
-  perfil, a API retorna 400.
-- A API impede inscrições duplicadas e respeita `quantidade_participantes` salvo se
-  `sem_limites=True`.
+- Sempre ative o ambiente virtual antes de rodar comandos Python
+- Se der erro de módulo (ex: `No module named 'rest_framework'`), instale as dependências
+- Para produção, configure cache (Redis/Memcached) para throttling e use HTTPS
+- Não exponha `.env` ou credenciais em repositórios públicos
+- Para customizar templates, edite os arquivos em `instituicao_ensino/templates/`
+- Para alterar regras de senha/telefone, veja `usuarios/forms.py` e `usuarios/models.py`
 
 ---
 
-## Notas de segurança e implantação
+## 🛡️ Segurança
 
-- Não deixe credenciais (SMTP, chaves, etc.) em `settings.py` no repositório. Use variáveis de
-  ambiente.
-- Para produção, configure um cache compartilhado (Redis/Memcached) para que o throttling funcione
-  corretamente entre múltiplos processos/instâncias.
-- Habilite HTTPS e configure cabeçalhos de segurança (HSTS, CSP) no servidor de produção.
+- Nunca suba senhas, chaves ou dados sensíveis para o repositório
+- Use variáveis de ambiente para SMTP, tokens e segredos
+- Habilite HTTPS e configure cabeçalhos de segurança em produção
 
 ---
 
-## Diagnóstico rápido
-
-- Se ao iniciar o servidor aparecer `ModuleNotFoundError: No module named 'rest_framework'`:
-  1. Ative o venv: `.\venv\Scripts\Activate.ps1` (PowerShell).
-  2. Instale dependências: `python -m pip install -r requirements.txt`.
-  3. Verifique: `python -c "import rest_framework; print(rest_framework.__version__)"`.
-
-- Se receber `{"detail":"Método \"GET\" não é permitido."}` no Postman: verifique que está
-  usando o método correto para o endpoint (por exemplo `POST /api/events/register/` para
-  inscrições).
-
----
-
-## Arquivos úteis no repositório
-
-- `postman_collection.json` — coleção Postman para teste da API.
-- `requirements.txt` — dependências (DRF já adicionado).
-- `eventos/serializers.py`, `eventos/api_views.py`, `eventos/urls_api.py` — implementação da API.
-
----
-
-## Próximos passos (opcionais)
-
-- Adicionar documentação OpenAPI/Swagger (ex: `drf-yasg` ou `drf-spectacular`).
-- Criar testes automatizados para endpoints da API (pytest + Django) e para validações de senha/
-  telefone.
-- Adicionar monitoramento de taxa de erro e métricas (Sentry, Prometheus).
-
----
-
-## Autor
+## 👨‍💻 Autores
 
 Desenvolvido por **Gustavo Gomide**, **Victor Ribeiro** e **Matheus Queiroz**.

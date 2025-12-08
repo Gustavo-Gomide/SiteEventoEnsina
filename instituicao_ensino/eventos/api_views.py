@@ -68,6 +68,22 @@ class InscricaoAPIView(APIView):
         except Exception:
             return Response({'detail': 'Perfil do usuário não encontrado.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Only allow users with TipoUsuario 'Aluno' or 'Professor'
+        tipo_nome = getattr(getattr(perfil, 'tipo', None), 'tipo', '') or ''
+        if tipo_nome.lower() not in ('aluno', 'professor'):
+            return Response({'detail': 'Apenas alunos ou professores podem se inscrever.'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Prevent event creator from registering
+        try:
+            if evento.criador and perfil.pk == evento.criador.pk:
+                return Response({'detail': 'Criador do evento não pode se inscrever.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            pass
+
+        # Prevent Django superusers from registering via API
+        if getattr(request.user, 'is_superuser', False):
+            return Response({'detail': 'Superusuário não pode se inscrever.'}, status=status.HTTP_403_FORBIDDEN)
+
         # prevent duplicate inscriptions
         if InscricaoEvento.objects.filter(evento=evento, inscrito=perfil).exists():
             return Response({'detail': 'Usuário já inscrito neste evento.'}, status=status.HTTP_400_BAD_REQUEST)

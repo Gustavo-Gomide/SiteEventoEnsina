@@ -1,14 +1,13 @@
 """
-Utility helpers for user media and certificate rendering.
+Funções utilitárias para mídia de usuários e geração de certificados.
 
-Provides:
-- create_user_dirs(usuario): ensure per-user directories exist under
-    MEDIA_ROOT so that file uploads and generated certificates have a stable
-    place to be stored.
-- render_and_save_html_certificate(cert_obj, evento, aluno): when binary
-    generation libraries are missing (Pillow/reportlab/qrcode) we still want
-    to present a certificate via the web. This helper renders the certificate
-    template to HTML and saves it as the `arquivo` on the Certificado model.
+Fornece:
+- create_user_dirs(usuario): garante que os diretórios por usuário existam em
+    MEDIA_ROOT para que uploads e certificados gerados tenham um local estável.
+- render_and_save_html_certificate(cert_obj, evento, aluno): quando as bibliotecas
+    binárias estão ausentes (Pillow/reportlab/qrcode), ainda é possível apresentar
+    um certificado via web. Este helper renderiza o template do certificado em HTML
+    e salva como `arquivo` no modelo Certificado.
 """
 
 from django.template.loader import render_to_string
@@ -19,9 +18,10 @@ import logging
 
 
 def create_user_dirs(usuario):
-    """Ensure base directories for a Usuario exist under MEDIA_ROOT.
+    """
+    Garante que os diretórios base de um Usuario existam em MEDIA_ROOT.
 
-    Creates: media/<base_dir>/foto_perfil and media/<base_dir>/certificados
+    Cria: media/<base_dir>/foto_perfil e media/<base_dir>/certificados
     """
     logger = logging.getLogger(__name__)
     try:
@@ -58,6 +58,10 @@ import os
 from django.conf import settings
 
 def resize_image(path, max_size=(400, 400), quality=70):
+    """
+    Redimensiona uma imagem para o tamanho máximo especificado e qualidade desejada.
+    Utiliza LANCZOS para melhor qualidade.
+    """
     if not os.path.exists(path):
         return
     with Image.open(path) as img:
@@ -67,7 +71,8 @@ def resize_image(path, max_size=(400, 400), quality=70):
 
 
 def log_audit(request=None, usuario=None, django_user=None, action=None, object_type=None, object_id=None, description=None, extra=None):
-    """Cria um registro em AuditLog de forma segura (import tardio para evitar ciclos).
+    """
+    Cria um registro em AuditLog de forma segura (importação tardia para evitar ciclos).
 
     Parâmetros:
     - request: objeto HttpRequest opcional (usado para extrair IP)

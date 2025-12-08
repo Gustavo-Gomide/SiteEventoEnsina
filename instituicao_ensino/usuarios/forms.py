@@ -5,15 +5,21 @@ from .models import Usuario, Perfil, Certificado, Instituicao
 import re
 
 
+"""
+Formulários customizados para o app de usuários.
+Incluem validações, normalizações e sincronização entre modelos customizados e o User do Django.
+"""
+
 # ============================================================
 # FORMULÁRIO DE CADASTRO DE USUÁRIO
 # ============================================================
 class CadastroUsuarioForm(forms.ModelForm):
     """
-    Formulário para criar um novo usuário:
+    Formulário para criar um novo usuário.
     - Salva no modelo custom `Usuario` e no `User` do Django.
     - Permite DDD separado do telefone.
     - Sincroniza senha criptografada com o User.
+    - Realiza validação de senha forte e telefone.
     """
     senha = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'id': 'id_senha'}))
     senha_confirm = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'id': 'id_senha_confirm'}), label='Confirme a senha')
@@ -55,7 +61,11 @@ class CadastroUsuarioForm(forms.ModelForm):
 
     def save(self, commit=True):
         """
-        Cria apenas o Django User como fonte de verdade e vincula o perfil legado.
+        Salva o usuário:
+        - Cria o auth.User se não existir, sincronizando dados essenciais.
+        - Atualiza User existente se já vinculado.
+        - Normaliza telefone e evita duplicidade de dados sensíveis no modelo legado.
+        - Cria diretórios de usuário após salvar.
         """
         User = get_user_model()
         usuario = super().save(commit=False)
@@ -120,6 +130,12 @@ class CadastroUsuarioForm(forms.ModelForm):
         return usuario
 
     def clean(self):
+        """
+        Valida o formulário de cadastro:
+        - Garante presença e confirmação de senha.
+        - Exige senha forte (mínimo 8 caracteres, letra, número e caractere especial).
+        - Garante que as senhas coincidam.
+        """
         cleaned = super().clean()
         senha = cleaned.get('senha')
         senha_confirm = cleaned.get('senha_confirm')
@@ -190,10 +206,8 @@ class LoginForm(forms.Form):
 # ============================================================
 class PerfilForm(forms.ModelForm):
     """
-    Permite editar:
-    - Foto de perfil
-    - Biografia
-    - Visibilidade de email e telefone
+    Formulário para edição do perfil do usuário.
+    Permite editar foto, biografia e visibilidade de email/telefone.
     """
     foto = forms.ImageField(required=False)
     mostrar_email = forms.BooleanField(required=False, label='Mostrar e-mail no perfil público')
@@ -205,10 +219,10 @@ class PerfilForm(forms.ModelForm):
 
     def clean_foto(self):
         """
-        Valida foto de perfil:
-        - Limite 5MB
-        - Formato JPEG ou PNG
-        - Só valida se o arquivo for novo enviado pelo form (tem content_type)
+        Valida a foto de perfil enviada:
+        - Limite de 5MB.
+        - Aceita apenas JPEG ou PNG.
+        - Só valida se o arquivo for novo enviado pelo form (tem content_type).
         """
         foto = self.cleaned_data.get('foto')
         if not foto:
@@ -227,6 +241,11 @@ class PerfilForm(forms.ModelForm):
 # FORMULÁRIO DE EDIÇÃO DE USUÁRIO
 # ============================================================
 class UsuarioEditForm(forms.ModelForm):
+    """
+    Formulário para edição dos dados do usuário.
+    Permite atualizar nome, email, telefone, instituição e senha.
+    Sincroniza alterações com o auth.User.
+    """
     # Tornar email e telefone obrigatórios no formulário de edição
     email = forms.EmailField(
         required=True,
@@ -275,6 +294,10 @@ class UsuarioEditForm(forms.ModelForm):
         fields = ['nome', 'nome_usuario', 'email', 'instituicao', 'telefone']
 
     def __init__(self, *args, **kwargs):
+        """
+        Inicializa o formulário de edição de usuário:
+        - Normaliza o campo telefone para exibição amigável.
+        """
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.telefone:
             tel = self.instance.telefone
@@ -297,6 +320,9 @@ class UsuarioEditForm(forms.ModelForm):
                     self.initial['telefone'] = tel
 
     def clean_nome_usuario(self):
+        """
+        Garante unicidade do nome de usuário ao editar.
+        """
         nome_usuario = self.cleaned_data['nome_usuario']
         qs = Usuario.objects.filter(nome_usuario=nome_usuario)
         if self.instance.pk:
@@ -306,6 +332,12 @@ class UsuarioEditForm(forms.ModelForm):
         return nome_usuario
 
     def save(self, commit=True):
+        """
+        Salva as alterações do usuário:
+        - Atualiza senha se informada.
+        - Sincroniza dados com o auth.User.
+        - Salva telefone normalizado.
+        """
         usuario = super().save(commit=False)
         nova_senha = self.cleaned_data.get('nova_senha')
         if nova_senha and usuario.user:
@@ -344,6 +376,11 @@ class UsuarioEditForm(forms.ModelForm):
         return usuario
 
     def clean_telefone(self):
+        """
+        Valida e normaliza o telefone informado na edição:
+        - Aceita formato (AA) NNNNN-NNNN ou apenas 11 dígitos.
+        - Retorna sempre no formato (AA) NNNNN-NNNN.
+        """
         tel = self.cleaned_data.get('telefone')
         if not tel:
             raise ValidationError('Telefone obrigatório. Informe no formato (AA) NNNNN-NNNN ou 11-13 dígitos.')
@@ -358,6 +395,10 @@ class UsuarioEditForm(forms.ModelForm):
         raise ValidationError('Telefone inválido. Formato exigido: (AA) NNNNN-NNNN ou somente 11 dígitos numéricos.')
 
     def clean_nova_senha(self):
+        """
+        Valida a nova senha informada na edição:
+        - Exige senha forte (mínimo 8 caracteres, letra, número e caractere especial).
+        """
         nova = self.cleaned_data.get('nova_senha')
         if not nova:
             return nova
@@ -373,6 +414,10 @@ class UsuarioEditForm(forms.ModelForm):
         return nova
 
     def clean(self):
+        """
+        Valida o formulário de edição de usuário:
+        - Se o usuário deseja alterar a senha, exige confirmação e igualdade.
+        """
         cleaned = super().clean()
         nova = cleaned.get('nova_senha')
         confirm = cleaned.get('nova_senha_confirm')
@@ -393,13 +438,18 @@ class CertificadoUploadForm(forms.ModelForm):
     """
     Formulário para upload de certificados:
     - Permite PDF ou imagens (JPEG/PNG)
-    - Limite 20MB
+    - Limite de 20MB.
     """
     class Meta:
         model = Certificado
         fields = ['arquivo', 'nome']
 
     def clean_arquivo(self):
+        """
+        Valida o arquivo de certificado enviado:
+        - Limite de 20MB.
+        - Aceita apenas PDF, JPEG ou PNG.
+        """
         arquivo = self.cleaned_data.get('arquivo')
         if not arquivo:
             return arquivo

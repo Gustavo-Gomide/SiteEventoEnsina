@@ -1,3 +1,10 @@
+
+"""
+Serviços para envio e agendamento de emails em background.
+
+Inclui funções para enfileirar emails de confirmação, certificados e recuperação de senha.
+"""
+
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.utils import timezone
@@ -9,7 +16,11 @@ import socket
 
 
 def enqueue_email(to_email: str, subject: str, *, text_body: str = None, html_body: str = None, attachments=None, when=None, send_now: bool = False):
-    """Add a new email to the queue. A background worker (same process) will send it."""
+    """
+    Adiciona um novo email à fila de envio.
+    Se send_now=True, envia imediatamente; caso contrário, agenda para o worker.
+    Aceita anexos, corpo em texto e HTML, e data/hora de envio.
+    """
     # If immediate send requested, send synchronously to avoid duplicate processing
     if send_now:
         # Ensure a valid sender to avoid SMTP rejection
@@ -94,7 +105,10 @@ def enqueue_email(to_email: str, subject: str, *, text_body: str = None, html_bo
 
 
 def queue_welcome_confirmation_email(user, usuario, *, send_now: bool = False):
-    """Queue welcome email with confirmation link for a Django `User` and its `Usuario` profile."""
+    """
+    Enfileira email de boas-vindas com link de confirmação para um novo usuário.
+    Gera link seguro de confirmação e envia template customizado.
+    """
     if not user or not getattr(usuario, 'email', None):
         return None
 
@@ -132,7 +146,10 @@ def queue_welcome_confirmation_email(user, usuario, *, send_now: bool = False):
 
 
 def queue_certificate_ready_email(usuario, cert, evento=None, *, send_now: bool = False):
-    """Queue certificate ready email with link and optional attachment."""
+    """
+    Enfileira email notificando que o certificado está disponível.
+    Inclui link para download e anexa o PDF se disponível.
+    """
     if not getattr(usuario, 'email', None):
         return None
 
@@ -181,9 +198,9 @@ def queue_certificate_ready_email(usuario, cert, evento=None, *, send_now: bool 
 
 
 def queue_password_recovery_email(user, usuario=None, *, login_url: str = None, send_now: bool = False):
-    """Send password recovery email with a direct login link to profile.
-
-    Uses a one-time token to authenticate, then the user can change the password.
+    """
+    Envia email de recuperação de senha com link de acesso direto ao perfil.
+    Utiliza token de uso único para autenticação e permite redefinir a senha.
     """
     to_email = None
     if usuario and getattr(usuario, 'email', None):

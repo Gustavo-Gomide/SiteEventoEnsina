@@ -1,3 +1,9 @@
+
+"""
+Sinais do app de usuários.
+Define integrações automáticas para login, criação de usuários e envio de e-mails de boas-vindas.
+"""
+
 from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
 from .models import Usuario
@@ -12,17 +18,21 @@ from django.urls import reverse
 from django.conf import settings
 
 def _queue_welcome_email(usuario: Usuario):
+    """
+    Enfileira o envio de e-mail de boas-vindas e confirmação para o novo usuário.
+    Não interrompe o fluxo em caso de erro no envio.
+    """
     try:
         if not usuario or not usuario.user or not usuario.email:
             return
-        # Build confirmation link (opcional; conta já ativa para testes)
+        # Monta link de confirmação (opcional; conta já ativa para testes)
         uid = urlsafe_base64_encode(force_bytes(usuario.user.pk))
         token = default_token_generator.make_token(usuario.user)
         path = reverse('confirmar_email', kwargs={'uidb64': uid, 'token': token})
         site_url = getattr(settings, 'SITE_URL', '').rstrip('/')
         confirm_url = f"{site_url}{path}" if site_url else path
 
-        # Render templates and enqueue email
+        # Renderiza templates e enfileira o e-mail
         from notifications.services import enqueue_email
         from django.template.loader import render_to_string
         ctx = {
@@ -38,31 +48,33 @@ def _queue_welcome_email(usuario: Usuario):
         html = render_to_string('emails/welcome_confirmation.html', ctx)
         enqueue_email(usuario.email, subject, text_body=text, html_body=html)
     except Exception:
-        # Do not break user creation on email errors
+        # Não interrompe criação do usuário em caso de erro no e-mail
         pass
 
 
 @receiver(user_logged_in)
 def link_usuario_on_login(sender, user, request, **kwargs):
-    """When a Django User logs in, try to associate it with an existing Usuario
-    that has the same username (nome_usuario). This provides a robust mapping
-    for existing users created via the registration form or admin.
+    """
+    Ao realizar login, associa o Django User ao Usuario correspondente (pelo nome de usuário).
+    Garante o vínculo entre contas criadas via formulário ou admin e mantém a sessão compatível.
     """
     try:
         perfil = Usuario.objects.get(nome_usuario=user.username)
         if not perfil.user:
             perfil.user = user
             perfil.save()
-        # ensure legacy session id is present for other code paths
+        # garante id de sessão legado para outros fluxos
         request.session['usuario_id'] = perfil.id
     except Usuario.DoesNotExist:
-        # nothing to do
+        # nada a fazer
         pass
 
 
 @receiver(post_save, sender=Usuario)
 def audit_usuario_created(sender, instance, created, **kwargs):
-    """Registra auditoria quando um Usuario do sistema é criado."""
+    """
+    Registra auditoria quando um Usuario do sistema é criado e garante Perfil e e-mail de boas-vindas.
+    """
     try:
         if created:
             # usuário lógico criado
@@ -79,7 +91,9 @@ def audit_usuario_created(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def audit_authuser_created(sender, instance, created, **kwargs):
-    """Registra auditoria quando um Django auth.User é criado."""
+    """
+    Registra auditoria quando um Django auth.User é criado e tenta vincular ao Usuario correspondente.
+    """
     try:
         if created:
             # tenta vincular usuario profile se existir

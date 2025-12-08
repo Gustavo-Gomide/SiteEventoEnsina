@@ -1,16 +1,16 @@
 """
-Users views and helpers.
+Views e utilitários de usuários.
 
-This module provides UI views for user registration, login, profile
-management and a helper `get_current_usuario()` which bridges the legacy
-session-based `usuario_id` approach with Django's `User` authentication.
+Este módulo provê as views de interface para cadastro, login, gerenciamento de perfil
+e o helper `get_current_usuario()`, que faz a ponte entre a abordagem legada baseada
+em sessão (`usuario_id`) e a autenticação do `User` do Django.
 
-Important notes:
-- When a Django `User` logs in, we try to link a `Usuario` with the same
-    `nome_usuario`. This keeps older code working while allowing gradual
-    migration to Django's auth system.
-- The `perfil` view ensures per-user media directories exist before saving
-    files by calling `create_user_dirs()`.
+Notas importantes:
+- Quando um `User` do Django faz login, tentamos vincular um `Usuario` com o mesmo
+    `nome_usuario`. Isso mantém o código antigo funcionando e permite migração gradual
+    para o sistema de autenticação do Django.
+- A view `perfil` garante que os diretórios de mídia do usuário existam antes de salvar
+    arquivos, chamando `create_user_dirs()`.
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -152,7 +152,9 @@ def logout_usuario(request):
 
 
 def confirmar_email(request, uidb64, token):
-    """Ativa a conta do usuário após confirmação por e-mail."""
+    """
+    Ativa a conta do usuário após confirmação por e-mail.
+    """
     User = get_user_model()
     user = None
     try:
@@ -187,7 +189,8 @@ def confirmar_email(request, uidb64, token):
 
 
 def esqueci_senha(request):
-    """Recebe o nome de usuário, envia e-mail com link de acesso direto.
+    """
+    Recebe o nome de usuário e envia e-mail com link de acesso direto.
 
     O link usa `default_token_generator` e `uidb64` para validar e realizar
     login automático, redirecionando para `perfil` para o usuário alterar a senha.
@@ -238,7 +241,9 @@ def esqueci_senha(request):
 
 
 def auto_login(request, uidb64, token):
-    """Valida token, efetua login e redireciona para perfil para troca de senha."""
+    """
+    Valida o token, efetua login e redireciona para o perfil para troca de senha.
+    """
     User = get_user_model()
     user = None
     try:
@@ -322,12 +327,13 @@ def get_current_usuario(request):
 
 
 def usuario_login_required(view_func):
-    """Decorator that accepts either a linked Django user or a legacy session 'usuario_id'.
+    """
+    Decorator que aceita tanto um usuário Django autenticado quanto uma sessão legada 'usuario_id'.
 
-    Many views historically relied on `request.session['usuario_id']`. This decorator
-    checks `get_current_usuario(request)` and only redirects to the login page if
-    no Usuario is available. It preserves compatibility with Django's @login_required
-    while supporting older session-based flows.
+    Muitas views dependiam de `request.session['usuario_id']`. Este decorator
+    verifica `get_current_usuario(request)` e só redireciona para login se
+    não houver Usuario disponível. Preserva compatibilidade com @login_required
+    do Django e fluxos antigos baseados em sessão.
     """
     @wraps(view_func)
     def _wrapped(request, *args, **kwargs):

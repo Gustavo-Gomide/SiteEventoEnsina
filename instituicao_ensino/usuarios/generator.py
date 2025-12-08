@@ -22,20 +22,18 @@ from django.utils.text import slugify
 
 def generate_certificates_for_event(evento_id):
     """
-    GERA CERTIFICADOS PARA TODOS OS INSCRITOS VALIDADOS DE UM EVENTO
-    =================================================================
-    
+    Gera certificados em PNG e PDF para todos os inscritos validados de um evento.
+    O design utiliza tema vermelho vinho e dourado, com elementos decorativos, QR code e marca d'água.
+
     Parâmetros:
-    - evento_id: ID do evento para o qual gerar os certificados
-    
+        evento_id (int): ID do evento para o qual gerar os certificados.
+
     Retorna:
-    - Número de certificados gerados
+        int: Número de certificados gerados.
     """
-    
     # =========================================================================
     # IMPORTAÇÕES E CONFIGURAÇÕES INICIAIS
     # =========================================================================
-    
     # Importações locais para evitar problemas de importação circular
     from eventos.models import Evento
     from usuarios.models import Certificado
@@ -48,7 +46,6 @@ def generate_certificates_for_event(evento_id):
     # =========================================================================
     # CONFIGURAÇÕES DE CORES E DESIGN - TEMA VERMELHO VINHO E DOURADO
     # =========================================================================
-    
     # Paleta de cores nobre para o certificado
     CORES = {
         'vinho_escuro': (139, 0, 0),      # #8B0000 - Vermelho vinho principal
@@ -75,7 +72,7 @@ def generate_certificates_for_event(evento_id):
 
     def load_font(path, size):
         """
-        CARREGA UMA FONTE DO SISTEMA OU USA FALLBACK
+        Carrega uma fonte do sistema ou retorna None se não encontrar.
         """
         try:
             return ImageFont.truetype(path, size=size)
@@ -105,7 +102,8 @@ def generate_certificates_for_event(evento_id):
 
     def pick_font(candidates, size):
         """
-        SELECIONA A MELHOR FONTE DISPONÍVEL NA LISTA
+        Seleciona a melhor fonte disponível na lista de caminhos.
+        Retorna a primeira fonte encontrada, ou a fonte padrão se nenhuma for encontrada.
         """
         for p in candidates:
             f = load_font(p, size)
@@ -204,7 +202,9 @@ def generate_certificates_for_event(evento_id):
         # ====================================
         
         def desenhar_ornamento_canto(x, y, tamanho=60):
-            """Desenha elemento decorativo nos cantos do certificado"""
+            """
+            Desenha elemento decorativo dourado nos cantos do certificado.
+            """
             # Pontos para criar forma ornamental
             pontos = [
                 (x, y), (x + tamanho//3, y), (x + tamanho//2, y + tamanho//4),
@@ -279,10 +279,11 @@ def generate_certificates_for_event(evento_id):
         
         def desenhar_texto_com_contorno(pos, texto, fonte, cor_principal, cor_contorno, largura_contorno=3, anchor="mm"):
             """
-            DESENHA TEXTO COM CONTORNO PARA DESTAQUE E LEGIBILIDADE
+            Desenha texto com contorno para destaque e legibilidade.
+            Utiliza múltiplas camadas para criar o efeito de contorno.
             """
             x, y = pos
-            # Desenha contorno (multiples posições ao redor)
+            # Desenha contorno (múltiplas posições ao redor)
             for dx in range(-largura_contorno, largura_contorno + 1):
                 for dy in range(-largura_contorno, largura_contorno + 1):
                     if dx == 0 and dy == 0:

@@ -1,8 +1,21 @@
+
+"""
+Formulários para manipulação de eventos na aplicação.
+
+Define o formulário principal para criação e edição de eventos, incluindo validações customizadas e widgets personalizados.
+"""
+
 from django import forms
 from .models import Evento, TipoEvento
 from django.utils import timezone
 
+
 class EventoForm(forms.ModelForm):
+    """
+    Formulário para criação e edição de eventos.
+
+    Inclui validações customizadas para datas e widgets personalizados para melhor experiência do usuário.
+    """
     tipo = forms.ModelChoiceField(
         queryset=TipoEvento.objects.all(),
         empty_label="Selecione o tipo",
@@ -30,9 +43,13 @@ class EventoForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        """
+        Inicializa o formulário, ajustando valores iniciais e restrições dos campos de data/hora.
+        Define o valor mínimo das datas como a data atual e preenche valores iniciais ao editar.
+        """
         super().__init__(*args, **kwargs)
-        # força valor inicial dos campos de data/hora para compatibilidade com HTML
-        # também define o mínimo permitido para datas como a data atual
+        # Força valor inicial dos campos de data/hora para compatibilidade com HTML
+        # Também define o mínimo permitido para datas como a data atual
         today_str = timezone.localdate().strftime('%Y-%m-%d')
         if 'min' not in self.fields['data_inicio'].widget.attrs:
             self.fields['data_inicio'].widget.attrs['min'] = today_str
@@ -47,12 +64,18 @@ class EventoForm(forms.ModelForm):
                 self.fields['horario'].initial = self.instance.horario.strftime('%H:%M')
 
     def clean_data_inicio(self):
+        """
+        Valida se a data de início não é anterior à data atual.
+        """
         data_inicio = self.cleaned_data.get('data_inicio')
         if data_inicio and data_inicio < timezone.localdate():
             raise forms.ValidationError("A data de início não pode ser anterior à data atual.")
         return data_inicio
 
     def clean_data_fim(self):
+        """
+        Valida se a data final não é menor que a data de início.
+        """
         data_inicio = self.cleaned_data.get('data_inicio')
         data_fim = self.cleaned_data.get('data_fim')
         if data_fim and data_inicio and data_fim < data_inicio:

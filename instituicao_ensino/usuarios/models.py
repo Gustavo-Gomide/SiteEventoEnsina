@@ -1,18 +1,17 @@
 """
-Usuarios models and storage helpers
+Modelos de usuários e utilitários de armazenamento
 
-This module contains models related to users and profile data. Key design
-decisions:
+Este módulo contém os modelos relacionados a usuários e dados de perfil. Decisões de projeto:
 
-- We keep a custom `Usuario` model for historical reasons. The project also
-    stores a link to Django's `User` object in `Usuario.user` to gradually
-    migrate to Django's auth system.
-- Files uploaded for a user (profile photo, certificados) are stored under a
-    stable `base_dir` inside `MEDIA_ROOT`. `Usuario.base_dir` is computed on
-    first save and used afterwards so file paths don't change when display
-    fields (nome_usuario/instituicao) are updated.
-- The `user_directory_path` helper dynamically infers the subfolder for a
-    specific FileField (e.g. 'foto_perfil', 'certificados'), sem depender de
+- Mantemos um modelo customizado `Usuario` por razões históricas. O projeto também
+    armazena um vínculo com o objeto `User` do Django em `Usuario.user` para migrar
+    gradualmente para o sistema de autenticação do Django.
+- Arquivos enviados por um usuário (foto de perfil, certificados) são armazenados em
+    um `base_dir` estável dentro do `MEDIA_ROOT`. O campo `Usuario.base_dir` é calculado
+    no primeiro save e usado depois, assim os caminhos dos arquivos não mudam quando
+    campos de exibição (nome_usuario/instituicao) são atualizados.
+- O helper `user_directory_path` infere dinamicamente a subpasta para um
+    FileField específico (ex: 'foto_perfil', 'certificados'), sem depender de
     atributos transitórios (_upload_field).
 """
 
@@ -92,7 +91,7 @@ class Usuario(models.Model):
                 raise ValidationError("Telefone inválido. Máximo esperado: código do país (até 3 dígitos) + DDD + número local")
 
     def save(self, *args, **kwargs):
-        # Hash de senha: usamos PBKDF2 via hashlib para reforçar criptografia.
+        # Hash de senha: usamos PBKDF2 via hashlib para reforçar a criptografia.
         # Mantemos compatibilidade com hashes do Django (prefixo 'pbkdf2_').
         if self.senha and not (self.senha.startswith('pbkdf2_') or self.senha.startswith('pbkdf2_custom$')):
             # implementação PBKDF2-SHA256 (iterações elevadas)
@@ -200,7 +199,7 @@ class Usuario(models.Model):
 # Caminho de upload
 # -----------------------------
 def user_directory_path(instance, filename):
-    """Gera caminho para armazenar arquivos do usuário.
+    """Gera o caminho para armazenar arquivos do usuário.
 
     Formato:
         usuarios/<nome_usuario>_<instituicao>/<tipo_arquivo>/<filename>
@@ -244,7 +243,7 @@ class Perfil(models.Model):
         except Exception:
             pass
 
-        # Remove foto antiga se for substituir
+        # Remove a foto antiga se for substituir
         try:
             if self.pk and self.foto:
                 old_instance = Perfil.objects.filter(pk=self.pk).first()
@@ -299,7 +298,8 @@ class Certificado(models.Model):
 # Registro de Auditoria
 # -----------------------------
 class AuditLog(models.Model):
-    """Armazena ações críticas para rastreabilidade.
+    """
+    Armazena ações críticas para rastreabilidade.
 
     Campos:
     - timestamp: quando ocorreu
