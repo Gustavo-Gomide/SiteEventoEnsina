@@ -4,13 +4,18 @@
 <!-- Título da página -->
 {% block title %}Detalhe do Evento{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/main.css' %}">
+<link rel="stylesheet" href="{% static 'css/detalhe_evento.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <div class="row">
+    <div class="row event-row">
         <!-- ======================================== -->
         <!-- Coluna da imagem do evento -->
         <!-- ======================================== -->
-        <div class="col-md-4">
+        <div class="col-md-4 image-column">
             {% if evento.thumb %}
                 <!-- Exibe a imagem enviada pelo usuário -->
                 <img src="{{ evento.thumb.url }}" class="img-fluid rounded" alt="{{ evento.titulo }}">
@@ -20,12 +25,14 @@
             {% endif %}
         </div>
 
+        <div class="separador"></div>
+        
         <!-- ======================================== -->
         <!-- Coluna com detalhes do evento -->
         <!-- ======================================== -->
-        <div class="col-md-8">
+        <div class="col-md-8 details-column">
             <!-- Título do evento -->
-            <h1>{{ evento.titulo }}</h1>
+            <h1 class="titulo-evento">{{ evento.titulo }}</h1>
 
             <!-- Tipo e modalidade do evento -->
             <p><strong>Tipo:</strong> {{ evento.tipo.tipo|default:evento.tipo }} | 
@@ -46,7 +53,7 @@
             <p>
                 <strong>Local:</strong> {{ evento.local|default:'Online' }}
                 {% if evento.link %}
-                    - <a href="{{ evento.link }}" target="_blank">Link</a>
+                    - <a href="{{ evento.link }}" target="_blank" class="text-link">Link</a>
                 {% endif %}
             </p>
 
@@ -57,17 +64,33 @@
 
             <!-- Descrição do evento -->
             {% if evento.descricao %}
-                <p><strong>Descrição:</strong> {{ evento.descricao }}</p>
+                <p><strong>Descrição:</strong></p>
+                <div class="descricao">{{ evento.descricao }}</div>
             {% endif %}
+            
+            <hr>
 
-            <!-- Participantes -->
-            <p>
-                <strong>Participantes:</strong>
-                {{ evento.inscricaoevento_set.count|stringformat:"02d" }}
-                {% if not evento.sem_limites and evento.quantidade_participantes %}
-                    /{{ evento.quantidade_participantes|stringformat:"02d" }}
-                {% endif %}
-            </p>
+            <div class="grid">
+                <!-- Participantes -->
+                <p>
+                    <strong>Participantes:</strong>
+                    {{ evento.inscricaoevento_set.count|stringformat:"02d" }}
+                    {% if not evento.sem_limites and evento.quantidade_participantes %}
+                        /{{ evento.quantidade_participantes|stringformat:"02d" }}
+                    {% endif %}
+                </p>
+                <!-- ======================================== -->
+                <!-- Status do evento -->
+                <!-- ======================================== -->
+                <p style="text-align: right;">
+                    <strong>Status:</strong>
+                    {% if evento.finalizado %}
+                        <i style="color: rgb(255, 58, 58);">Finalizado</i>
+                    {% else %}
+                        <i style="color: rgb(0, 233, 0);">Em andamento</i>
+                    {% endif %}
+                </p>
+            </div>
 
             <!-- ======================================== -->
             <!-- Mensagens do Django -->
@@ -116,18 +139,6 @@
                 <!-- Usuário não logado é redirecionado para login -->
                 <a href="{% url 'login' %}" class="btn btn-primary">Entrar para inscrever</a>
             {% endif %}
-
-            <!-- ======================================== -->
-            <!-- Status do evento -->
-            <!-- ======================================== -->
-            <p>
-                <strong>Status:</strong>
-                {% if evento.finalizado %}
-                    Finalizado
-                {% else %}
-                    Em andamento
-                {% endif %}
-            </p>
         </div>
     </div>
 </div>

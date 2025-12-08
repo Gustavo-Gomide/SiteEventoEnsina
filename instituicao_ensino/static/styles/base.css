@@ -110,8 +110,8 @@ a, .btn {
     text-decoration: none;
 }
 
-a:hover, .btn:hover {
-    color: #fff;
+a.text-link:hover {
+    color: var(--primary-gold);
     text-decoration: underline;
 }
 

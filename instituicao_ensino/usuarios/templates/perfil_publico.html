@@ -3,6 +3,11 @@
 
 {% block title %}Perfil de {{ usuario.nome }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/main.css' %}">
+<link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
   <div class="row">
@@ -14,6 +19,7 @@
           {% else %}
           <img src="{% static 'images/unknown.svg' %}" class="img-fluid rounded mb-2" alt="Sem foto">
           {% endif %}
+          <hr>
           <h4 class="card-title">{{ usuario.nome }}</h4>
           <p class="text-muted">@{{ usuario.nome_usuario }}</p>
           {% if usuario.certificados.count > 0 %}
@@ -27,21 +33,21 @@
     <div class="col-md-8">
       <div class="card">
         <div class="card-body">
-          <p><strong>Instituição:</strong>
-            {% if usuario.instituicao %}
-            <a href="{% url 'instituicao_publica' usuario.instituicao.id %}" target="_blank"
-              rel="noopener noreferrer">{{ usuario.instituicao.nome }}</a>
-            {% else %}-{% endif %}
-          </p>
-          <h5>Sobre</h5>
+          <h5><strong>Biografia</strong></h5>
           <div class="descricao">
             <p>{{ usuario.perfil.biografia|default:'Sem biografia.' }}</p>
           </div>
+          <p><strong>Instituição:</strong>
+            {% if usuario.instituicao %}
+            <a href="{% url 'instituicao_publica' usuario.instituicao.id %}" target="_blank"
+              rel="noopener noreferrer" class="text-link">{{ usuario.instituicao.nome }}</a>
+            {% else %}-{% endif %}
+          </p>
           {% if usuario.perfil.mostrar_email and usuario.email %}
-          <p><strong>E-mail:</strong> <a href="mailto:{{ usuario.email }}">{{ usuario.email }}</a></p>
+          <p><strong>E-mail:</strong> <a href="mailto:{{ usuario.email }}" class="text-link">{{ usuario.email }}</a></p>
           {% endif %}
           {% if usuario.perfil.mostrar_telefone and usuario.telefone %}
-          <p><strong>Telefone:</strong> <a href="{{ whatsapp_link }}" target="_blank" rel="noopener noreferrer">{{ usuario.telefone }}</a></p>
+          <p><strong>Telefone:</strong> <a href="{{ whatsapp_link }}" target="_blank" rel="noopener noreferrer" class="text-link">{{ usuario.telefone }}</a></p>
           {% endif %}
         </div>
       </div>

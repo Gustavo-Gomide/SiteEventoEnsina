@@ -14,7 +14,7 @@
 {% block content %}
 <div class="container mt-4">
 
-    <h1 class="mb-3">Meus Eventos</h1>
+    <h1 class="mb-3 pag-title">Meus Eventos</h1>
 
     <div class="row">
         <!-- COLUNA ESQUERDA -->
@@ -93,7 +93,12 @@
                             <h5 class="card-title">{{ evento_selecionado.titulo }}</h5>
                             <p class="card-text"><strong>Data:</strong> {{ evento_selecionado.data_inicio }}{% if evento_selecionado.data_fim %} a {{ evento_selecionado.data_fim }}{% endif %}</p>
                             <p class="card-text"><strong>Horário:</strong> {{ evento_selecionado.horario }}</p>
+                            {% if evento_selecionado.local %}
                             <p class="card-text"><strong>Local:</strong> {{ evento_selecionado.local }}</p>
+                            {% endif %}
+                            {% if evento_selecionado.link %}
+                            <p class="card-text"><strong>Link:</strong> <a href="{{ evento_selecionado.link }}" target="_blank" rel="noopener noreferrer" class="text-link">{{ evento_selecionado.link }}</a></p>
+                            {% endif %}
                             <p class="card-text">
                                 <strong>Participantes:</strong> 
                                 {{ evento_selecionado.inscricaoevento_set.count }}
@@ -101,7 +106,7 @@
                                 /{{ evento_selecionado.quantidade_participantes }}
                                 {% endif %}
                             </p>
-                            <p class="card-text"><strong>Organizador:</strong> <a href="{% url 'perfil_publico' evento_selecionado.organizador %}" target="_blank">{{ evento_selecionado.criador }}</a></p>
+                            <p class="card-text"><strong>Organizador:</strong> <a href="{% url 'perfil_publico' evento_selecionado.organizador %}" target="_blank" class="text-link">{{ evento_selecionado.criador }}</a></p>
                             <p class="card-text"><strong>Horas:</strong> {{ evento_selecionado.horas }}</p>
 
                             {% if evento_selecionado.finalizado %}
@@ -240,10 +245,10 @@
                             <img src="{% static 'images/unknown.svg' %}" class="me-2" style="width:40px;height:40px;">
                             {% endif %}
                             <div class="flex-grow-1">
-                                <a href="{% url 'perfil_publico' ins.inscrito.nome_usuario %}" target="_blank">{{ ins.inscrito.nome }}</a>
+                                <a href="{% url 'perfil_publico' ins.inscrito.nome_usuario %}" target="_blank" class="text-link">{{ ins.inscrito.nome }}</a>
                                 <div class="small text-muted">
                                     {% if ins.inscrito.instituicao %}
-                                    <a href="{% url 'instituicao_publica' ins.inscrito.instituicao.id %}" target="_blank">{{ ins.inscrito.instituicao.nome }}</a>
+                                    <a href="{% url 'instituicao_publica' ins.inscrito.instituicao.id %}" target="_blank" class="text-link">{{ ins.inscrito.instituicao.nome }}</a>
                                     {% else %}-{% endif %}
                                 </div>
                             </div>

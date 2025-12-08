@@ -5,15 +5,16 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'styles/forms.css' %}">
+<link rel="stylesheet" href="{% static 'css/perfil.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4 perfil-container">
-    <h1 class="mb-3">Perfil de {{ usuario.nome }}</h1>
+    <h1 class="mb-3">Perfil de <strong class="username">{{ usuario.nome }}</strong></h1>
 
     <div class="row perfil-grid">
         <!-- Lateral esquerda: foto, dados e certificados -->
-        <div class="col-md-4 perfil-left">
+        <asside class="col-md-4 perfil-left">
             {% if usuario.perfil.foto %}
             <img src="{{ usuario.perfil.foto.url }}" alt="Foto de {{ usuario.nome }}" class="img-fluid rounded"
                 style="max-width:200px; margin-bottom: 5px; filter: drop-shadow(0 0 4px var(--primary-gold));" />
@@ -21,23 +22,25 @@
             <img src="{% static 'images/unknown.svg' %}" alt="Sem foto" class="img-fluid rounded"
                 style="max-width:200px;" />
             {% endif %}
-
-            <p><strong>Usuário:</strong> {{ usuario.nome_usuario }}</p>
-            <p><strong>Tipo:</strong> {{ usuario.tipo.tipo }}</p>
-            <p><strong>Instituição:</strong>
-                {% if usuario.instituicao %}
-                <a href="{% url 'instituicao_publica' usuario.instituicao.id %}">{{ usuario.instituicao.nome }}</a>
-                {% else %}
-                -
-                {% endif %}
-            </p>
-            <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
-            <p><strong>Email:</strong> {{ usuario.email }}</p>
-
-            <h3 class="mt-4">Certificados</h3>
+            <hr>
+            <div class="profile">
+                <p><strong>Usuário:</strong> {{ usuario.nome_usuario }}</p>
+                <p><strong>Tipo:</strong> {{ usuario.tipo.tipo }}</p>
+                <p><strong>Instituição:</strong>
+                    {% if usuario.instituicao %}
+                    <a href="{% url 'instituicao_publica' usuario.instituicao.id %}" class="text-link">{{ usuario.instituicao.nome }}</a>
+                    {% else %}
+                    -
+                    {% endif %}
+                </p>
+                <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
+                <p><strong>Email:</strong> {{ usuario.email }}</p>
+            </div>
+            <hr>
+            <h3 class="mt-4"><strong>Certificados</strong></h3>
             <a href="{% url 'perfil_certificados' usuario.nome_usuario %}" class="btn btn-success mt-2">Ver todos os
                 certificados</a>
-        </div>
+        </asside>
 
         <!-- Lateral direita: formulário de edição -->
         <div class="col-md-8 perfil-right">

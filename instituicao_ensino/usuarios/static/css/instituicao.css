@@ -1,0 +1,13 @@
+strong {
+    color: #d4af37;
+}
+
+.mt-4 h1 {
+    filter: drop-shadow(0 0 3px #d4af37);
+    text-shadow: 0 0 5px #d4af37;
+}
+
+hr {
+    height: 1px;
+    color: #d4af37;
+}

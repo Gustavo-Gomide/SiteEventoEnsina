@@ -35,9 +35,11 @@
     text-align: center;
     color: var(--text-heading);
     margin-bottom: 2rem;
+    margin: auto;
     font-size: 2.2rem;
     font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    filter: drop-shadow(0 0 3px goldenrod);
+    text-shadow: 0 0 2px goldenrod;
 }
 
 /* Subtítulos */
@@ -202,11 +204,16 @@ h4 {
 }
 
 .col-md-6 label a {
-    word-break: break-all;  /* força a quebra do link em qualquer ponto se for longo */
-    overflow-wrap: break-word; /* compatibilidade extra */
-    display: inline-block; /* garante que respeite limites do container */
-    color: var(--primary-gold); /* cor do link */
-    text-decoration: underline; /* opcional */
+    word-break: break-all;
+    /* força a quebra do link em qualquer ponto se for longo */
+    overflow-wrap: break-word;
+    /* compatibilidade extra */
+    display: inline-block;
+    /* garante que respeite limites do container */
+    color: var(--primary-gold);
+    /* cor do link */
+    text-decoration: underline;
+    /* opcional */
 }
 
 .form-evento {
@@ -234,7 +241,7 @@ h4 {
     z-index: 0;
 }
 
-.form-evento > * {
+.form-evento>* {
     position: relative;
     z-index: 1;
 }
@@ -361,13 +368,13 @@ h4 {
 }
 
 /* Checkbox quando marcado */
-.form-check-input:checked + .form-check-label::before {
+.form-check-input:checked+.form-check-label::before {
     background: var(--primary-gold-dark);
     border-color: var(--primary-gold);
 }
 
 /* Ícone de check personalizado - TAMANHO CORRIGIDO */
-.form-check-input:checked + .form-check-label::after {
+.form-check-input:checked+.form-check-label::after {
     content: '✓';
     position: absolute;
     left: 4px;
@@ -443,12 +450,15 @@ input[type="number"] {
 
 /* Força o link a quebrar linha se for longo */
 .thumb-field a {
-    display: block; /* garante que fique em linha separada */
-    word-break: break-all; /* quebra em qualquer ponto se necessário */
+    display: block;
+    /* garante que fique em linha separada */
+    word-break: break-all;
+    /* quebra em qualquer ponto se necessário */
     overflow-wrap: break-word;
     color: var(--primary-gold);
     text-decoration: underline;
-    margin-bottom: 0.5rem; /* espaço entre link e checkbox */
+    margin-bottom: 0.5rem;
+    /* espaço entre link e checkbox */
 }
 
 /* Container do checkbox + label como caixinha */
@@ -461,7 +471,7 @@ input[type="number"] {
     accent-color: var(--primary-gold);
 }
 
-.thumb-field input[type="checkbox"] + label {
+.thumb-field input[type="checkbox"]+label {
     display: inline-block;
     padding: 0.3rem 0.6rem;
     border: 2px solid var(--background-base-medium);
@@ -475,13 +485,13 @@ input[type="number"] {
 }
 
 /* Hover na label */
-.thumb-field input[type="checkbox"] + label:hover {
+.thumb-field input[type="checkbox"]+label:hover {
     border-color: var(--primary-gold);
     background: rgba(45, 27, 27, 0.8);
 }
 
 /* Quando marcado */
-.thumb-field input[type="checkbox"]:checked + label {
+.thumb-field input[type="checkbox"]:checked+label {
     background: var(--primary-gold);
     color: var(--background-base-dark);
     font-weight: 600;
@@ -540,8 +550,10 @@ input[type="number"] {
     cursor: pointer;
     font-size: 0.9rem;
     display: inline-block;
-    white-space: normal;       /* permite quebra de linha se necessário */
-    overflow-wrap: break-word;  /* compatibilidade extra */
+    white-space: normal;
+    /* permite quebra de linha se necessário */
+    overflow-wrap: break-word;
+    /* compatibilidade extra */
 }
 
 .thumb-field input[type="file"]:focus {
@@ -858,6 +870,7 @@ input[type="number"] {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -865,8 +878,13 @@ input[type="number"] {
 }
 
 @keyframes shine {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* ============================= */
@@ -877,89 +895,89 @@ input[type="number"] {
     .container.mt-4 {
         padding: 0.8rem;
     }
-    
+
     .container.mt-4 h1 {
         font-size: 1.8rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .list-group-item {
         padding: 0.7rem;
         min-height: 60px;
     }
-    
+
     .list-group-item img {
         width: 45px;
         height: 45px;
     }
-    
+
     .card .col-12.col-sm-4,
     .card .col-12.col-sm-8 {
         flex: 0 0 100%;
         max-width: 100%;
         padding: 1rem;
     }
-    
+
     .card .col-12.col-sm-4 img {
         height: 150px;
         object-fit: contain;
     }
-    
+
     .list-group {
         max-height: 200px;
     }
-    
+
     .list-unstyled {
         max-height: 250px;
         padding: 0.8rem;
     }
-    
+
     /* FORMULÁRIO MOBILE */
     .form-evento {
         padding: 1.2rem;
     }
-    
+
     .form-row {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
-    
+
     .form-check {
         padding: 0.8rem;
     }
-    
+
     .form-check-label {
         padding-left: 1.8rem;
         font-size: 0.9rem;
     }
-    
+
     .form-check-label::before {
         width: 16px;
         height: 16px;
         top: 0.15rem;
     }
-    
-    .form-check-input:checked + .form-check-label::after {
+
+    .form-check-input:checked+.form-check-label::after {
         left: 3px;
         top: 0.15rem;
         font-size: 10px;
     }
-    
+
     .checkbox-description {
         font-size: 0.8rem;
         margin-top: 0.3rem;
     }
-    
+
     .btn-submit {
         padding: 0.8rem 1.5rem;
         font-size: 0.95rem;
         max-width: 100%;
     }
-    
+
     .form-group label {
         font-size: 0.9rem;
     }
-    
+
     .form-evento input,
     .form-evento textarea,
     .form-evento select {
@@ -967,15 +985,15 @@ input[type="number"] {
         min-height: 40px;
         font-size: 0.9rem;
     }
-    
+
     .thumb-field {
         padding: 1rem;
     }
-    
+
     .thumb-field input[type="file"] {
         padding: 0.7rem;
     }
-    
+
     .thumb-field input[type="file"]::file-selector-button {
         padding: 0.5rem 0.8rem;
         font-size: 0.85rem;

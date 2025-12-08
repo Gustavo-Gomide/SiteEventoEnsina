@@ -48,7 +48,8 @@
                     <p><strong>Participantes:</strong>
                         {% if evento.sem_limites %}Ilimitado{% elif evento.quantidade_participantes %}{{ evento.quantidade_participantes }}{% else %}Não informado{% endif %}
                     </p>
-                    <p><strong>Organizador:</strong> {{ evento.organizador|default:"Não informado" }}</p>
+                    <!-- Link do perfil publico do organizador -->
+                    <p><strong>Organizador:</strong> <a href="{% url 'perfil_publico' evento.organizador %}" target="_blank" class="text-link">{{ evento.organizador }}</a></p>
                     {% if evento.link %}<p><a href="{{ evento.link }}" target="_blank">Link do Evento</a></p>{% endif %}
                     <p><strong>Inscritos:</strong> {{ evento.inscricaoevento_set.count|stringformat:"02d" }}
                         {% if not evento.sem_limites and evento.quantidade_participantes %}/{{ evento.quantidade_participantes|stringformat:"02d" }}{% elif not evento.sem_limites %}/--{% endif %}

@@ -20,7 +20,9 @@
     --card-shadow-hover: 0 6px 12px rgba(212, 175, 55, 0.2);
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
     width: 100%;
     background-color: rgba(26, 15, 15, 0.8) !important;
     border: 2px solid #5a0000;
@@ -47,7 +49,8 @@ input, select, textarea {
     margin-bottom: 2rem;
     font-size: 2.2rem;
     font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    filter: drop-shadow(0 0 3px darkred);
+    text-shadow: 0 0 5px darkred;
 }
 
 /* Ajustes para formulários Django */
@@ -330,7 +333,8 @@ input[type="time"].form-control {
 }
 
 /* Ajustes específicos para os campos Tipo e Modalidade */
-#id_tipo, #id_modalidade {
+#id_tipo,
+#id_modalidade {
     background: rgba(26, 15, 15, 0.8) !important;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
     background-repeat: no-repeat !important;
@@ -340,7 +344,8 @@ input[type="time"].form-control {
     color: #f8f8f8 !important;
 }
 
-#id_tipo:focus, #id_modalidade:focus {
+#id_tipo:focus,
+#id_modalidade:focus {
     border-color: #d4af37 !important;
     background: rgba(26, 15, 15, 0.9) !important;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d4af37'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") !important;
@@ -355,33 +360,33 @@ input[type="time"].form-control {
     .container.mt-4 {
         padding: 0 0.5rem;
     }
-    
+
     .container.mt-4 h1 {
         font-size: 1.8rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .row.align-items-end {
         flex-direction: column;
         gap: 0.5rem;
     }
-    
+
     .row.align-items-end .col-md-6:first-child,
     .row.align-items-end .col-md-6:last-child {
         flex: 1;
         width: 100%;
     }
-    
+
     .form-check {
         padding: 0.7rem 0.8rem;
         min-height: 55px;
     }
-    
+
     .btn-primary {
         padding: 0.9rem 1.5rem;
         font-size: 1rem;
     }
-    
+
     .row .col-md-6 {
         margin-bottom: 1rem;
     }
@@ -391,31 +396,31 @@ input[type="time"].form-control {
     .container.mt-4 h1 {
         font-size: 1.6rem;
     }
-    
+
     .form-control {
         padding: 0.7rem 0.8rem;
         font-size: 0.95rem;
     }
-    
+
     .form-label {
         font-size: 0.95rem;
     }
-    
+
     .btn-primary {
         padding: 0.8rem 1rem;
         font-size: 0.95rem;
     }
-    
+
     .form-check {
         min-height: 50px;
         padding: 0.6rem 0.8rem;
     }
-    
+
     .form-check-input {
         width: 20px !important;
         height: 20px !important;
     }
-    
+
     .form-check-label {
         white-space: normal;
         font-size: 0.9rem !important;
@@ -432,6 +437,7 @@ input[type="time"].form-control {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -466,8 +472,13 @@ input[type="time"].form-control {
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Efeito de pulso para checkbox quando marcado */
@@ -475,9 +486,11 @@ input[type="time"].form-control {
     0% {
         box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
     }
+
     70% {
         box-shadow: 0 0 0 8px rgba(212, 175, 55, 0);
     }
+
     100% {
         box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
     }
